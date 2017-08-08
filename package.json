@@ -1,0 +1,29 @@
+{
+  "name": "uiks",
+  "version": "1.0.0",
+  "description": "High-level components for compositing UIs",
+  "main": "index.js",
+  "dependencies": {
+    "font-face-rule": "1.0.0",
+    "insert-css": "2.0.0",
+    "lodash": "4.17.4",
+    "material-colors": "1.2.5",
+    "reactivedb": "github:kaesapps/reactivedb",
+    "reaks": "1.0.0",
+    "reaks-layout": "1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KAESapps/uiks.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KAESapps/uiks/issues"
+  },
+  "homepage": "https://github.com/KAESapps/uiks#readme"
+}
