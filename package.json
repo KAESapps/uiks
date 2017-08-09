@@ -8,11 +8,13 @@
     "insert-css": "2.0.0",
     "lodash": "4.17.4",
     "material-colors": "1.2.5",
-    "reactivedb": "github:kaesapps/reactivedb",
-    "reaks": "1.0.0",
-    "reaks-layout": "1.0.0"
+    "reactivedb": "github:kaesapps/reactivedb#465cf9c7e846befb4598ac879f45a15328ce5b60",
+    "reaks": "github:kaesapps/reaks#9f45788b2615e9ef9968651792e2c3fbbff18bb0",
+    "reaks-layout": "github:kaesapps/reaks-layout#e90e0753f264cab9801a6364d17c774a5e37e61a"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "update-git-packages": "github:kaesapps/update-git-packages"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
