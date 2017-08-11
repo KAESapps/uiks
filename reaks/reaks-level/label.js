@@ -1,13 +1,2 @@
-const text = require("reaks/text")
-const style = require("reaks/style")
-const seq = require("reaks/seq")
-
-module.exports = arg =>
-  seq([
-    text(arg),
-    style({
-      whiteSpace: "nowrap",
-      textOverflow: "ellipsis",
-      overflow: "hidden",
-    }),
-  ])
+module.exports = () =>
+  console.error("deprecated, use require('uiks/reaks/label').reaks instead")
