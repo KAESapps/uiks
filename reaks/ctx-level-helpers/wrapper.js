@@ -1,5 +1,6 @@
 const seq = require("reaks/seq")
 const contextualize = require("./contextualize")
+const ctxCmp = require("./component")
 const map = require("lodash/map")
 
 // Generates a wrapper with the following API:
@@ -37,6 +38,7 @@ module.exports = createMixin => {
       )
   }
 
+  ctxWrapper.mixin = ctxCmp(createMixin)
   ctxWrapper.reaksMixin = createMixin
   ctxWrapper.reaksWrapper = reaksWrapper
 
