@@ -1,4 +1,6 @@
+const isString = require("lodash/isString")
 const navigatorCore = require("../reaks/navigator")
+const label = require("../reaks/label").reaks
 const vFlex = require("reaks-layout/vFlex")
 const hFlex = require("reaks-layout/hFlex")
 const seq = require("reaks/seq")
@@ -43,6 +45,8 @@ const appBar = function({
   backgroundColor = colors.teal["500"],
   textColor = colors.white,
 }) {
+  const title = isString(page.title) ? label(page.title) : page.title
+
   return seq([
     hFlex([
       pageIndex === 0
@@ -57,7 +61,7 @@ const appBar = function({
               clickable(back),
             ]),
           ],
-      seq([page.title, style({ fontSize: "20px" }), align({ v: "center" })]),
+      seq([title, style({ fontSize: "20px" }), align({ v: "center" })]),
       [
         { weight: null },
         seq([page.action, align({ v: "center" }), margin({ r: 10 })]),

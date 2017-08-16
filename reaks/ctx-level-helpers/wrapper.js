@@ -1,8 +1,16 @@
 const seq = require("reaks/seq")
 const contextualize = require("./contextualize")
+const map = require("lodash/map")
 
-module.exports = createMixin =>
-  function(arg1, arg2) {
+// Generates a wrapper with the following API:
+// wrapper([options], wrappedComponent)
+
+// Arguments:
+// - createMixin: reaks-transform generator taking options as argument
+// the generated transform gets applied to the same DOM-node as the wrapped component
+
+module.exports = createMixin => {
+  const reaksWrapper = function(arg1, arg2) {
     let opts, cmp
 
     if (arguments.length === 1) {
@@ -12,13 +20,25 @@ module.exports = createMixin =>
       cmp = arg2
     }
 
-    return ctx => {
-      let mixin
-      if (opts !== undefined) {
-        mixin = createMixin(contextualize(opts, ctx))
-      } else {
-        mixin = createMixin()
-      }
-      return seq([mixin, cmp && cmp(ctx)])
+    let mixin
+    if (opts !== undefined) {
+      mixin = createMixin(opts)
+    } else {
+      mixin = createMixin()
     }
+    return seq([mixin, cmp])
   }
+
+  const ctxWrapper = function() {
+    return ctx =>
+      reaksWrapper.apply(
+        reaksWrapper,
+        map(arguments, arg => contextualize(arg, ctx))
+      )
+  }
+
+  ctxWrapper.reaksMixin = createMixin
+  ctxWrapper.reaksWrapper = reaksWrapper
+
+  return ctxWrapper
+}
