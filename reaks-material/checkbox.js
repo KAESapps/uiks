@@ -1,4 +1,5 @@
 const ctxCmp = require("../reaks/ctx-level-helpers/component")
+const defaults = require("lodash/defaults")
 const hFlex = require("reaks-layout/hFlex")
 const svgIcon = require("reaks/svgIcon")
 const label = require("../reaks/label").reaks
@@ -33,5 +34,14 @@ module.exports = ctxCmp(
     return clickable(() => {
       setValue(!getValue())
     }, hFlex([[{ weight: null }, swap(() => (getValue() ? checked : unchecked))], seq([margin({ l: 8 }), align({ v: "center" }, label(labelText))])]))
+  },
+  function(arg) {
+    return [
+      ctx =>
+        defaults({}, arg, {
+          uncheckedIconColor: ctx.colors.primary,
+          checkedIconColor: ctx.colors.secondary,
+        }),
+    ]
   }
 )

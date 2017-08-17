@@ -81,7 +81,16 @@ const renderer = function(ctx) {
     const pageIndex = getPageIndex()
     const page = pages[pageIndex]
     return vFlex([
-      [{ weight: null }, appBar({ page, pageIndex, back })],
+      [
+        { weight: null },
+        appBar({
+          page,
+          pageIndex,
+          back,
+          backgroundColor: ctx.colors.primary,
+          textColor: ctx.colors.textOnPrimary,
+        }),
+      ],
       page.content,
     ])
   })
