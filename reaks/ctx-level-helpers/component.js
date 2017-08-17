@@ -1,10 +1,10 @@
 const contextualize = require("./contextualize")
 const map = require("lodash/map")
 
-module.exports = createTransform => {
+module.exports = (createTransform, mapArgs) => {
   const ctxCmp = function() {
-    const args = arguments
     return ctx => {
+      const args = mapArgs ? mapArgs.apply(mapArgs, arguments) : arguments
       return createTransform.apply(
         createTransform,
         map(args, arg => contextualize(arg, ctx))

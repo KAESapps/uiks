@@ -1,4 +1,5 @@
 const isObject = require("lodash/isPlainObject")
+const isString = require("lodash/isString")
 const isNumber = require("lodash/isNumber")
 const defaults = require("lodash/defaults")
 const assign = require("lodash/assign")
@@ -10,9 +11,9 @@ const align = require("./align")
 const margin = require("./margin")
 const border = require("./border")
 const group = require("./group")
+const label = require("./label")
 
-const wrapper = require("./ctx-level-helpers/wrapper")
-const size = wrapper(require("reaks/size"))
+const size = require("uiks/reaks/size")
 
 const convertArgs = args => {
   return args.map(itemArg => {
@@ -54,7 +55,14 @@ const createCell = itemArg => {
 
 const createColumnHeader = itemArg => {
   let opts = itemArg[0]
-  return createCell([assign({}, opts, { noAlignWrapper: false }), opts.header])
+  let headerContent = opts.header
+  if (isString(opts.header)) {
+    headerContent = label(opts.header)
+  }
+  return createCell([
+    assign({}, opts, { noAlignWrapper: false }),
+    headerContent,
+  ])
 }
 
 module.exports = function(arg1, arg2) {

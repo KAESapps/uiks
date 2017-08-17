@@ -27,7 +27,7 @@ module.exports = createMixin => {
     } else {
       mixin = createMixin()
     }
-    return seq([mixin, cmp])
+    return seq([cmp, mixin])
   }
 
   const ctxWrapper = function() {
