@@ -1,11 +1,11 @@
-const label = require("../reaks/reaks-level/label")
+const label = require("../reaks/label").reaks
 const contextualize = require("../reaks/ctx-level-helpers/contextualize")
 const hFlex = require("reaks-layout/hFlex")
 const vFlex = require("reaks-layout/vFlex")
 const swap = require("reaks/swap")
 const seq = require("reaks/seq")
 const { observable } = require("reactivedb/obs")
-const clickable = require("../reaks/reaks-level/clickable")
+const clickable = require("../reaks/clickable").reaksMixin
 const style = require("reaks/style")
 const align = require("reaks-layout/align")
 const size = require("reaks/size")

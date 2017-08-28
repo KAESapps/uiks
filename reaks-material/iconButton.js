@@ -1,4 +1,4 @@
-const clickable = require("../reaks/reaks-level/clickable")
+const clickable = require("../reaks/clickable").reaksMixin
 const svgIcon = require("reaks/svgIcon")
 const seq = require("reaks/seq")
 const child = require("reaks/child")

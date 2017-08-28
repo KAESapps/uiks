@@ -36,7 +36,7 @@ const align = ({ h, v }) =>
   })
 
 const margin = require("reaks-layout/margin")
-const clickable = require("../reaks/reaks-level/clickable")
+const clickable = require("../reaks/clickable").reaksMixin
 
 const appBar = function({
   page,

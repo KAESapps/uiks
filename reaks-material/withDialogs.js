@@ -5,14 +5,14 @@ const child = require("reaks/child")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
 const text = require("reaks/text")
-const label = require("../reaks/reaks-level/label")
+const label = require("../reaks/label").reaks
 const align = require("reaks-layout/align")
 const margin = require("reaks-layout/margin")
 const innerMargin = require("reaks-layout/innerMargin")
 const vPile = require("reaks-layout/vPile")
 const hPile = require("reaks-layout/hPile")
-const observable = require("ks-data/observable")
-const materialRoot = require("./root")
+const {observable} = require("reactivedb/obs")
+const materialRoot = require("./root").reaksMixin
 const flatButton = require("./flatButton").reaks
 const colors = require("material-colors")
 
