@@ -19,7 +19,7 @@ module.exports = ctxCmp(
     uncheckedIconColor = colors.darkIcons.active,
     checkedIconColor = colors.teal[500],
     label: labelText,
-    getValue,
+    value,
     setValue,
   }) => {
     const checked = svgIcon(checkedIcon)({
@@ -32,8 +32,8 @@ module.exports = ctxCmp(
     })
 
     return clickable(() => {
-      setValue(!getValue())
-    }, hFlex([[{ weight: null }, swap(() => (getValue() ? checked : unchecked))], seq([margin({ l: 8 }), align({ v: "center" }, label(labelText))])]))
+      setValue(!value())
+    }, hFlex([[{ weight: null }, swap(() => (value() ? checked : unchecked))], seq([margin({ l: 8 }), align({ v: "center" }, label(labelText))])]))
   },
   function(arg) {
     return [
@@ -41,6 +41,8 @@ module.exports = ctxCmp(
         defaults({}, arg, {
           uncheckedIconColor: ctx.colors.primary,
           checkedIconColor: ctx.colors.secondary,
+          value: ctx => ctx.value,
+          setValue: ctx => ctx.setValue,
         }),
     ]
   }

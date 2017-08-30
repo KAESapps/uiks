@@ -9,14 +9,14 @@ const radioChecked = require("./icons/toggle/radioChecked")
 
 const radioButton = ({
   label,
-  getValue,
+  value,
   setValue,
   checkedIconColor,
   uncheckedIconColor,
 }) =>
   checkbox({
     label,
-    getValue,
+    value,
     setValue,
     checkedIcon: radioChecked,
     uncheckedIcon: radioUnchecked,
@@ -25,12 +25,12 @@ const radioButton = ({
   })
 
 module.exports = ctxCmp(
-  ({ choices, getValue, setValue, checkedIconColor, uncheckedIconColor }) => {
+  ({ choices, value, setValue, checkedIconColor, uncheckedIconColor }) => {
     return vPile(
       map(choices, (label, key) =>
         radioButton({
           label,
-          getValue: () => getValue() === key,
+          value: () => value() === key,
           setValue: () => setValue(key),
           checkedIconColor,
           uncheckedIconColor,
@@ -43,6 +43,8 @@ module.exports = ctxCmp(
       defaults({}, arg, {
         checkedIconColor: ctx => ctx.colors.secondary,
         uncheckedIconColor: ctx => ctx.colors.primary,
+        value: ctx => ctx.value,
+        setValue: ctx => ctx.setValue,
       }),
     ]
   }
