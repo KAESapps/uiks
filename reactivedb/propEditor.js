@@ -4,7 +4,7 @@ const isFunction = require('lodash/isFunction')
 module.exports = ({ entity = 'value', prop }, view) => ctx => {
   const getEntity = isFunction(entity) ? entity(ctx) : entity
   const getProp = isFunction(prop) ? prop(ctx) : prop
-  const getValue = () =>
+  const value = () =>
     ctx.model.query([
       { constant: isFunction(getEntity) ? getEntity() : getEntity },
       { valueOfProp: isFunction(getProp) ? getProp() : getProp },
@@ -18,5 +18,5 @@ module.exports = ({ entity = 'value', prop }, view) => ctx => {
       },
     })
   }
-  return view(create(ctx, { getValue, setValue }))
+  return view(create(ctx, { value, setValue }))
 }

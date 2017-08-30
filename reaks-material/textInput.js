@@ -10,7 +10,7 @@ const onEvent = require("reaks/onEvent")
 const defaults = require("lodash/defaults")
 
 module.exports = ctxCmp(
-  ({ placeholder, getValue, setValue, password = false }) =>
+  ({ placeholder='', value, setValue, password = false }) =>
     child(
       seq([
         style({
@@ -28,7 +28,7 @@ module.exports = ctxCmp(
           placeholder: placeholder,
           type: password ? "password" : null,
         }),
-        attr("value", getValue),
+        attr("value", value),
         onEvent("input", ev => {
           setValue(ev.target.value)
         }),
@@ -39,7 +39,7 @@ module.exports = ctxCmp(
   function(arg) {
     return [
       defaults({}, arg, {
-        getValue: ctx => ctx.getValue,
+        value: ctx => ctx.value,
         setValue: ctx => ctx.setValue,
       }),
     ]
