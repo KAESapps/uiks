@@ -9,7 +9,7 @@
     "lodash": "4.17.4",
     "material-colors": "1.2.5",
     "reaks": "github:kaesapps/reaks#194b14cbe9fc8a4a19f5a93f7f60d324e2049c04",
-    "reaks-layout": "github:kaesapps/reaks-layout#190dde5532723bdcb3a3e57bfa146abb78b9e8e3"
+    "reaks-layout": "github:kaesapps/reaks-layout#80665d4b2ade934727c7fb81911b1da0c7ea1a26"
   },
   "peerDependencies": {
     "reactivedb": "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"

@@ -11,9 +11,11 @@ const margin = require("reaks-layout/margin")
 const innerMargin = require("reaks-layout/innerMargin")
 const vPile = require("reaks-layout/vPile")
 const hPile = require("reaks-layout/hPile")
-const {observable} = require("reactivedb/obs")
+const zPile = require("reaks-layout/zPile")
+const { observable } = require("reactivedb/obs")
 const materialRoot = require("./root").reaksMixin
 const flatButton = require("./flatButton").reaks
+const clickable = require("../reaks/clickable").reaksMixin
 const colors = require("material-colors")
 
 const titleLabel = text =>
@@ -36,36 +38,52 @@ const bodyText = message =>
     ])
   )
 
-module.exports = view => ctx => {
-  const dialogContent = observable()
+const disableState = { enabled: false }
 
-  const closeDialog = () => dialogContent(null)
+module.exports = view => ctx => {
+  const dialogParams = observable(disableState)
+  const dialogContent = () => dialogParams().content
+  const isEnabled = () => dialogParams().enabled
+  const isModal = () => dialogParams().modal
+
+  const closeDialog = () => dialogParams(disableState)
 
   return seq([
     renderFullscreen(
       seq([
         materialRoot({ fontPath: "assets/" }),
-        align({ v: "center", h: "center" }),
         style(() => ({
-          display: dialogContent() ? "flex" : "none",
+          display: isEnabled() ? "flex" : "none",
         })),
-        style({
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        }),
-        child(
+        zPile([
           seq([
-            innerMargin({ t: 24 }),
             style({
-              minWidth: "75%",
-              maxWidth: 768,
-              backgroundColor: "white",
-              borderRadius: 3,
-              boxShadow:
-                "rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             }),
-            swap(dialogContent),
-          ])
-        ),
+            swap(() => !isModal() && clickable(closeDialog)),
+          ]),
+          seq([
+            style({
+              pointerEvents: "none",
+            }),
+            align({ v: "center", h: "center" }),
+            child(
+              seq([
+                innerMargin({ t: 24 }),
+                style({
+                  pointerEvents: "all",
+                  minWidth: "75%",
+                  maxWidth: 768,
+                  backgroundColor: "white",
+                  borderRadius: 3,
+                  boxShadow:
+                    "rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px",
+                }),
+                swap(dialogContent),
+              ])
+            ),
+          ]),
+        ]),
       ])
     ),
     view(
@@ -76,8 +94,8 @@ module.exports = view => ctx => {
               closeDialog()
               resolve()
             }
-            dialogContent(
-              vPile([
+            dialogParams({
+              content: vPile([
                 titleLabel(title),
                 bodyText(message),
                 seq([
@@ -85,8 +103,9 @@ module.exports = view => ctx => {
                   margin({ v: 8, l: 24, r: 8 }),
                   child(flatButton(dismissLabel, dismissAction)),
                 ]),
-              ])
-            )
+              ]),
+              enabled: true,
+            })
           }),
         confirm: ({
           title,
@@ -99,8 +118,8 @@ module.exports = view => ctx => {
               closeDialog()
               resolve(result)
             }
-            dialogContent(
-              vPile([
+            dialogParams({
+              content: vPile([
                 titleLabel(title),
                 bodyText(message),
                 seq([
@@ -114,12 +133,14 @@ module.exports = view => ctx => {
                     flatButton(confirmLabel, closeAction(true)),
                   ]),
                 ]),
-              ])
-            )
+              ]),
+              modal: true,
+              enabled: true,
+            })
           }),
-        dialog: ({ title, content, actions = [] }) => {
-          dialogContent(
-            vPile([
+        dialog: ({ title, content, actions = [], modal = false }) => {
+          dialogParams({
+            content: vPile([
               titleLabel(title),
               contentArea(content),
               seq([
@@ -127,8 +148,10 @@ module.exports = view => ctx => {
                 margin({ v: 8, l: 24, r: 8 }),
                 hPile(actions),
               ]),
-            ])
-          )
+            ]),
+            modal,
+            enabled: true,
+          })
         },
         closeDialog,
       })
