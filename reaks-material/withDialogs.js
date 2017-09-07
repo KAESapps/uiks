@@ -74,6 +74,8 @@ module.exports = view => ctx => {
                   pointerEvents: "all",
                   minWidth: "75%",
                   maxWidth: 768,
+                  maxHeight: "100%",
+                  boxSizing: "border-box",
                   backgroundColor: "white",
                   borderRadius: 3,
                   boxShadow:
@@ -142,7 +144,7 @@ module.exports = view => ctx => {
           dialogParams({
             content: vPile([
               titleLabel(title),
-              contentArea(content),
+              [{ weight: 1 }, contentArea(content)],
               seq([
                 align({ h: "right" }),
                 margin({ v: 8, l: 24, r: 8 }),

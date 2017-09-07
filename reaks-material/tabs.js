@@ -1,5 +1,4 @@
 const label = require("../reaks/label").reaks
-const contextualize = require("../reaks/ctx-level-helpers/contextualize")
 const hFlex = require("reaks-layout/hFlex")
 const vFlex = require("reaks-layout/vFlex")
 const swap = require("reaks/swap")
@@ -10,16 +9,17 @@ const style = require("reaks/style")
 const align = require("reaks-layout/align")
 const size = require("reaks/size")
 const colors = require("material-colors")
+const orderedArgs = require("../reaks/ctx-level-helpers/orderedArgs")
 
-const rksTabs = args => {
+const rksTabs = tabArgs => {
   const getActiveTab = observable(0, "activeTab")
   return vFlex([
     [
       { weight: null },
       hFlex(
-        args.map((tab, i) =>
+        tabArgs.map((tabArg, i) =>
           seq([
-            label(tab[0]),
+            label(tabArg[0]),
             clickable(() => getActiveTab(i)),
             size({ h: 48 }),
             align({ h: "center", v: "center" }),
@@ -36,14 +36,8 @@ const rksTabs = args => {
         )
       ),
     ],
-    swap(() => args[getActiveTab()][1]),
+    swap(() => tabArgs[getActiveTab()][1]),
   ])
 }
 
-const orderedLayoutArgs = layout => args => ctx => {
-  return layout(
-    args.map(arg => arg.map(argPart => contextualize(argPart, ctx)))
-  )
-}
-
-module.exports = orderedLayoutArgs(rksTabs)
+module.exports = orderedArgs(rksTabs)

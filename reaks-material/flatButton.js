@@ -1,4 +1,4 @@
-const isString = require("lodash/isString")
+const isPlainObject = require("lodash/isPlainObject")
 const defaults = require("lodash/defaults")
 const label = require("../reaks/label").reaks
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
@@ -12,7 +12,7 @@ const colors = require("material-colors")
 
 module.exports = ctxComponent(
   (arg, action) => {
-    if (isString(arg)) {
+    if (!isPlainObject(arg)) {
       arg = { label: arg }
     }
     const { label: text, color = colors.black } = arg
@@ -32,7 +32,7 @@ module.exports = ctxComponent(
     ])
   },
   function(arg, action) {
-    if (isString(arg)) {
+    if (!isPlainObject(arg)) {
       arg = { label: arg }
     }
     const { primary = true } = arg
