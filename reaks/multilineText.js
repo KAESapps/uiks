@@ -2,7 +2,7 @@ const isFunction = require("lodash/isFunction")
 const component = require("./ctx-level-helpers/component")
 const text = require("reaks/text")
 const swap = require("reaks/swap")
-const vPile = require("reaks-layout/vPile")
+const vPile = require("../reaks-layout/vPile")
 
 const staticMultilineText = multilineTextValue =>
   multilineTextValue &&

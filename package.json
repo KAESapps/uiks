@@ -8,8 +8,7 @@
     "insert-css": "2.0.0",
     "lodash": "4.17.4",
     "material-colors": "1.2.5",
-    "reaks": "github:kaesapps/reaks#8a51f06b7ae1f7a1c0e4a3c45d9db86be8da9601",
-    "reaks-layout": "github:kaesapps/reaks-layout#80665d4b2ade934727c7fb81911b1da0c7ea1a26"
+    "reaks": "github:kaesapps/reaks#8a51f06b7ae1f7a1c0e4a3c45d9db86be8da9601"
   },
   "peerDependencies": {
     "reactivedb": "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"

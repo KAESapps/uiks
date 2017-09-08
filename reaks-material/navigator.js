@@ -1,8 +1,8 @@
 const isString = require("lodash/isString")
 const navigatorCore = require("../reaks/navigator")
 const label = require("../reaks/label").reaks
-const vFlex = require("reaks-layout/vFlex")
-const hFlex = require("reaks-layout/hFlex")
+const vFlex = require("../reaks-layout/vFlex")
+const hFlex = require("../reaks-layout/hFlex")
 const seq = require("reaks/seq")
 const swap = require("reaks/swap")
 
@@ -35,7 +35,7 @@ const align = ({ h, v }) =>
     justifyContent: h,
   })
 
-const margin = require("reaks-layout/margin")
+const margin = require("../reaks-layout/margin")
 const clickable = require("../reaks/clickable").reaksMixin
 
 const appBar = function({

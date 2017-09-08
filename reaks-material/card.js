@@ -1,7 +1,7 @@
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
-const innerMargin = require("reaks-layout/innerMargin")
+const innerMargin = require("../reaks-layout/innerMargin")
 const colors = require("material-colors")
 
 module.exports = ctxComponent(content => {

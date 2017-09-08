@@ -4,7 +4,7 @@ const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
 const clickable = require("../reaks/clickable").reaksMixin
 const style = require("reaks/style")
-const align = require("reaks-layout/align")
+const align = require("../reaks-layout/align")
 const size = require("reaks/size")
 const colors = require("material-colors")
 

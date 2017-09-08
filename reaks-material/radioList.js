@@ -1,5 +1,5 @@
 const ctxCmp = require("../reaks/ctx-level-helpers/component")
-const vPile = require("reaks-layout/vPile")
+const vPile = require("../reaks-layout/vPile")
 const checkbox = require("./checkbox").reaks
 const map = require("lodash/map")
 const defaults = require("lodash/defaults")

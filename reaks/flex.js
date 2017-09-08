@@ -1,4 +1,4 @@
-const flex = require("reaks-layout/flex")
+const flex = require("../reaks-layout/flex")
 
 module.exports = flexConfig => {
   const reaksFlex = flex(flexConfig)

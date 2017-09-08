@@ -4,7 +4,7 @@ const svgIcon = require("reaks/svgIcon")
 const seq = require("reaks/seq")
 const child = require("reaks/child")
 const size = require("reaks/size")
-const align = require("reaks-layout/align")
+const align = require("../reaks-layout/align")
 const component = require("../reaks/ctx-level-helpers/component")
 
 module.exports = component(
