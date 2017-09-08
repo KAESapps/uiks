@@ -1,7 +1,5 @@
-const contextualize = require("./contextualize")
+const contextualizeOrderedArgs = require("./contextualizeOrderedArgs")
 
 module.exports = transform => args => ctx => {
-  return transform(
-    args.map(arg => arg.map(argPart => contextualize(argPart, ctx)))
-  )
+  return transform(contextualizeOrderedArgs(args, ctx))
 }

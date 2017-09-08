@@ -38,7 +38,8 @@ module.exports = ctxComponent(
     const { primary = true } = arg
     return [
       defaults({}, arg, {
-        color: ctx => (primary ? ctx.colors.secondary : colors.grey[600]),
+        color: ctx =>
+          primary ? ctx.colors.secondary : ctx.colors.fadedDarkText,
       }),
       action,
     ]
