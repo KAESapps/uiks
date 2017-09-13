@@ -37,7 +37,7 @@ const asFlexParent = ({ orientation, wrap, align }) =>
     })
   )
 
-const asFlexChild = ({ weight, orientation, wrap, align }) => {
+const asFlexChild = ({ weight, wrap, align }) => {
   const styleObj = weight
     ? assign(
         { flex: weight },
@@ -65,6 +65,8 @@ module.exports = ({ orientation = "row", defaultChildOpts, wrap = false }) =>
     const { align: defaultAlign } = opts
 
     const flexChildren = argsNormalized.map(([childOpts, childMixin]) => {
+      if (childOpts == "flex") childOpts = { weight: 1 }
+      if (childOpts == "fixed") childOpts = { weight: null }
       const { child: createChild = createDiv, weight, align } = assign(
         {},
         defaultChildOpts,

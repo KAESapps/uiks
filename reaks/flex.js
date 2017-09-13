@@ -2,7 +2,7 @@ const flex = require("../reaks-layout/flex")
 
 module.exports = flexConfig => {
   const reaksFlex = flex(flexConfig)
-  return function(arg1, arg2) {
+  const ctxCmp = function(arg1, arg2) {
     let opts, args
 
     if (arguments.length === 1) {
@@ -21,4 +21,8 @@ module.exports = flexConfig => {
       return reaksFlex(opts, argsWithCtx)
     }
   }
+
+  ctxCmp.reaks = reaksFlex
+
+  return ctxCmp
 }
