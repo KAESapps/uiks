@@ -1,16 +1,17 @@
 const contextualize = require("./contextualize")
 const contextualizeOrderedArgs = require("./contextualizeOrderedArgs")
 
-module.exports = transform =>
-  function(opts, args) {
+module.exports = (transform, { itemArg, itemArgMap }) =>
+  function() {
+    const args = itemArg ? itemArg.apply(itemArg, arguments) : arguments
     return ctx => {
-      if (arguments.length === 1) {
-        return transform(contextualizeOrderedArgs(opts, ctx))
+      if (args.length === 1) {
+        return transform(contextualizeOrderedArgs(args[0], ctx, { itemArgMap }))
       }
-      if (arguments.length === 2) {
+      if (args.length === 2) {
         return transform(
-          contextualize(opts, ctx),
-          contextualizeOrderedArgs(args, ctx)
+          contextualize(args[0], ctx),
+          contextualizeOrderedArgs(args[1], ctx, { itemArgMap })
         )
       }
     }

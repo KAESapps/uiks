@@ -11,8 +11,8 @@ const colors = require("material-colors")
 module.exports = ctxComponent(
   (text, action, opts) => {
     const { textColor, backgroundColor } = defaults({}, opts, {
-      textColor: colors.white,
-      backgroundColor: colors.pink["a200"],
+      textColor: colors.black,
+      backgroundColor: colors.grey[300],
     })
     return seq([
       clickable(action),
