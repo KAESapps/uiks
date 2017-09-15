@@ -1,5 +1,12 @@
 const contextualize = require("./contextualize")
-const identity = require("lodash/identity")
+const isArray = require("lodash/isArray")
 
-module.exports = (args, ctx, { itemArgMap = identity }) =>
-  args.map(arg => itemArgMap(arg).map(argPart => contextualize(argPart, ctx)))
+module.exports = (args, ctx, opts = {}) => {
+  const { itemArgMap } = opts
+  return args.map(arg => {
+    const itemArgMapped = itemArgMap ? itemArgMap(arg) : arg
+    return isArray(itemArgMapped)
+      ? itemArgMapped.map(argPart => contextualize(argPart, ctx))
+      : contextualize(itemArgMapped, ctx)
+  })
+}

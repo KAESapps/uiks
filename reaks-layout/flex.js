@@ -4,6 +4,7 @@
 const createDiv = require("reaks/child")
 const seq = require("reaks/seq")
 const concat = require("lodash/concat")
+const isFunction = require("lodash/isFunction")
 const assign = require("lodash/assign")
 const style = require("reaks/style")
 
@@ -37,15 +38,22 @@ const asFlexParent = ({ orientation, wrap, align }) =>
     })
   )
 
-const asFlexChild = ({ weight, wrap, align }) => {
-  const styleObj = weight
+const staticFlexChildStyle = ({ weight, wrap, align }) => {
+  return weight
     ? assign(
         { flex: weight },
         wrap ? { overflow: null } : { overflow: "hidden" },
         { alignSelf: flexAlign(align) }
       )
     : { display: "flex", flexShrink: 0 }
-  return style(styleObj)
+}
+const flexChildStyle = arg => {
+  const { weight } = arg
+  if (isFunction(weight)) {
+    return () => staticFlexChildStyle(assign({}, arg, { weight: weight() }))
+  } else {
+    return staticFlexChildStyle(arg)
+  }
 }
 
 module.exports = ({ orientation = "row", defaultChildOpts, wrap = false }) =>
@@ -73,7 +81,10 @@ module.exports = ({ orientation = "row", defaultChildOpts, wrap = false }) =>
         childOpts
       )
       return createChild(
-        seq([asFlexChild({ orientation, wrap, weight, align }), childMixin])
+        seq([
+          style(flexChildStyle({ orientation, wrap, weight, align })),
+          childMixin,
+        ])
       )
     })
     return seq(

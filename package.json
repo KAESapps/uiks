@@ -4,11 +4,12 @@
   "description": "High-level components for compositing UIs",
   "main": "index.js",
   "dependencies": {
+    "element-resize-detector": "1.1.12",
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
     "lodash": "4.17.4",
     "material-colors": "1.2.5",
-    "reaks": "github:kaesapps/reaks#735b1583963c31ae995f6e1f859c00ecb6197578"
+    "reaks": "github:kaesapps/reaks#9f93a43344816a09b366a4d9004cb37b510ed9b9"
   },
   "peerDependencies": {
     "reactivedb": "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"

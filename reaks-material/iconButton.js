@@ -1,4 +1,5 @@
 const defaults = require("lodash/defaults")
+const isFunction = require("lodash/isFunction")
 const clickable = require("../reaks/clickable").reaksMixin
 const svgIcon = require("reaks/svgIcon")
 const seq = require("reaks/seq")
@@ -20,7 +21,7 @@ module.exports = component(
   function(iconArg, action) {
     return [
       ctx =>
-        defaults({}, iconArg, {
+        defaults({}, isFunction(iconArg) ? iconArg(ctx) : iconArg, {
           color: ctx.colors.textOnPrimary,
         }),
       action,

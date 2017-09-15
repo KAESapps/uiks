@@ -1,4 +1,6 @@
 const flex = require("../reaks-layout/flex")
+const contextualize = require("./ctx-level-helpers/contextualize")
+const contextualizeOrderedArgs = require("./ctx-level-helpers/contextualizeOrderedArgs")
 
 module.exports = flexConfig => {
   const reaksFlex = flex(flexConfig)
@@ -13,13 +15,8 @@ module.exports = flexConfig => {
       args = arg2
     }
 
-    return ctx => {
-      const argsWithCtx = args.map(
-        c => (Array.isArray(c) ? [c[0], c[1](ctx)] : c && c(ctx))
-      )
-
-      return reaksFlex(opts, argsWithCtx)
-    }
+    return ctx =>
+      reaksFlex(contextualize(opts, ctx), contextualizeOrderedArgs(args, ctx))
   }
 
   ctxCmp.reaks = reaksFlex
