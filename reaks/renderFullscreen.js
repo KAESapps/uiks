@@ -1,3 +1,3 @@
 const renderFullscreen = require("../reaks-layout/renderFullscreen")
 
-module.exports = (ctx, cmp) => renderFullscreen(cmp(ctx))
+module.exports = cmp => ctx => renderFullscreen(cmp(ctx))()
