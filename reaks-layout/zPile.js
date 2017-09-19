@@ -2,9 +2,16 @@ const child = require("reaks/child")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
 
-module.exports = function(layers) {
+module.exports = function(opts, layers) {
+  if (arguments.length === 1) {
+    layers = opts
+    opts = {}
+  }
+
+  const { setPositionRelative = true } = opts
+
   return seq([
-    style({ position: "relative" }),
+    setPositionRelative && style({ position: "relative" }),
     seq(
       layers.map((layer, i) =>
         child(

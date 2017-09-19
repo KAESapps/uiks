@@ -55,7 +55,7 @@ module.exports = view => ctx => {
         style(() => ({
           display: isEnabled() ? "flex" : "none",
         })),
-        zPile([
+        zPile({ setPositionRelative: false }, [
           seq([
             style({
               backgroundColor: "rgba(0, 0, 0, 0.5)",
