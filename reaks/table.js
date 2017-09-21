@@ -42,7 +42,7 @@ const createCell = itemArg => {
   let [opts, cellContent] = itemArg
   let cell = cellContent
   if (!opts.noAlignWrapper) {
-    cell = align({ h: opts.hAlign, v: "center" }, cell)
+    cell = cell && align({ h: opts.hAlign, v: "center" }, cell)
   }
   if (opts.margin) {
     cell = margin(opts.margin, cell)

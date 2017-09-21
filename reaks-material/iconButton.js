@@ -1,5 +1,6 @@
-const clickable = require("../reaks/clickable")
-const icon = require("./icon")
+const clickable = require("../reaks/clickable").reaksWrapper
+const icon = require("./icon").reaks
+const ctxCmp = require('../reaks/ctx-level-helpers/component')
 
-module.exports = (iconArg, action) =>
-    clickable(action, icon(iconArg))
+module.exports = ctxCmp((iconArg, action) =>
+    clickable(action, icon(iconArg)))
