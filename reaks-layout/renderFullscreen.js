@@ -11,7 +11,7 @@ const layerStyle = style({
 })
 
 const renderAppFullscreenInBody = insertApp =>
-  seq([child(seq([layerStyle, insertApp]))])
+  child(seq([layerStyle, insertApp]))
 
 module.exports = insertApp => () =>
   renderAppFullscreenInBody(insertApp)(document.body)
