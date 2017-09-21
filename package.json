@@ -15,6 +15,7 @@
     "reactivedb": "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"
   },
   "devDependencies": {
+    "eslint": "4.7.1",
     "update-git-packages": "github:kaesapps/update-git-packages"
   },
   "scripts": {
@@ -29,5 +30,9 @@
   "bugs": {
     "url": "https://github.com/KAESapps/uiks/issues"
   },
-  "homepage": "https://github.com/KAESapps/uiks#readme"
+  "homepage": "https://github.com/KAESapps/uiks#readme",
+  "prettier": {
+    "trailingComma": "es5",
+    "semi": false
+  }
 }
