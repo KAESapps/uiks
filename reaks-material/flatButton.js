@@ -7,6 +7,7 @@ const clickable = require("../reaks/clickable").reaksMixin
 const style = require("reaks/style")
 const innerMargin = require("../reaks-layout/innerMargin")
 const align = require("../reaks-layout/align")
+const hoverable = require("../reaks/hoverable")
 const size = require("reaks/size")
 const colors = require("material-colors")
 
@@ -18,6 +19,9 @@ module.exports = ctxComponent(
     const { label: text, color = colors.black } = arg
 
     return seq([
+      hoverable.reaksMixin({
+        over: style({backgroundColor: '#EEE'})
+      }),
       clickable(action),
       label(text),
       align({ h: "center", v: "center" }),
