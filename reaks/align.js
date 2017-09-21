@@ -1,4 +1,4 @@
-const wrapper = require("./ctx-level-helpers/wrapper")
+const component = require("./ctx-level-helpers/component")
 const align = require("../reaks-layout/align")
 
-module.exports = wrapper(align)
+module.exports = component(align)

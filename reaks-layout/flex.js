@@ -9,7 +9,7 @@ const assign = require("lodash/assign")
 const style = require("reaks/style")
 
 const flexAlign = a => {
-  let flexAlign
+  let flexAlign = a
 
   if (a === "top") {
     flexAlign = "flex-start"
@@ -39,14 +39,17 @@ const asFlexParent = ({ orientation, wrap, align }) =>
   )
 
 const staticFlexChildStyle = ({ weight, wrap, align }) => {
-  return weight
-    ? assign(
-        { flex: weight },
-        wrap ? { overflow: null } : { overflow: "hidden" },
-        { alignSelf: flexAlign(align) }
-      )
-    : { display: "flex", flexShrink: 0 }
+  return assign(
+    weight
+      ? {
+          flex: weight,
+          overflow: wrap ? null : "hidden",
+        }
+      : { display: "flex", flexShrink: 0 },
+    { alignSelf: flexAlign(align) }
+  )
 }
+
 const flexChildStyle = arg => {
   const { weight } = arg
   if (isFunction(weight)) {

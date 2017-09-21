@@ -1,6 +1,8 @@
 const style = require("reaks/style")
+const child = require('reaks/child')
+const seq = require('reaks/seq')
 
-module.exports = ({ h, v }) => {
+const alignStyle = ({ h, v }) => {
   let alignItems = v
   if (v === "top") {
     alignItems = "flex-start"
@@ -21,4 +23,12 @@ module.exports = ({ h, v }) => {
     alignItems,
     justifyContent,
   })
+}
+
+module.exports = function (arg, cmp) {
+  if (arguments.length === 1) {
+    // return mixin
+    return alignStyle(arg)
+  }
+  return seq([alignStyle(arg), child(cmp)])
 }
