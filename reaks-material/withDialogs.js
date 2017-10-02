@@ -1,5 +1,4 @@
 const create = require("lodash/create")
-const renderFullscreen = require("../reaks-layout/renderFullscreen")
 const swap = require("reaks/swap")
 const child = require("reaks/child")
 const seq = require("reaks/seq")
@@ -13,7 +12,6 @@ const vPile = require("../reaks-layout/vPile")
 const hPile = require("../reaks-layout/hPile")
 const zPile = require("../reaks-layout/zPile")
 const { observable } = require("reactivedb/obs")
-const materialRoot = require("./root").reaksMixin
 const flatButton = require("./flatButton").reaks
 const clickable = require("../reaks/clickable").reaksMixin
 const colors = require("material-colors")
@@ -48,45 +46,7 @@ module.exports = view => ctx => {
 
   const closeDialog = () => dialogParams(disableState)
 
-  return seq([
-    renderFullscreen(
-      seq([
-        style(() => ({
-          display: isEnabled() ? "flex" : "none",
-        })),
-        zPile({ setPositionRelative: false }, [
-          seq([
-            style({
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            }),
-            swap(() => !isModal() && clickable(closeDialog)),
-          ]),
-          seq([
-            style({
-              pointerEvents: "none",
-            }),
-            align({ v: "center", h: "center" }),
-            child(
-              seq([
-                innerMargin({ t: 24 }),
-                style({
-                  pointerEvents: "all",
-                  minWidth: "75%",
-                  maxWidth: 768,
-                  maxHeight: "100%",
-                  boxSizing: "border-box",
-                  backgroundColor: "white",
-                  borderRadius: 3,
-                  boxShadow:
-                    "rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px",
-                }),
-                swap(dialogContent),
-              ])
-            ),
-          ]),
-        ]),
-      ])
-    ),
+  return zPile({ setPositionRelative: false }, [
     view(
       create(ctx, {
         alert: ({ title, message, dismissLabel = "OK" }) =>
@@ -157,5 +117,41 @@ module.exports = view => ctx => {
         closeDialog,
       })
     ),
+    seq([
+      style(() => ({
+        display: isEnabled() ? "flex" : "none",
+      })),
+      zPile({ setPositionRelative: false }, [
+        seq([
+          style({
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }),
+          swap(() => !isModal() && clickable(closeDialog)),
+        ]),
+        seq([
+          style({
+            pointerEvents: "none",
+          }),
+          align({ v: "center", h: "center" }),
+          child(
+            seq([
+              innerMargin({ t: 24 }),
+              style({
+                pointerEvents: "all",
+                minWidth: "75%",
+                maxWidth: 768,
+                maxHeight: "100%",
+                boxSizing: "border-box",
+                backgroundColor: "white",
+                borderRadius: 3,
+                boxShadow:
+                  "rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px",
+              }),
+              swap(dialogContent),
+            ])
+          ),
+        ]),
+      ]),
+    ]),
   ])
 }
