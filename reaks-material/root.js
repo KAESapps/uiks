@@ -4,23 +4,23 @@ const insertCss = require("insert-css")
 const fontFaceRule = require("font-face-rule")
 const wrapper = require("../reaks/ctx-level-helpers/wrapper")
 
-module.exports = wrapper(({ fontPath }) =>
+module.exports = wrapper(({ getFileUrl }) =>
   seq([
     // add font-face rules
     () => {
       const rules = [
         fontFaceRule("Roboto", {
-          src: [`url('${fontPath}Roboto-Regular.woff')`],
+          src: [`url('${getFileUrl("Roboto-Regular.woff")}')`],
           "font-weight": "normal",
           "font-style": "normal",
         }),
         fontFaceRule("Roboto", {
-          src: [`url('${fontPath}Roboto-Medium.woff')`],
+          src: [`url('${getFileUrl("Roboto-Medium.woff")}')`],
           "font-weight": "500",
           "font-style": "normal",
         }),
         fontFaceRule("Roboto", {
-          src: [`url('${fontPath}Roboto-Bold.woff')`],
+          src: [`url('${getFileUrl("Roboto-Bold.woff")}')`],
           "font-weight": "bold",
           "font-style": "normal",
         }),

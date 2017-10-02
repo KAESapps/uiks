@@ -51,7 +51,6 @@ module.exports = view => ctx => {
   return seq([
     renderFullscreen(
       seq([
-        materialRoot({ fontPath: "assets/" }),
         style(() => ({
           display: isEnabled() ? "flex" : "none",
         })),
