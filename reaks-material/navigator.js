@@ -9,24 +9,11 @@ const swap = require("reaks/swap")
 const style = require("reaks/style")
 const colors = require("material-colors")
 
-const childSvg = require("reaks/childSvg")
 const size = require("reaks/size")
-const attr = require("reaks/attrs")
 
-const svgIcon = ({ path, viewBox }) => t =>
-  childSvg(
-    seq([
-      style({ fill: "white" }),
-      attr({ viewBox }),
-      childSvg(seq([attr({ d: path })]), "path"),
-      t,
-    ])
-  )
+const svgIcon = require("reaks/svgIcon")
 
-const svgBackIcon = svgIcon({
-  path: "M40 22H15.66l11.17-11.17L24 8 8 24l16 16 2.83-2.83L15.66 26H40v-4z",
-  viewBox: "0 0 48 48",
-})
+const backIcon = require("./icons/navigation/arrowBack")
 
 const align = ({ h, v }) =>
   style({
@@ -44,23 +31,35 @@ const appBar = function({
   back,
   backgroundColor = colors.teal["500"],
   textColor = colors.white,
+  rootIconAction = {},
 }) {
   const title = isString(page.title) ? label(page.title) : page.title
 
+  const firstPage = pageIndex === 0
+
+  const iconOpts = {
+    size: { h: 24 },
+    color: textColor,
+  }
+  const svgBackIcon = svgIcon(backIcon, iconOpts)
+  const svgRootIcon = rootIconAction.icon
+    ? svgIcon(rootIconAction.icon, iconOpts)
+    : null
+
   return seq([
     hFlex([
-      pageIndex === 0
-        ? [{ weight: null }, size({ w: 72 })]
-        : [
-            { weight: null },
-            seq([
-              size({ w: 72 }),
-              align({ v: "center" }),
-              margin({ l: 16 }),
-              svgBackIcon(seq([size({ h: 24 })])),
-              clickable(back),
-            ]),
-          ],
+      [
+        { weight: null },
+        seq([
+          size({ w: 72 }),
+          align({ v: "center" }),
+          margin({ l: 16 }),
+          firstPage ? svgRootIcon : svgBackIcon,
+          firstPage
+            ? rootIconAction.action ? clickable(rootIconAction.action) : null
+            : clickable(back),
+        ]),
+      ],
       seq([title, style({ fontSize: "20px" }), align({ v: "center" })]),
       [
         { weight: null },
@@ -75,30 +74,35 @@ const appBar = function({
   ])
 }
 
-const renderer = function(ctx) {
-  const { pages, getPageIndex, back } = ctx
-  return swap(function() {
-    const pageIndex = getPageIndex()
-    const page = pages[pageIndex]
-    return vFlex([
-      [
-        { weight: null },
-        appBar({
-          page,
-          pageIndex,
-          back,
-          backgroundColor: ctx.colors.primary,
-          textColor: ctx.colors.textOnPrimary,
-        }),
-      ],
-      page.content,
-    ])
-  })
-}
+const renderer = rootIconAction =>
+  function(ctx) {
+    const { pages, getPageIndex, back } = ctx
+    return swap(function() {
+      const pageIndex = getPageIndex()
+      const page = pages[pageIndex]
+      return vFlex([
+        [
+          { weight: null },
+          appBar({
+            page,
+            pageIndex,
+            back,
+            backgroundColor: ctx.colors.primary,
+            textColor: ctx.colors.textOnPrimary,
+            rootIconAction: rootIconAction && {
+              icon: rootIconAction.icon,
+              action: rootIconAction.action(ctx),
+            },
+          }),
+        ],
+        page.content,
+      ])
+    })
+  }
 
-module.exports = function(firstPage) {
+module.exports = function(firstPage, rootIconAction) {
   return navigatorCore({
     firstPage,
-    renderer,
+    renderer: renderer(rootIconAction),
   })
 }

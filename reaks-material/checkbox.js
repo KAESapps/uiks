@@ -22,11 +22,11 @@ module.exports = ctxCmp(
     value,
     setValue,
   }) => {
-    const checked = svgIcon(checkedIcon)({
+    const checked = svgIcon(checkedIcon, {
       size: { h: 24 },
       color: checkedIconColor,
     })
-    const unchecked = svgIcon(uncheckedIcon)({
+    const unchecked = svgIcon(uncheckedIcon, {
       size: { h: 24 },
       color: uncheckedIconColor,
     })

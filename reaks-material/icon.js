@@ -8,12 +8,12 @@ const align = require("../reaks-layout/align")
 const component = require("../reaks/ctx-level-helpers/component")
 
 module.exports = component(
-  (iconArg) =>
+  iconArg =>
     child(
       seq([
         size({ h: 36, w: 36 }),
         align({ v: "center", h: "center" }),
-        svgIcon(iconArg.icon)({ size: { h: 24 }, color: iconArg.color }),
+        svgIcon(iconArg.icon, { size: { h: 24 }, color: iconArg.color }),
       ])
     ),
   function(iconArg) {

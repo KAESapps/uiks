@@ -1,15 +1,14 @@
-const create = require('lodash/create')
-const { observable } = require('reactivedb/obs')
-const seq = require('reaks/seq')
+const create = require("lodash/create")
+const { observable } = require("reactivedb/obs")
+const seq = require("reaks/seq")
 
 module.exports = args => ctx => {
   const { renderer, firstPage } = args
   const pages = []
-  const pageIndex = observable(0, 'navigator/pageIndex')
+  const pageIndex = observable(0, "navigator/pageIndex")
   const back = () => {
     const index = pageIndex()
     if (index === 0) {
-      navigator.app.exitApp()
       return
     }
     const page = pages[index]
@@ -32,8 +31,8 @@ module.exports = args => ctx => {
   return seq([
     renderer(create(ctx, { pages, getPageIndex: pageIndex, back })),
     () => {
-      document.addEventListener('backbutton', back)
-      return () => document.removeEventListener('backbutton', back)
+      document.addEventListener("backbutton", back)
+      return () => document.removeEventListener("backbutton", back)
     },
   ])
 }
