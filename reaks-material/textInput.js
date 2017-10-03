@@ -17,6 +17,7 @@ module.exports = ctxCmp(
           border: "none",
           outline: "none",
           font: "inherit",
+          paddingTop: 16,
         }),
         size({ h: 48, w: "100%" }),
         border({

@@ -1,6 +1,6 @@
 const create = require("lodash/create")
-const isFunction = require("lodash/isFunction")
-const constant = require("lodash/constant")
+const propQuery = require("./propQuery")
+const valueLoadingAs = require("./valueLoadingAs")
 
 module.exports = function(prop, opts, view) {
   if (arguments.length === 2) {
@@ -8,13 +8,9 @@ module.exports = function(prop, opts, view) {
     opts = { as: "value" }
   }
   const { as: ctxProp } = opts
+  const query = propQuery(prop)
   return ctx => {
-    const getEntity = isFunction(ctx.value) ? ctx.value : constant(ctx.value)
-    const getProp = isFunction(prop) ? prop(ctx) : constant(prop)
-    const getValue = () => {
-      return ctx.query([{ constant: getEntity() }, { valueOfProp: getProp() }])
-        .value
-    }
+    const getValue = valueLoadingAs(null, query)(ctx)
     return view(create(ctx, { [ctxProp]: getValue }))
   }
 }
