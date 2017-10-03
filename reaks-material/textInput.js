@@ -4,13 +4,13 @@ const size = require("reaks/size")
 const seq = require("reaks/seq")
 const ctxCmp = require("../reaks/ctx-level-helpers/component")
 const border = require("../reaks-layout/border")
-const attr = require("reaks/attr")
+const valueAttr = require("reaks/valueAttr")
 const attrs = require("reaks/attrs")
 const onEvent = require("reaks/onEvent")
 const defaults = require("lodash/defaults")
 
 module.exports = ctxCmp(
-  ({ placeholder='', value, setValue, password = false }) =>
+  ({ placeholder = "", value, setValue, password = false }) =>
     child(
       seq([
         style({
@@ -28,7 +28,7 @@ module.exports = ctxCmp(
           placeholder: placeholder,
           type: password ? "password" : null,
         }),
-        attr("value", value),
+        valueAttr(value), // specialized attr handler that prevent cursor jumping
         onEvent("input", ev => {
           setValue(ev.target.value)
         }),

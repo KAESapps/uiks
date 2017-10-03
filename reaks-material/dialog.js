@@ -13,6 +13,6 @@ const dialog = arg => ctx => () => {
   return ctx.dialog(args)
 }
 
-dialog.dialogArgs = dialogArgs
+dialog.dialogArgs = dialog.args = dialogArgs
 
 module.exports = dialog
