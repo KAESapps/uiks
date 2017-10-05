@@ -32,6 +32,7 @@ module.exports = ctxComponent(
         textTransform: "uppercase",
         fontSize: "14px",
         fontWeight: 500,
+        borderRadius: 2,
       }),
     ])
   },
