@@ -40,7 +40,7 @@ module.exports = (reaksMixin, extraParams = {}) => {
 
     return ctx =>
       seq([
-        cmp(ctx),
+        cmp && cmp(ctx),
         reaksMixin.apply(reaksMixin, mixinArgs.map(a => contextualize(a, ctx))),
       ])
   }
