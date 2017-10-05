@@ -20,7 +20,7 @@ module.exports = ctxComponent(
 
     return seq([
       hoverable.reaksMixin({
-        over: style({backgroundColor: '#EEE'})
+        over: style({ backgroundColor: "rgba(0,0,0,0.1)" }),
       }),
       clickable(action),
       label(text),

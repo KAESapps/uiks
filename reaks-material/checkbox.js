@@ -37,13 +37,12 @@ module.exports = ctxCmp(
   },
   function(arg) {
     return [
-      ctx =>
-        defaults({}, arg, {
-          uncheckedIconColor: ctx.colors.primary,
-          checkedIconColor: ctx.colors.secondary,
-          value: ctx => ctx.value,
-          setValue: ctx => ctx.setValue,
-        }),
+      defaults({}, arg, {
+        uncheckedIconColor: ctx => ctx.colors.primary,
+        checkedIconColor: ctx => ctx.colors.secondary,
+        value: ctx => ctx.value,
+        setValue: ctx => ctx.setValue,
+      }),
     ]
   }
 )
