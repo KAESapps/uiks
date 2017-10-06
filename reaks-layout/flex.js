@@ -40,7 +40,7 @@ const asFlexParent = ({ orientation, wrap, align }) =>
 
 const staticFlexChildStyle = ({ weight, wrap, align }) => {
   return assign(
-    weight
+    weight !== null
       ? {
           flex: weight,
           overflow: wrap ? null : "hidden",
