@@ -1,13 +1,20 @@
 const { observable } = require("reactivedb/obs")
 const create = require("lodash/create")
+const isString = require("lodash/isString")
 const upperFirst = require("lodash/upperFirst")
 
-module.exports = (prop, view) => ctx => {
+module.exports = (opts, view) => ctx => {
   if (!view) {
-    view = prop
-    prop = "activeItem"
+    view = opts
+    opts = "activeItem"
   }
-  const activeItem = observable(null, prop)
+  if (isString(opts)) {
+    opts = {
+      prop: opts,
+    }
+  }
+  const { prop = "activeItem", defaultValue = null } = opts
+  const activeItem = observable(defaultValue, prop)
   return view(
     create(ctx, { [prop]: activeItem, [`set${upperFirst(prop)}`]: activeItem })
   )
