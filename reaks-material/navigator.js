@@ -31,7 +31,7 @@ const appBar = function({
   back,
   backgroundColor = colors.teal["500"],
   textColor = colors.white,
-  rootIconAction = {},
+  rootAction = {},
 }) {
   const title = isString(page.title) ? label(page.title) : page.title
 
@@ -42,8 +42,8 @@ const appBar = function({
     color: textColor,
   }
   const svgBackIcon = svgIcon(backIcon, iconOpts)
-  const svgRootIcon = rootIconAction.icon
-    ? svgIcon(rootIconAction.icon, iconOpts)
+  const svgRootIcon = rootAction.icon
+    ? svgIcon(rootAction.icon, iconOpts)
     : null
 
   return seq([
@@ -56,7 +56,7 @@ const appBar = function({
           margin({ l: 16 }),
           firstPage ? svgRootIcon : svgBackIcon,
           firstPage
-            ? rootIconAction.action ? clickable(rootIconAction.action) : null
+            ? rootAction.action ? clickable(rootAction.action) : null
             : clickable(back),
         ]),
       ],
@@ -74,7 +74,7 @@ const appBar = function({
   ])
 }
 
-const renderer = rootIconAction =>
+const renderer = rootAction =>
   function(ctx) {
     const { pages, getPageIndex, back } = ctx
     return swap(function() {
@@ -89,9 +89,9 @@ const renderer = rootIconAction =>
             back,
             backgroundColor: ctx.colors.primary,
             textColor: ctx.colors.textOnPrimary,
-            rootIconAction: rootIconAction && {
-              icon: rootIconAction.icon,
-              action: rootIconAction.action(ctx),
+            rootAction: rootAction && {
+              icon: rootAction.icon,
+              action: rootAction.action(ctx),
             },
           }),
         ],
@@ -100,9 +100,9 @@ const renderer = rootIconAction =>
     })
   }
 
-module.exports = function(firstPage, rootIconAction) {
+module.exports = function(firstPage, opts) {
   return navigatorCore({
     firstPage,
-    renderer: renderer(rootIconAction),
+    renderer: renderer(opts && opts.rootAction),
   })
 }
