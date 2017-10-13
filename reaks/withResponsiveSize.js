@@ -1,3 +1,4 @@
+const isNumber = require("lodash/isNumber")
 const elementResizeDetectorMaker = require("element-resize-detector")
 const seq = require("reaks/seq")
 const create = require("lodash/create")
@@ -32,23 +33,27 @@ const observableDedupe = function(initValue, mapValue) {
   }
 }
 
-module.exports = (breakWidth, wrappedCmp) => ctx => {
-  const responsiveObs = observableDedupe(null, width => {
-    if (width === null) return
+module.exports = (mapWidth, wrappedCmp) => {
+  // if first arg is a number, it is a simple narrow/large breakpoint
+  if (isNumber(mapWidth)) {
+    const breakWidth = mapWidth
+    mapWidth = width => (width > breakWidth ? "large" : "narrow")
+  }
 
-    if (width > breakWidth) {
-      return "large"
-    } else {
-      return "narrow"
-    }
-  })
+  return ctx => {
+    const responsiveObs = observableDedupe(null, width => {
+      if (width === null) return
 
-  return seq([
-    widthDetector(responsiveObs),
-    wrappedCmp(
-      create(ctx, {
-        responsiveSize: responsiveObs,
-      })
-    ),
-  ])
+      return mapWidth(width)
+    })
+
+    return seq([
+      widthDetector(responsiveObs),
+      wrappedCmp(
+        create(ctx, {
+          responsiveSize: responsiveObs,
+        })
+      ),
+    ])
+  }
 }
