@@ -12,10 +12,11 @@
     "reaks": "github:kaesapps/reaks#b3531b30ee75e46fd6a1868f3e0d52a3db979865"
   },
   "peerDependencies": {
-    "reactivedb": "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"
+    "reactivedb":
+      "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"
   },
   "devDependencies": {
-    "eslint": "4.7.1",
+    "eslint": "4.8.0",
     "update-git-packages": "github:kaesapps/update-git-packages"
   },
   "scripts": {
