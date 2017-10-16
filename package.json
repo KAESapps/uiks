@@ -9,7 +9,7 @@
     "insert-css": "2.0.0",
     "lodash": "4.17.4",
     "material-colors": "1.2.5",
-    "reaks": "github:kaesapps/reaks#b3531b30ee75e46fd6a1868f3e0d52a3db979865"
+    "reaks": "github:kaesapps/reaks#f15e01221016b997ceecacad7b643d430a551a09"
   },
   "peerDependencies": {
     "reactivedb":
