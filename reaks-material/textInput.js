@@ -10,7 +10,13 @@ const onEvent = require("reaks/onEvent")
 const defaults = require("lodash/defaults")
 
 module.exports = ctxCmp(
-  ({ placeholder = "", value, setValue, password = false }) =>
+  ({
+    placeholder = "",
+    value,
+    setValue,
+    password = false,
+    autoFocus = false,
+  }) =>
     child(
       seq([
         style({
@@ -34,6 +40,7 @@ module.exports = ctxCmp(
         onEvent("input", ev => {
           setValue(ev.target.value)
         }),
+        autoFocus && (domNode => domNode.focus()),
       ]),
       () => document.createElement("input")
     ),
