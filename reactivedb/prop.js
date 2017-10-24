@@ -5,12 +5,12 @@ const valueLoadingAs = require("./valueLoadingAs")
 module.exports = function(prop, opts, view) {
   if (arguments.length === 2) {
     view = opts
-    opts = { as: "value" }
+    opts = {}
   }
-  const { as: ctxProp } = opts
+  const { as: ctxProp = "value", loadingValue = null } = opts
   const query = propQuery(prop)
   return ctx => {
-    const getValue = valueLoadingAs(null, query)(ctx)
+    const getValue = valueLoadingAs(loadingValue, query)(ctx)
     return view(create(ctx, { [ctxProp]: getValue }))
   }
 }
