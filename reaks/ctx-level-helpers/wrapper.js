@@ -1,3 +1,4 @@
+const map = require("lodash/map")
 const seq = require("reaks/seq")
 const contextualize = require("./contextualize")
 const ctxCmp = require("./component")
@@ -41,7 +42,10 @@ module.exports = (reaksMixin, extraParams = {}) => {
     return ctx =>
       seq([
         cmp && cmp(ctx),
-        reaksMixin.apply(reaksMixin, mixinArgs.map(a => contextualize(a, ctx))),
+        reaksMixin.apply(
+          reaksMixin,
+          map(mixinArgs, a => contextualize(a, ctx))
+        ),
       ])
   }
 
