@@ -18,7 +18,7 @@ module.exports = (prop, view) => ctx => {
   const inputValue = observable(defaultValue)
   const submit = () => {
     const newValue = inputValue()
-    ctx.patch({ [ctx.activeItem()]: { [prop]: newValue } })
+    ctx.patch({ [ctx.value]: { [prop]: newValue } })
     clearTimeout(afterSubmitTimeout)
     afterSubmitTimeout = setTimeout(() => editMode(false), displayModeDelay) // on repasse en mode display
   }
@@ -26,7 +26,7 @@ module.exports = (prop, view) => ctx => {
   const value = observable(() => {
     if (editMode()) return inputValue()
     const remoteValue = ctx.query([
-      { constant: ctx.activeItem() },
+      { constant: ctx.value },
       { valueOfProp: prop },
     ])
     return remoteValue.loaded ? remoteValue.value : defaultValue
