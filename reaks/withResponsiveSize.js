@@ -1,20 +1,11 @@
 const isNumber = require("lodash/isNumber")
-const elementResizeDetectorMaker = require("element-resize-detector")
 const seq = require("reaks/seq")
 const create = require("lodash/create")
-
-const erd = elementResizeDetectorMaker({
-  strategy: "scroll", //<- For ultra performance.
-})
-
 const { observable } = require("reactivedb/obs")
+const sizeDetector = require("./sizeDetector")
 
-const widthDetector = setWidth => node => {
-  erd.listenTo(node, function(node) {
-    setWidth(node.offsetWidth)
-  })
-  return () => erd.uninstall(node)
-}
+const widthDetector = setWidth =>
+  sizeDetector(node => setWidth(node.offsetWidth))
 
 const observableDedupe = function(initValue, mapValue) {
   let prevValue = mapValue(initValue)

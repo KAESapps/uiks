@@ -81,8 +81,15 @@ module.exports = function(arg1, arg2) {
   }
 
   args = convertArgs(args)
-  return vFlex([
-    [{ weight: null }, hFlex(args.map(createColumnHeader))],
-    scroll(list(row)),
-  ])
+
+  const header = hFlex(args.map(createColumnHeader))
+  const body = scroll(list(row))
+  const table = vFlex([[{ weight: null }, header], body])
+
+  // expose split parts
+  table.header = header
+  table.row = row
+  table.body = body
+
+  return table
 }
