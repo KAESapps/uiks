@@ -66,6 +66,7 @@ module.exports = view => ctx => {
                 ]),
               ]),
               enabled: true,
+              modal: true,
             })
           }),
         confirm: ({
