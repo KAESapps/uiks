@@ -56,7 +56,11 @@ const scrollContentLayout = ({
     ),
   ])
 
-const nbExtraItems = 10
+// nombre d'éléments pré-rendus avant et après
+const nbExtraItems = 30
+// distance de scroll en nombre d'éléments avant un re-rendu
+// TODO: on pourrait plutôt se baser sur RAF non ?
+const nbScrolledItemsBeforeRerender = 10
 
 module.exports = ({ itemHeight, item }) =>
   withSize(
@@ -67,14 +71,21 @@ module.exports = ({ itemHeight, item }) =>
         return null
       }
 
-      const startIndex = observableDedupe(0, scrollTop =>
-        Math.floor(
-          scrollTop / itemHeight - (scrollTop / itemHeight) % nbExtraItems
-        )
+      let nbItemsRendered =
+        Math.ceil(containerHeight / itemHeight) + nbExtraItems * 2
+      // nombre pair d'éléments
+      nbItemsRendered -= nbItemsRendered % 2
+
+      // start index = index du premier élément rendu
+      const startIndex = observableDedupe(
+        0,
+        scrollTop =>
+          Math.floor(
+            scrollTop / itemHeight -
+              (scrollTop / itemHeight) % nbScrolledItemsBeforeRerender
+          ) - nbExtraItems
       )
       const setScrollTop = startIndex
-      const nbItemsDisplayed =
-        Math.ceil(containerHeight / itemHeight) + nbExtraItems
 
       return style(
         { position: "relative", willChange: "transform" },
@@ -82,10 +93,7 @@ module.exports = ({ itemHeight, item }) =>
           { h: containerHeight },
           scroll(
             {
-              onScroll: () => ev => {
-                console.log(ev.target.scrollTop)
-                setScrollTop(ev.target.scrollTop)
-              },
+              onScroll: () => ev => setScrollTop(ev.target.scrollTop),
             },
             ctx =>
               scrollContentLayout({
@@ -93,14 +101,22 @@ module.exports = ({ itemHeight, item }) =>
                 floatingLayerTopPosition: () => startIndex() * itemHeight,
                 floatingContent: contextualize(
                   vPile(
-                    range(0, nbItemsDisplayed).map(index =>
-                      displayIf(
-                        ctx => () => startIndex() + index < ctx.value().length,
-                        value(
-                          ctx => () => {
-                            return ctx.value()[startIndex() + index]
+                    range(0, nbItemsRendered).map(index =>
+                      style(
+                        // les éléments de pré-rendu au-delà du dernier élément ne doivent pas prendre de place dans le DOM
+                        // pour ne pas agrandir la zone de scroll
+                        ctx => () =>
+                          startIndex() + index >= ctx.value().length && {
+                            display: "none",
                           },
-                          size({ h: itemHeight }, item)
+                        size(
+                          { h: itemHeight },
+                          value(
+                            ctx => () => {
+                              return ctx.value()[startIndex() + index]
+                            },
+                            item
+                          )
                         )
                       )
                     )
