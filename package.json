@@ -8,11 +8,11 @@
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
     "lodash": "4.17.4",
-    "material-colors": "1.2.5",
-    "reaks": "github:kaesapps/reaks#f15e01221016b997ceecacad7b643d430a551a09"
+    "material-colors": "1.2.5"
   },
   "peerDependencies": {
-    "kobs": "kaesapps/kobs#a95a4c9"
+    "kobs": "kaesapps/kobs#a95a4c9",
+    "reaks": "kaesapps/reaks#205cc29"
   },
   "devDependencies": {
     "eslint": "4.8.0",
