@@ -1,4 +1,4 @@
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 const seq = require("reaks/seq")
 const onEvent = require("reaks/onEvent")
 const swap = require("reaks/swap")

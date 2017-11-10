@@ -1,4 +1,4 @@
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 
 module.exports = ls => {
   const cache = new Map()

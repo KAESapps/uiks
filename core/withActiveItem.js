@@ -1,4 +1,4 @@
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 const create = require("lodash/create")
 const isString = require("lodash/isString")
 const upperFirst = require("lodash/upperFirst")

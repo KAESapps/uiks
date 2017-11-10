@@ -1,5 +1,5 @@
 const create = require("lodash/create")
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 
 // raccourci pour assignObservable + observableAsValue
 module.exports = (startValue, view) => ctx => {

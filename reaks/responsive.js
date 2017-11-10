@@ -7,7 +7,7 @@ const erd = elementResizeDetectorMaker({
   strategy: "scroll", //<- For ultra performance.
 })
 
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 
 const widthDetector = setWidth => node => {
   erd.listenTo(node, function(node) {

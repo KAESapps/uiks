@@ -12,8 +12,7 @@
     "reaks": "github:kaesapps/reaks#f15e01221016b997ceecacad7b643d430a551a09"
   },
   "peerDependencies": {
-    "reactivedb":
-      "github:kaesapps/reactivedb#ac326c70364c88a20dc5d259673f22de54a9de68"
+    "kobs": "kaesapps/kobs#a95a4c9"
   },
   "devDependencies": {
     "eslint": "4.8.0",

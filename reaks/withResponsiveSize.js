@@ -1,7 +1,7 @@
 const isNumber = require("lodash/isNumber")
 const seq = require("reaks/seq")
 const create = require("lodash/create")
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 const sizeDetector = require("./sizeDetector")
 
 const widthDetector = setWidth =>

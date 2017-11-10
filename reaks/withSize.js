@@ -1,5 +1,5 @@
 const create = require("lodash/create")
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 const seq = require("reaks/seq")
 const sizeDetector = require("./sizeDetector")
 

@@ -7,7 +7,7 @@
  */
 
 const create = require("lodash/create")
-const { observable, transaction } = require("reactivedb/obs")
+const { observable, transaction } = require("kobs")
 
 module.exports = (prop, view) => ctx => {
   let beforeSubmitTimeout, afterSubmitTimeout

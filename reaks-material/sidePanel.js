@@ -3,7 +3,7 @@ const ctxCmp = require("../reaks/ctx-level-helpers/component")
 const hFlex = require("../reaks/hFlex").reaks
 const size = require("../reaks/size").reaksWrapper
 const border = require("../reaks/border").reaksWrapper
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 const withResponsiveSize = require("../reaks/withResponsiveSize")
 
 module.exports = ({ panel, content, breakWidth }) =>

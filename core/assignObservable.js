@@ -1,6 +1,6 @@
 const create = require("lodash/create")
 const mapValues = require("lodash/mapValues")
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 
 module.exports = (values, view) => ctx => {
   const obsValues = mapValues(values, defaultValue =>

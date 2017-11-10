@@ -1,5 +1,5 @@
 const create = require("lodash/create")
-const { observable } = require("reactivedb/obs")
+const { observable } = require("kobs")
 
 module.exports = (makePromise, cmp) => ctx => {
   const makeCtxPromise = makePromise(ctx)
