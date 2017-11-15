@@ -39,6 +39,8 @@ const bodyText = message =>
 const disableState = { enabled: false }
 
 module.exports = view => ctx => {
+  console.warn("withDialogs is deprecated, please use withPopup")
+
   const dialogParams = observable(disableState)
   const dialogContent = () => dialogParams().content
   const isEnabled = () => dialogParams().enabled
