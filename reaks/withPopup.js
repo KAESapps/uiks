@@ -35,7 +35,7 @@ const withPopup = view => ctx => {
   const popup = (popupLayer, ctx, opts = {}) => {
     if (popupLayer === false) {
       // close popup
-      popupParams(disableState)
+      closePopup()
       return
     }
     if (!ctx) {
@@ -82,7 +82,7 @@ const withPopup = view => ctx => {
             return (
               enabled &&
               (nested ? withPopup(popupLayer) : popupLayer)(
-                create(ctx, { closePopup })
+                create(ctx, { selfPopup: popup, closePopup })
               )
             )
           }),
