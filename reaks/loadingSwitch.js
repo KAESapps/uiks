@@ -1,12 +1,11 @@
-const swap = require("./swap")
-const value = require("../core/value")
+const create = require("lodash/create")
+const swap = require("reaks/swap")
 
-module.exports = ({ loaded, loading }) => {
-  const withLoadedValueView = value(ctx => () => ctx.value().value, loaded)
-  return swap(ctx => () => {
-    const loadableValue = ctx.value()
-    if (loadableValue.loaded) {
-      return withLoadedValueView
-    } else return loading
-  })
+module.exports = ({ loaded, loading }) => ctx => {
+  return swap(
+    () =>
+      ctx.value().loaded
+        ? loaded(create(ctx, { value: ctx.value().value }))
+        : loading(ctx)
+  )
 }
