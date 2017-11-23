@@ -41,11 +41,11 @@ module.exports = (reaksMixin, extraParams = {}) => {
 
     return ctx =>
       seq([
-        cmp && cmp(ctx),
         reaksMixin.apply(
           reaksMixin,
           map(mixinArgs, a => contextualize(a, ctx))
         ),
+        cmp && cmp(ctx),
       ])
   }
 
@@ -55,7 +55,7 @@ module.exports = (reaksMixin, extraParams = {}) => {
     ctxWrapper.reaksWrapper = function() {
       const { mixinArgs, cmp } = convertArgs.apply(convertArgs, arguments)
       const mixin = reaksMixin.apply(reaksMixin, mixinArgs)
-      return seq([cmp, mixin])
+      return seq([mixin, cmp])
     }
   }
 

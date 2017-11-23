@@ -27,15 +27,19 @@ const flexAlign = a => {
   return flexAlign
 }
 
-const asFlexParent = ({ orientation, wrap, align }) =>
+const asFlexParent = ({ orientation, wrap, align, overflowAllowed }) =>
   style(
-    assign({
-      display: "flex",
-      flexDirection: orientation,
-      flexWrap: wrap ? "wrap" : null,
-      overflow: "hidden",
-      alignItems: flexAlign(align),
-    })
+    assign(
+      {
+        display: "flex",
+        flexDirection: orientation,
+        flexWrap: wrap ? "wrap" : null,
+        alignItems: flexAlign(align),
+      },
+      !overflowAllowed && {
+        overflow: "hidden",
+      }
+    )
   )
 
 const staticFlexChildStyle = ({ weight, wrap, align }) => {
@@ -59,7 +63,12 @@ const flexChildStyle = arg => {
   }
 }
 
-module.exports = ({ orientation = "row", defaultChildOpts, wrap = false }) =>
+module.exports = ({
+  orientation = "row",
+  defaultChildOpts,
+  wrap = false,
+  overflowAllowed = false,
+}) =>
   function(arg1, arg2) {
     let opts, args
 
@@ -92,7 +101,12 @@ module.exports = ({ orientation = "row", defaultChildOpts, wrap = false }) =>
     })
     return seq(
       concat(
-        asFlexParent({ orientation, wrap, align: defaultAlign }),
+        asFlexParent({
+          orientation,
+          wrap,
+          align: defaultAlign,
+          overflowAllowed,
+        }),
         flexChildren
       )
     )
