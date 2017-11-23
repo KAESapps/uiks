@@ -1,4 +1,4 @@
 const scroll = require("../reaks-layout/scroll")
-const wrapper = require("./ctx-level-helpers/wrapper")
+const component = require("./ctx-level-helpers/component")
 
-module.exports = wrapper(scroll)
+module.exports = component(scroll)
