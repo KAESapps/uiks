@@ -75,25 +75,28 @@ const dialogPopupLayer = ({ title, content, actions = [] }) =>
   )
 
 const dialog = arg => ctx => {
-  // retrocompat
-  if (ctx.dialog) {
-    return dialogLegacy(arg)(ctx)
-  }
-
   return () => {
     return ctx.popup(dialogPopupLayer(arg), ctx, arg)
   }
 }
 
-const alert = ({ title, message, dismissLabel = "OK", onClose }) => {
-  const dismissAction = ctx => () => {
-    ctx.closePopup()
-    onClose && onClose()
+const alert = ({
+  title,
+  message,
+  dismissLabel = "OK",
+  onClose: onCloseCtx,
+}) => {
+  const dismissAction = ctx => {
+    const onClose = onCloseCtx && onCloseCtx(ctx)
+    return () => {
+      ctx.closePopup()
+      onClose && onClose()
+    }
   }
   return dialog({
     title,
     content: bodyText(message),
-    actions: [flatButton(dismissLabel, dismissAction)],
+    actions: [button(dismissLabel, dismissAction)],
     modal: true,
     nested: false,
   })
@@ -104,13 +107,21 @@ const confirm = ({
   message,
   confirmLabel = "OK",
   cancelLabel = "Annuler",
-  onConfirm,
-  onCancel,
+  onClose: onCloseCtx,
+  onConfirm: onConfirmCtx,
+  onCancel: onCancelCtx,
 }) => {
-  const closeAction = res => ctx => () => {
-    const onClose = res ? onConfirm : onCancel
-    onClose && onClose()
-    ctx.closePopup()
+  const closeAction = res => ctx => {
+    const onClose = onCloseCtx && onCloseCtx(ctx)
+    const onResponse = res
+      ? onConfirmCtx && onConfirmCtx(ctx)
+      : onCancelCtx && onCancelCtx(ctx)
+
+    return () => {
+      onClose && onClose(res)
+      onResponse && onResponse()
+      ctx.closePopup()
+    }
   }
   return dialog({
     title,
