@@ -29,7 +29,7 @@ module.exports = view =>
             alert(create(args, { onClose: () => resolve }))(ctx)()
           )
         },
-        dialog: function({ title, content, actions }) {
+        dialog: function({ title, content, actions = [] }) {
           console.warn(
             "ctx.dialog() is deprecated, please use uiks/reaks-material/dialog"
           )
