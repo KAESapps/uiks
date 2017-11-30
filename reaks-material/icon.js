@@ -8,14 +8,16 @@ const align = require("../reaks-layout/align")
 const component = require("../reaks/ctx-level-helpers/component")
 
 module.exports = component(
-  iconArg =>
-    child(
+  iconArg => {
+    const { icon, size: sizeArg = { h: 24, w: 24 }, color } = iconArg
+    return child(
       seq([
-        size({ h: 36, w: 36 }),
+        size(sizeArg),
         align({ v: "center", h: "center" }),
-        svgIcon(iconArg.icon, { size: { h: 24 }, color: iconArg.color }),
+        svgIcon(icon, { size: sizeArg, color }),
       ])
-    ),
+    )
+  },
   function(iconArg) {
     return [
       ctx =>
