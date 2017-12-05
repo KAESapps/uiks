@@ -5,7 +5,7 @@ module.exports = ({ loaded, loading }) => ctx => {
   return swap(
     () =>
       ctx.value().loaded
-        ? loaded(create(ctx, { value: ctx.value().value }))
+        ? loaded(create(ctx, { value: () => ctx.value().value }))
         : loading(ctx)
   )
 }
