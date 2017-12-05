@@ -1,5 +1,7 @@
-const swap = require('reaks/swap')
-module.exports = (condition, cases) => ctx => {
-  const cond = condition(ctx)
-  return swap(() => cases[cond()](ctx))
+const switchCases = require("../reaks/switchCases")
+module.exports = function() {
+  console.warn(
+    "switchCases has moved from uiks/core/switchCases to uiks/reaks/switchCases"
+  )
+  return switchCases.apply(switchCases, arguments)
 }
