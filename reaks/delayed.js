@@ -11,7 +11,7 @@ module.exports = cmp => ctx => {
     setTimeout(() => {
       destroy()
       destroy = reaksCmp(domNode)
-    })
+    }, 10)
     return () => destroy && destroy()
   }
 }
