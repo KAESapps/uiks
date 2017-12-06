@@ -13,6 +13,13 @@ const size = require("reaks/size")
 const colors = require("material-colors")
 const ctxCmp = require("../reaks/ctx-level-helpers/component")
 const contextualizeOrderedArgs = require("../reaks/ctx-level-helpers/contextualizeOrderedArgs")
+const switcherPreload = require("../reaks/switcherPreload").reaks
+
+const basicSwitcher = (tabArgs, getActiveTab) =>
+  swap(() => tabArgs[getActiveTab()][1])
+
+const preloadedContentSwitcher = (tabArgs, getActiveTab) =>
+  switcherPreload(tabArgs.map(t => t[1]), getActiveTab)
 
 const rksTabs = function(opts, tabArgs) {
   if (arguments.length === 1) {
@@ -24,7 +31,14 @@ const rksTabs = function(opts, tabArgs) {
     }
   }
 
-  const { backgroundColor, activeTextColor, inactiveTextColor } = opts
+  const {
+    backgroundColor,
+    activeTextColor,
+    inactiveTextColor,
+    preload = false,
+  } = opts
+
+  const contentSwitcher = preload ? preloadedContentSwitcher : basicSwitcher
 
   const getActiveTab = observable(0, "activeTab")
   return vFlex([
@@ -56,7 +70,7 @@ const rksTabs = function(opts, tabArgs) {
         ),
       ]),
     ],
-    swap(() => tabArgs[getActiveTab()][1]),
+    contentSwitcher(tabArgs, getActiveTab),
   ])
 }
 
