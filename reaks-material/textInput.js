@@ -29,7 +29,7 @@ module.exports = ctxCmp(
         size({ w: "100%" }),
         border({
           b: {
-            width: 2,
+            width: 1,
           },
         }),
         attrs({
