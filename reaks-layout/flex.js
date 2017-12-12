@@ -6,6 +6,7 @@ const seq = require("reaks/seq")
 const concat = require("lodash/concat")
 const isFunction = require("lodash/isFunction")
 const assign = require("lodash/assign")
+const defaults = require("lodash/defaults")
 const style = require("reaks/style")
 
 const flexAlign = a => {
@@ -63,6 +64,12 @@ const flexChildStyle = arg => {
   }
 }
 
+const convertChildOpts = childOpts => {
+  if (childOpts == "flex") return { weight: 1 }
+  if (childOpts == "fixed") return { weight: null }
+  return childOpts
+}
+
 module.exports = ({
   orientation = "row",
   defaultChildOpts,
@@ -76,21 +83,22 @@ module.exports = ({
       args = arg1
       opts = {}
     } else {
-      opts = arg1
+      opts = convertChildOpts(arg1)
       args = arg2
     }
 
     const argsNormalized = args.map(c => (Array.isArray(c) ? c : [{}, c]))
 
-    const { align: defaultAlign } = opts
+    const { align: defaultAlign, weight: defaultWeight } = opts
 
     const flexChildren = argsNormalized.map(([childOpts, childMixin]) => {
-      if (childOpts == "flex") childOpts = { weight: 1 }
-      if (childOpts == "fixed") childOpts = { weight: null }
-      const { child: createChild = createDiv, weight, align } = assign(
+      childOpts = convertChildOpts(childOpts)
+
+      const { child: createChild = createDiv, weight, align } = defaults(
         {},
-        defaultChildOpts,
-        childOpts
+        childOpts,
+        { weight: defaultWeight },
+        defaultChildOpts
       )
       return createChild(
         seq([
