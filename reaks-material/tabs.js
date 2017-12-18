@@ -1,12 +1,12 @@
 const defaults = require("lodash/defaults")
+const create = require("lodash/create")
 const isFunction = require("lodash/isFunction")
-const assignCtx = require("uiks/core/assign")
 const label = require("../reaks/label").reaks
 const hFlex = require("../reaks-layout/hFlex")
 const vFlex = require("../reaks-layout/vFlex")
 const swap = require("reaks/swap")
 const seq = require("reaks/seq")
-const { observable } = require("kobs")
+const { observable, observe } = require("kobs")
 const clickable = require("../reaks/clickable").reaksMixin
 const style = require("reaks/style")
 const align = require("../reaks-layout/align")
@@ -22,7 +22,7 @@ const basicSwitcher = (tabArgs, getActiveTab) =>
 const preloadedContentSwitcher = (tabArgs, getActiveTab) =>
   switcherPreload(tabArgs.map(t => t[1]), getActiveTab)
 
-const rksTabs = function(opts, tabArgs) {
+const rksTabs = function (opts, tabArgs) {
   if (arguments.length === 1) {
     tabArgs = opts
     opts = {
@@ -75,7 +75,7 @@ const rksTabs = function(opts, tabArgs) {
   ])
 }
 
-module.exports = ctxCmp(rksTabs, function(opts, tabArgs) {
+module.exports = ctxCmp(rksTabs, function (opts, tabArgs) {
   if (arguments.length === 1) {
     tabArgs = opts
   }
@@ -100,10 +100,24 @@ module.exports = ctxCmp(rksTabs, function(opts, tabArgs) {
         tabArgs.map((tabArg, i) => {
           return [
             tabArg[0],
-            assignCtx(
-              { isActiveTab: () => () => getActiveTab() === i },
-              tabArg[1]
-            ),
+            // s'abonne à getActiveTab et maintient une version filtrée (mais détachée) de isActiveTab dans le contexte de chacun des enfants
+            ctx => {
+              let currentIsActiveTabValue = false
+              const isActiveTab = observable(currentIsActiveTabValue, 'isActiveTab-' + i)
+              const cancel = observe(() => getActiveTab() === i, newIsActiveTabValue => {
+                if (newIsActiveTabValue !== currentIsActiveTabValue) {
+                  currentIsActiveTabValue = newIsActiveTabValue
+                  isActiveTab(currentIsActiveTabValue)
+                }
+              })()
+              const subCtx = create(ctx, {
+                isActiveTab,
+              })
+              return seq([
+                () => cancel,
+                tabArg[1](subCtx),
+              ])
+            },
           ]
         }),
         ctx
