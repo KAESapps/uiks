@@ -1,5 +1,6 @@
 const defaults = require("lodash/defaults")
 const isFunction = require("lodash/isFunction")
+const assignCtx = require("uiks/core/assign")
 const label = require("../reaks/label").reaks
 const hFlex = require("../reaks-layout/hFlex")
 const vFlex = require("../reaks-layout/vFlex")
@@ -36,11 +37,11 @@ const rksTabs = function(opts, tabArgs) {
     activeTextColor,
     inactiveTextColor,
     preload = false,
+    getActiveTab = observable(0, "activeTab"),
   } = opts
 
   const contentSwitcher = preload ? preloadedContentSwitcher : basicSwitcher
 
-  const getActiveTab = observable(0, "activeTab")
   return vFlex([
     [
       { weight: null },
@@ -78,13 +79,34 @@ module.exports = ctxCmp(rksTabs, function(opts, tabArgs) {
   if (arguments.length === 1) {
     tabArgs = opts
   }
+
+  const getActiveTab = observable(0, "activeTab")
+
   return [
     ctx =>
-      defaults({}, isFunction(opts) ? opts(ctx) : opts, {
-        backgroundColor: ctx.colors.primary,
-        activeTextColor: ctx.colors.textOnPrimary,
-        inactiveTextColor: ctx.colors.fadedTextOnPrimary,
-      }),
-    ctx => contextualizeOrderedArgs(tabArgs, ctx),
+      defaults(
+        {
+          getActiveTab,
+        },
+        isFunction(opts) ? opts(ctx) : opts,
+        {
+          backgroundColor: ctx.colors.primary,
+          activeTextColor: ctx.colors.textOnPrimary,
+          inactiveTextColor: ctx.colors.fadedTextOnPrimary,
+        }
+      ),
+    ctx =>
+      contextualizeOrderedArgs(
+        tabArgs.map((tabArg, i) => {
+          return [
+            tabArg[0],
+            assignCtx(
+              { isActiveTab: () => () => getActiveTab() === i },
+              tabArg[1]
+            ),
+          ]
+        }),
+        ctx
+      ),
   ]
 })
