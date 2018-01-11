@@ -51,7 +51,7 @@ const appBar = function({
       [
         { weight: null },
         seq([
-          size({ w: 72 }),
+          size({ w: 56 }),
           align({ v: "center" }),
           margin({ l: 16 }),
           firstPage ? svgRootIcon : svgBackIcon,
@@ -60,7 +60,11 @@ const appBar = function({
             : clickable(back),
         ]),
       ],
-      seq([title, style({ fontSize: "20px" }), align({ v: "center" })]),
+      seq([
+        title,
+        style({ fontSize: 21, fontWeight: 500 }),
+        align({ v: "center" }),
+      ]),
       [
         { weight: null },
         seq([page.action, align({ v: "center" }), margin({ r: 10 })]),

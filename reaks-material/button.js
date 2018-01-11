@@ -18,7 +18,7 @@ module.exports = ctxComponent(
       clickable(action),
       label(text),
       align({ h: "center", v: "center" }),
-      size({ h: 36 }),
+      size({ h: 40 }),
       style({
         color: textColor,
         backgroundColor,
@@ -28,7 +28,7 @@ module.exports = ctxComponent(
           "rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px",
         paddingLeft: 16,
         paddingRight: 16,
-        fontSize: "14px",
+        fontSize: 14,
         fontWeight: 500,
       }),
     ])
