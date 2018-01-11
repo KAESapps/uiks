@@ -4,6 +4,7 @@
   "description": "High-level components for compositing UIs",
   "main": "index.js",
   "dependencies": {
+    "diff": "3.4.0",
     "element-resize-detector": "1.1.12",
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
