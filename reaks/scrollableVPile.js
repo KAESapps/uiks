@@ -171,9 +171,6 @@ module.exports = ({
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
 }) => {
   return withSize(ctx => {
-    const getDefaultVisibleItem = getDefaultVisibleItemGetter(ctx)
-    const disableEnsureItemVisible = getDisableEnsureItemVisibleFn(ctx)
-
     const getItemIds = ctx.value
     const getItemTop = isFunction(itemHeight)
       ? id => {
@@ -186,27 +183,35 @@ module.exports = ({
         }
       : id => getItemIds().indexOf(id) * itemHeight
 
-    let scrollTop = 0
-    const defaultScrollTop = () => {
-      const scrollWindowTop = scrollTop
-      const itemId = getDefaultVisibleItem()
-      if (itemId == null) {
-        return scrollWindowTop
-      }
+    let getDefaultVisibleItem = getDefaultVisibleItemGetter(ctx),
+      disableEnsureItemVisible,
+      scrollTop,
+      defaultScrollTop = () => 0
+    if (getDefaultVisibleItem) {
+      disableEnsureItemVisible = getDisableEnsureItemVisibleFn(ctx)
+      scrollTop = 0
 
-      const itemTop = getItemTop(itemId)
-      const itemBottom =
-        itemTop + (isFunction(itemHeight) ? itemHeight(itemId) : itemHeight)
-      const containerHeight = ctx.size().height || 0
-      const scrollWindowBottom = scrollWindowTop + containerHeight
+      defaultScrollTop = () => {
+        const scrollWindowTop = scrollTop
+        const itemId = getDefaultVisibleItem()
+        if (itemId == null) {
+          return scrollWindowTop
+        }
 
-      if (itemTop >= scrollWindowTop && itemBottom <= scrollWindowBottom) {
-        // item already visible
-        return scrollWindowTop
-      } else if (itemTop < scrollWindowTop) {
-        return itemTop
-      } else if (itemBottom > scrollWindowTop) {
-        return itemBottom - containerHeight
+        const itemTop = getItemTop(itemId)
+        const itemBottom =
+          itemTop + (isFunction(itemHeight) ? itemHeight(itemId) : itemHeight)
+        const containerHeight = ctx.size().height || 0
+        const scrollWindowBottom = scrollWindowTop + containerHeight
+
+        if (itemTop >= scrollWindowTop && itemBottom <= scrollWindowBottom) {
+          // item already visible
+          return scrollWindowTop
+        } else if (itemTop < scrollWindowTop) {
+          return itemTop
+        } else if (itemBottom > scrollWindowTop) {
+          return itemBottom - containerHeight
+        }
       }
     }
 
@@ -302,10 +307,11 @@ module.exports = ({
           }),
         ])
       ),
-      attr("scrollTop", () => {
-        programmaticScroll = true
-        return defaultScrollTop()
-      }),
+      getDefaultVisibleItem &&
+        attr("scrollTop", () => {
+          programmaticScroll = true
+          return defaultScrollTop()
+        }),
     ])
   })
 }
