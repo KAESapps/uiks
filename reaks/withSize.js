@@ -4,14 +4,19 @@ const seq = require("reaks/seq")
 const sizeDetector = require("./sizeDetector")
 
 module.exports = cmp => ctx => {
-  const size = observable({})
+  const size = observable(null)
+  let loading = true
+  const reaksCmp = cmp(create(ctx, { size }))
   return seq([
-    sizeDetector(node =>
+    sizeDetector(node => {
       size({
         height: node.offsetHeight,
         width: node.offsetWidth,
       })
-    ),
-    cmp(create(ctx, { size })),
+      if (loading) {
+        reaksCmp(node)
+        loading = false
+      }
+    }),
   ])
 }

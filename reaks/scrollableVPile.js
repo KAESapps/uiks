@@ -1,4 +1,5 @@
 const sum = require("lodash/sum")
+const difference = require("lodash/difference")
 const create = require("lodash/create")
 const isFunction = require("lodash/isFunction")
 const range = require("lodash/range")
@@ -9,9 +10,15 @@ const attr = require("reaks/attr")
 const onEvent = require("reaks/onEvent")
 const { observable } = require("kobs")
 const withSize = require("uiks/reaks/withSize")
-const diffArrays = require("diff/lib/diff/array").diffArrays
 
 const { autorun } = require("kobs")
+
+const diffArrays = (oldArray, newArray) => {
+  return [
+    { removed: true, value: difference(oldArray, newArray) },
+    { added: true, value: difference(newArray, oldArray) },
+  ]
+}
 
 const diffRanges = (oldRange, newRange) => {
   const [oldStart, oldEnd] = oldRange
@@ -87,7 +94,6 @@ const listWindow = ({
   let currentRange = [0, 0]
 
   const addItem = id => {
-    //console.log("addItem", id)
     const domNode = document.createElement("div")
     parentNode.appendChild(domNode)
     const cmp = createItem(id)
@@ -96,7 +102,6 @@ const listWindow = ({
   }
 
   const removeItem = id => {
-    //console.log("removeItem", id)
     const unmount = cmps.get(id)
     unmount()
     cmps.delete(id)
@@ -121,20 +126,24 @@ const listWindow = ({
     currentFullIds = newFullIds
     currentIds = newIds
 
-    cancelRangeObservation && cancelRangeObservation()
-    cancelRangeObservation = autorun(() => {
-      const newRange = getRange()
+    if (!cancelRangeObservation) {
+      cancelRangeObservation = autorun(() => {
+        const newRange = getRange()
 
-      const diff = diffRanges(currentRange, newRange)
-      diff.forEach(part =>
-        range(part.value[0], part.value[1])
-          .map(idx => currentFullIds[idx])
-          .forEach(part.added ? addItem : removeItem)
-      )
+        const diff = diffRanges(currentRange, newRange)
+        diff.forEach(part =>
+          range(
+            Math.min(part.value[0], currentFullIds.length),
+            Math.min(part.value[1], currentFullIds.length)
+          )
+            .map(idx => currentFullIds[idx])
+            .forEach(part.added ? addItem : removeItem)
+        )
 
-      currentRange = newRange
-      currentIds = currentFullIds.slice(currentRange[0], currentRange[1])
-    }, "listWindowGetRange")
+        currentRange = newRange
+        currentIds = currentFullIds.slice(currentRange[0], currentRange[1])
+      }, "listWindowGetRange")
+    }
   }, "listWindowGetValue")
   return () => {
     cancelValueObservation()
@@ -162,7 +171,7 @@ const observeWithDeduping = function(
 }
 
 // pré-rendu avant et après exprimé en px (hauteurs variables)
-const overscanPx = 1000
+const overscanPx = 500
 
 module.exports = ({
   itemHeight,
@@ -215,7 +224,7 @@ module.exports = ({
       }
     }
 
-    const scrollTopObs = observable(defaultScrollTop())
+    const scrollTopObs = observable()
     const setScrollTop = scrollTopObs
 
     let programmaticScroll = false
@@ -258,9 +267,10 @@ module.exports = ({
               Math.floor(scrollTop / itemHeight) - overscanNbItems,
               0
             )
+            const maxIndex = ctx.value().length
             return [
-              startIndex,
-              Math.min(startIndex + nbItemsRendered, ctx.value().length),
+              Math.min(startIndex, maxIndex),
+              Math.min(startIndex + nbItemsRendered, maxIndex),
             ]
           },
       rangeObs,
@@ -268,6 +278,7 @@ module.exports = ({
     )
 
     return seq([
+      () => scrollTopObs(defaultScrollTop()),
       observeRange,
       style({
         position: "relative",
