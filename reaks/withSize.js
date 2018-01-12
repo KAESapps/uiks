@@ -5,7 +5,7 @@ const sizeDetector = require("./sizeDetector")
 
 module.exports = cmp => ctx => {
   const size = observable(null)
-  let loading = true
+  let destroy
   const reaksCmp = cmp(create(ctx, { size }))
   return seq([
     sizeDetector(node => {
@@ -13,10 +13,14 @@ module.exports = cmp => ctx => {
         height: node.offsetHeight,
         width: node.offsetWidth,
       })
-      if (loading) {
-        reaksCmp(node)
-        loading = false
+      if (!destroy) {
+        // create cmp when size is detected
+        destroy = reaksCmp(node)
       }
     }),
+    () => () => {
+      destroy && destroy()
+      destroy = null
+    },
   ])
 }
