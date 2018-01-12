@@ -279,7 +279,7 @@ module.exports = ({
         setScrollTop(ev.target.scrollTop)
         if (programmaticScroll) {
           programmaticScroll = false
-        } else {
+        } else if (getDefaultVisibleItem) {
           getDefaultVisibleItem() != null && disableEnsureItemVisible()
         }
       }),
