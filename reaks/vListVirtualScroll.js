@@ -2,7 +2,6 @@ const sum = require("lodash/sum")
 const difference = require("lodash/difference")
 const create = require("lodash/create")
 const isFunction = require("lodash/isFunction")
-const range = require("lodash/range")
 const seq = require("reaks/seq")
 const child = require("reaks/child")
 const style = require("reaks/style")
@@ -34,28 +33,28 @@ const diffRanges = (oldRange, newRange) => {
 
   let diff = []
   // B) ranges intersect
-  if (newStart < oldStart) {
-    diff.push({
-      added: true,
-      value: [newStart, oldStart],
-    })
-  }
   if (oldStart < newStart) {
     diff.push({
       removed: true,
       value: [oldStart, newStart],
     })
   }
-  if (oldEnd < newEnd) {
-    diff.push({
-      added: true,
-      value: [oldEnd, newEnd],
-    })
-  }
   if (newEnd < oldEnd) {
     diff.push({
       removed: true,
       value: [newEnd, oldEnd],
+    })
+  }
+  if (newStart < oldStart) {
+    diff.push({
+      added: true,
+      value: [newStart, oldStart],
+    })
+  }
+  if (oldEnd < newEnd) {
+    diff.push({
+      added: true,
+      value: [oldEnd, newEnd],
     })
   }
   return diff
@@ -93,9 +92,18 @@ const listWindow = ({
   let currentIds = []
   let currentRange = [0, 0]
 
+  let nodeRecycling = []
+  const flushRecycling = () => {
+    nodeRecycling.forEach(n => parentNode.removeChild(n))
+    nodeRecycling = []
+  }
+
   const addItem = id => {
-    const domNode = document.createElement("div")
-    parentNode.appendChild(domNode)
+    let domNode = nodeRecycling.pop()
+    if (!domNode) {
+      domNode = document.createElement("div")
+      parentNode.appendChild(domNode)
+    }
     const cmp = createItem(id)
     cmps.set(id, cmp(domNode))
     domNodes.set(id, domNode)
@@ -106,8 +114,8 @@ const listWindow = ({
     unmount()
     cmps.delete(id)
     const domNode = domNodes.get(id)
-    parentNode.removeChild(domNode)
     domNodes.delete(id)
+    nodeRecycling.push(domNode)
   }
 
   let cancelRangeObservation
@@ -122,6 +130,7 @@ const listWindow = ({
         part.value.forEach(part.added ? addItem : removeItem)
       }
     })
+    flushRecycling()
 
     currentFullIds = newFullIds
     currentIds = newIds
@@ -131,14 +140,16 @@ const listWindow = ({
         const newRange = getRange()
 
         const diff = diffRanges(currentRange, newRange)
-        diff.forEach(part =>
-          range(
-            Math.min(part.value[0], currentFullIds.length),
-            Math.min(part.value[1], currentFullIds.length)
-          )
-            .map(idx => currentFullIds[idx])
-            .forEach(part.added ? addItem : removeItem)
-        )
+        diff.forEach(part => {
+          for (
+            let idx = Math.min(part.value[0], currentFullIds.length);
+            idx < Math.min(part.value[1], currentFullIds.length);
+            idx++
+          ) {
+            ;(part.added ? addItem : removeItem)(currentFullIds[idx])
+          }
+        })
+        flushRecycling()
 
         currentRange = newRange
         currentIds = currentFullIds.slice(currentRange[0], currentRange[1])
@@ -181,6 +192,7 @@ module.exports = ({
 }) => {
   return withSize(ctx => {
     const getItemIds = ctx.value
+    itemHeight = isFunction(itemHeight) ? itemHeight(ctx) : itemHeight
     const getItemTop = isFunction(itemHeight)
       ? id => {
           const idx = getItemIds().indexOf(id)
@@ -194,11 +206,10 @@ module.exports = ({
 
     let getDefaultVisibleItem = getDefaultVisibleItemGetter(ctx),
       disableEnsureItemVisible,
-      scrollTop,
+      scrollTop = 0,
       defaultScrollTop = () => 0
     if (getDefaultVisibleItem) {
       disableEnsureItemVisible = getDisableEnsureItemVisibleFn(ctx)
-      scrollTop = 0
 
       defaultScrollTop = () => {
         const scrollWindowTop = scrollTop
@@ -225,7 +236,11 @@ module.exports = ({
     }
 
     const scrollTopObs = observable()
-    const setScrollTop = scrollTopObs
+    // TODO: debounce scroll events with RAF
+    const setScrollTop = value => {
+      scrollTop = value
+      scrollTopObs(value)
+    }
 
     let programmaticScroll = false
 
@@ -286,7 +301,6 @@ module.exports = ({
         overflow: "auto",
       }),
       onEvent("scroll", ev => {
-        scrollTop = ev.target.scrollTop
         setScrollTop(ev.target.scrollTop)
         if (programmaticScroll) {
           programmaticScroll = false
