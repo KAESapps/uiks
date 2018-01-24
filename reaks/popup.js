@@ -3,5 +3,9 @@ module.exports = (opt, cmp) => {
     cmp = opt
     opt = undefined
   }
-  return ctx => () => ctx.popup(cmp, ctx, opt)
+  return ctx => {
+    const popup = opt && opt.replace ? ctx.selfPopup : ctx.popup
+
+    return () => popup(cmp, ctx, opt)
+  }
 }

@@ -75,8 +75,9 @@ const dialogPopupLayer = ({ title, content, actions = [] }) =>
   )
 
 const dialog = arg => ctx => {
+  const popup = arg.selfPopup ? ctx.selfPopup : ctx.popup
   return () => {
-    return ctx.popup(dialogPopupLayer(arg), ctx, arg)
+    return popup(dialogPopupLayer(arg), ctx, arg)
   }
 }
 
