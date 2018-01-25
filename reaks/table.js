@@ -12,8 +12,7 @@ const margin = require("./margin")
 const border = require("./border")
 const group = require("./group")
 const label = require("./label")
-
-const size = require("uiks/reaks/size")
+const size = require("./size")
 
 const convertArgs = args => {
   return args.map(itemArg => {

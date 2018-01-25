@@ -8,7 +8,7 @@ const style = require("reaks/style")
 const attr = require("reaks/attr")
 const onEvent = require("reaks/onEvent")
 const { observable } = require("kobs")
-const withSize = require("uiks/reaks/withSize")
+const withSize = require("./withSize")
 
 const { autorun } = require("kobs")
 

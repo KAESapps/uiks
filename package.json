@@ -15,11 +15,15 @@
     "reaks": "kaesapps/reaks#205cc29"
   },
   "devDependencies": {
+    "budo": "10.0.4",
     "eslint": "4.8.0",
+    "kobs": "github:kaesapps/kobs",
+    "reaks": "github:kaesapps/reaks",
+    "smooth-move": "1.0.1",
     "update-git-packages": "github:kaesapps/update-git-packages"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test.virtualScroll": "budo tests/virtualScroll.js:index.js --live"
   },
   "repository": {
     "type": "git",
