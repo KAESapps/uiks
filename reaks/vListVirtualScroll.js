@@ -227,10 +227,10 @@ module.exports = ({
         if (itemTop >= scrollWindowTop && itemBottom <= scrollWindowBottom) {
           // item already visible
           return scrollWindowTop
-        } else if (itemTop < scrollWindowTop) {
-          return itemTop
         } else if (itemBottom > scrollWindowTop) {
           return itemBottom - containerHeight
+        } else if (itemTop < scrollWindowTop) {
+          return itemTop
         }
       }
     }
