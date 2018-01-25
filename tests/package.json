@@ -1,0 +1,21 @@
+{
+  "name": "uiks-tests",
+  "version": "0.0.0",
+  "dependencies": {
+    "budo": "10.0.4",
+    "eslint": "4.8.0",
+    "kobs": "kaesapps/kobs#a95a4c9",
+    "reaks": "kaesapps/reaks#205cc29",
+    "smooth-move": "1.0.1"
+  },
+  "scripts": {
+    "virtualScroll":
+      "NODE_PATH=node_modules budo virtualScroll.js:index.js --live"
+  },
+  "author": "",
+  "license": "ISC",
+  "prettier": {
+    "trailingComma": "es5",
+    "semi": false
+  }
+}

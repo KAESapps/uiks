@@ -99,6 +99,7 @@ const listWindow = ({
   }
 
   const addItem = id => {
+    //if (cmps.has(id)) return
     let domNode = nodeRecycling.pop()
     if (!domNode) {
       domNode = document.createElement("div")
@@ -122,8 +123,9 @@ const listWindow = ({
   const cancelValueObservation = autorun(() => {
     const newFullIds = getItemIds() || []
     const newIds = newFullIds.slice(currentRange[0], currentRange[1])
-    const diff = diffArrays(currentIds, newIds)
 
+    // console.time("value change : diffArrays")
+    const diff = diffArrays(currentIds, newIds)
     // add/remove items
     diff.forEach(part => {
       if (part.added || part.removed) {
@@ -131,6 +133,7 @@ const listWindow = ({
       }
     })
     flushRecycling()
+    // console.timeEnd("value change = diffArrays")
 
     currentFullIds = newFullIds
     currentIds = newIds
@@ -139,6 +142,14 @@ const listWindow = ({
       cancelRangeObservation = autorun(() => {
         const newRange = getRange()
 
+        // console.time("range change = diffRanges")
+        // console.info(
+        //   "diffRanges",
+        //   "new = ",
+        //   newRange,
+        //   "current = ",
+        //   currentRange
+        // )
         const diff = diffRanges(currentRange, newRange)
         diff.forEach(part => {
           for (
@@ -150,6 +161,7 @@ const listWindow = ({
           }
         })
         flushRecycling()
+        // console.timeEnd("range change = diffRanges")
 
         currentRange = newRange
         currentIds = currentFullIds.slice(currentRange[0], currentRange[1])
@@ -162,23 +174,6 @@ const listWindow = ({
     cmps.forEach(unmount => unmount())
     domNodes.forEach(domNode => parentNode.removeChild(domNode))
   }
-}
-
-const observeWithDeduping = function(
-  getValue,
-  cb,
-  isEqual = (a, b) => a === b
-) {
-  let currentValue
-
-  return () =>
-    autorun(() => {
-      const newValue = getValue()
-      if (!isEqual(currentValue, newValue)) {
-        currentValue = newValue
-        setTimeout(() => cb(newValue))
-      }
-    })
 }
 
 // pré-rendu avant et après exprimé en px (hauteurs variables)
@@ -236,65 +231,59 @@ module.exports = ({
     }
 
     const scrollTopObs = observable()
-    // TODO: debounce scroll events with RAF
     const setScrollTop = value => {
+      // console.log("scroll event", Math.abs(scrollTop - value))
       scrollTop = value
       scrollTopObs(value)
     }
 
     let programmaticScroll = false
 
-    const rangeObs = observable([0, 0])
-    const observeRange = observeWithDeduping(
-      isFunction(itemHeight)
-        ? () => {
-            const containerHeight = ctx.size().height
-            const scrollTop = scrollTopObs()
-            let idx = 0
-            let heightSum = 0
-            const ids = ctx.value()
-            while (heightSum < Math.max(0, scrollTop - overscanPx)) {
-              heightSum += itemHeight(ids[idx])
-              idx++
-            }
-            const startIndex = idx
-            while (
-              heightSum < scrollTop + containerHeight + overscanPx &&
-              idx < ids.length
-            ) {
-              heightSum += itemHeight(ids[idx])
-              idx++
-            }
-            const endIndex = idx
-            return [startIndex, endIndex]
+    const getRange = isFunction(itemHeight)
+      ? () => {
+          const containerHeight = ctx.size().height
+          const scrollTop = scrollTopObs()
+          let idx = 0
+          let heightSum = 0
+          const ids = ctx.value()
+          while (heightSum < Math.max(0, scrollTop - overscanPx)) {
+            heightSum += itemHeight(ids[idx])
+            idx++
           }
-        : () => {
-            const overscanNbItems = Math.floor(overscanPx / itemHeight)
-            const containerHeight = ctx.size().height
+          const startIndex = idx
+          while (
+            heightSum < scrollTop + containerHeight + overscanPx &&
+            idx < ids.length
+          ) {
+            heightSum += itemHeight(ids[idx])
+            idx++
+          }
+          const endIndex = idx
+          return [startIndex, endIndex]
+        }
+      : () => {
+          const overscanNbItems = Math.floor(overscanPx / itemHeight)
+          const containerHeight = ctx.size().height
 
-            let nbItemsRendered = containerHeight
-              ? Math.ceil(containerHeight / itemHeight) + overscanNbItems * 2
-              : 0
+          let nbItemsRendered = containerHeight
+            ? Math.ceil(containerHeight / itemHeight) + overscanNbItems * 2
+            : 0
 
-            const scrollTop = scrollTopObs()
-            // start index = index du premier élément rendu
-            const startIndex = Math.max(
-              Math.floor(scrollTop / itemHeight) - overscanNbItems,
-              0
-            )
-            const maxIndex = ctx.value().length
-            return [
-              Math.min(startIndex, maxIndex),
-              Math.min(startIndex + nbItemsRendered, maxIndex),
-            ]
-          },
-      rangeObs,
-      (r1, r2) => r1 && r2 && r1[0] == r2[0] && r1[1] == r2[1]
-    )
+          const scrollTop = scrollTopObs()
+          // start index = index du premier élément rendu
+          const startIndex = Math.max(
+            Math.floor(scrollTop / itemHeight) - overscanNbItems,
+            0
+          )
+          const maxIndex = ctx.value().length
+          return [
+            Math.min(startIndex, maxIndex),
+            Math.min(startIndex + nbItemsRendered, maxIndex),
+          ]
+        }
 
     return seq([
       () => scrollTopObs(defaultScrollTop()),
-      observeRange,
       style({
         position: "relative",
         willChange: "transform",
@@ -325,7 +314,7 @@ module.exports = ({
           ),
           listWindow({
             getItemIds,
-            getRange: rangeObs,
+            getRange,
             createCmp: id => item(create(ctx, { value: id })),
             itemHeight,
             getItemTop,
