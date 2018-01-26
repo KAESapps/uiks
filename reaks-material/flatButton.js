@@ -25,7 +25,7 @@ module.exports = ctxComponent(
       clickable(action),
       label(text),
       align({ h: "center", v: "center" }),
-      size({ h: 36 }),
+      size({ h: 40 }),
       innerMargin({ h: 16 }),
       style({
         color,

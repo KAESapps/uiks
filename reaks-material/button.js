@@ -37,11 +37,10 @@ module.exports = ctxComponent(
     return [
       text,
       action,
-      ctx =>
-        defaults({}, opts, {
-          textColor: ctx.colors.textOnSecondary,
-          backgroundColor: ctx.colors.secondary,
-        }),
+      defaults({}, opts, {
+        textColor: ctx => ctx.colors.textOnSecondary,
+        backgroundColor: ctx => ctx.colors.secondary,
+      }),
     ]
   }
 )
