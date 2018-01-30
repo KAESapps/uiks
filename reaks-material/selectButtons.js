@@ -1,5 +1,5 @@
 const orderedArgsCmp = require("../reaks/ctx-level-helpers/orderedArgs")
-const hPile = require("../reaks/hPile").reaks
+const hFlex = require("../reaks/hFlex").reaks
 const isString = require("lodash/isString")
 const clickable = require("../reaks/clickable").reaksMixin
 const label = require("../reaks/label").reaks
@@ -52,11 +52,11 @@ module.exports = orderedArgsCmp(
         borderRadius: 2,
         backgroundColor: defaultBackgroundColor,
         boxShadow:
-          "rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px",
+          "rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.2) 0px 1px 2px",
       },
       size.reaksWrapper(
         { h: 36 },
-        hPile(
+        hFlex(
           args.map(([{ isActive, onAction }, label]) =>
             toggleButton(label, onAction, isActive, {
               activeTextColor,

@@ -11,7 +11,7 @@ module.exports = ctxComponent(content => {
       backgroundColor: colors.white,
       borderRadius: 2,
       boxShadow:
-        "rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px",
+        "rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.2) 0px 1px 2px",
     }),
     content,
   ])
