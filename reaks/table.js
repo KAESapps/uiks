@@ -8,7 +8,7 @@ const vFlex = require("./vFlex")
 const scroll = require("./scroll")
 const list = require("./list")
 const align = require("./align")
-const margin = require("./margin")
+const innerMargin = require("./innerMargin")
 const border = require("./border")
 const group = require("./group")
 const label = require("./label")
@@ -44,7 +44,7 @@ const createCell = itemArg => {
     cell = cell && align({ h: opts.hAlign, v: "center" }, cell)
   }
   if (opts.margin) {
-    cell = margin(opts.margin, cell)
+    cell = innerMargin(opts.margin, cell)
   }
   if (isNumber(opts.width)) {
     cell = [{ weight: null }, size({ w: opts.width }, cell)]
