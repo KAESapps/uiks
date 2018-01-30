@@ -13,7 +13,7 @@ module.exports = ctxCmp((iconArg, action) =>
     },
     clickable(
       action,
-      size({ h: 36, w: 36 }, align({ v: "center", h: "center" }, icon(iconArg)))
+      size({ h: 40, w: 40 }, align({ v: "center", h: "center" }, icon(iconArg)))
     )
   )
 )

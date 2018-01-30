@@ -13,7 +13,6 @@ const colors = require("material-colors")
 const withPopup = require("../reaks/withPopup")
 
 // start retrocompat
-const isFunction = require("lodash/isFunction")
 const contextualize = require("../reaks/ctx-level-helpers/contextualize")
 
 const dialogArgs = ({ title, content, actions, modal }) => ctx => ({
@@ -22,11 +21,6 @@ const dialogArgs = ({ title, content, actions, modal }) => ctx => ({
   modal,
   actions: actions.map(action => contextualize(action, ctx)),
 })
-
-const dialogLegacy = arg => ctx => () => {
-  const args = isFunction(arg) ? arg(ctx) : dialogArgs(arg)(ctx)
-  return ctx.dialog(args)
-}
 // end retrocompat
 
 const titleLabel = text =>
@@ -103,6 +97,9 @@ const alert = ({
   })
 }
 
+const cancelButton = (cancelLabel = "Annuler") =>
+  flatButton({ label: cancelLabel, primary: false }, ctx => ctx.closePopup)
+
 const confirm = ({
   title,
   message,
@@ -140,7 +137,7 @@ dialog.dialogPopupLayer = dialog.popupLayer = dialogPopupLayer
 
 dialog.alert = alert
 dialog.confirm = confirm
-
+dialog.cancelButton = cancelButton
 // retrocompat
 dialog.dialogArgs = dialog.args = dialogArgs
 
