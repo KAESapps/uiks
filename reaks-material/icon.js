@@ -20,10 +20,9 @@ module.exports = component(
   },
   function(iconArg) {
     return [
-      ctx =>
-        defaults({}, isFunction(iconArg) ? iconArg(ctx) : iconArg, {
-          color: ctx.colors.textOnPrimary,
-        }),
+      defaults({}, iconArg, {
+        color: ctx => ctx.colors.textOnPrimary,
+      }),
     ]
   }
 )

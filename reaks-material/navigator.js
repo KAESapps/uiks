@@ -15,13 +15,6 @@ const svgIcon = require("reaks/svgIcon")
 
 const backIcon = require("./icons/navigation/arrowBack")
 
-const align = ({ h, v }) =>
-  style({
-    display: "flex",
-    alignItems: v,
-    justifyContent: h,
-  })
-
 const margin = require("../reaks-layout/margin")
 const clickable = require("../reaks/clickable").reaksMixin
 
@@ -47,12 +40,13 @@ const appBar = function({
     : null
 
   return seq([
-    hFlex([
+    hFlex({ align: "center" }, [
       [
-        { weight: null },
+        {
+          weight: null,
+        },
         seq([
           size({ w: 56 }),
-          align({ v: "center" }),
           margin({ l: 16 }),
           firstPage ? svgRootIcon : svgBackIcon,
           firstPage
@@ -60,15 +54,8 @@ const appBar = function({
             : clickable(back),
         ]),
       ],
-      seq([
-        title,
-        style({ fontSize: 21, fontWeight: 500 }),
-        align({ v: "center" }),
-      ]),
-      [
-        { weight: null },
-        seq([page.action, align({ v: "center" }), margin({ r: 10 })]),
-      ],
+      seq([title, style({ fontSize: 21, fontWeight: 500 })]),
+      [{ weight: null }, seq([page.action, margin({ r: 10 })])],
     ]),
     style({
       backgroundColor,
