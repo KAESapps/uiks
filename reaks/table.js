@@ -1,7 +1,7 @@
-const isObject = require("lodash/isPlainObject")
+const isArray = require("lodash/isArray")
+const isPlainObject = require("lodash/isPlainObject")
 const isString = require("lodash/isString")
 const isNumber = require("lodash/isNumber")
-const defaults = require("lodash/defaults")
 const assign = require("lodash/assign")
 const hFlex = require("./hFlex")
 const vFlex = require("./vFlex")
@@ -14,26 +14,22 @@ const group = require("./group")
 const label = require("./label")
 const size = require("./size")
 
-const convertArgs = args => {
-  return args.map(itemArg => {
-    let opts = itemArg[0]
-    let normalizedItemArg
-    if (!isObject(opts)) {
-      // if not an object, it's the header component
-      normalizedItemArg = [
-        {
-          header: opts,
-        },
-        itemArg[1],
-      ]
+const normalizeColumnArgs = args => {
+  return args.map((columnArg, c) => {
+    let opts, cmp
+    if (!isArray(columnArg)) {
+      opts = null
+      cmp = columnArg
     } else {
-      normalizedItemArg = itemArg
+      opts = columnArg[0]
+      cmp = columnArg[1]
     }
 
-    defaults(normalizedItemArg[0], {
-      hAlign: "left",
-    })
-    return normalizedItemArg
+    if (!isPlainObject(opts)) {
+      opts = { header: opts }
+    }
+
+    return [opts, cmp]
   })
 }
 
@@ -64,7 +60,7 @@ const createColumnHeader = itemArg => {
   ])
 }
 
-module.exports = function(arg1, arg2) {
+const table = function(arg1, arg2) {
   let opts, args
   if (arguments.length === 1) {
     args = arg1
@@ -74,12 +70,12 @@ module.exports = function(arg1, arg2) {
     args = arg2
   }
 
+  args = normalizeColumnArgs(args)
+
   let row = border({ t: true }, hFlex(args.map(createCell)))
   if (opts.rowMixin) {
     row = group([row, opts.rowMixin])
   }
-
-  args = convertArgs(args)
 
   const header = hFlex(args.map(createColumnHeader))
   const body = scroll(list(row))
@@ -92,3 +88,7 @@ module.exports = function(arg1, arg2) {
 
   return table
 }
+
+table.normalizeColumnArgs = normalizeColumnArgs
+
+module.exports = table
