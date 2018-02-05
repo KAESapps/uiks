@@ -21,7 +21,7 @@ module.exports = component(
   function(iconArg) {
     return [
       defaults({}, iconArg, {
-        color: ctx => ctx.colors.textOnPrimary,
+        color: ctx => ctx.colors.iconDefault,
       }),
     ]
   }
