@@ -1,3 +1,4 @@
-const flex = require('./flex')
+const flex = require("./flex")
+const cfg = require("./flex/configs/vFlex")
 
-module.exports = flex({ orientation: 'column', defaultChildOpts: { weight: 1 } })
+module.exports = flex(cfg)

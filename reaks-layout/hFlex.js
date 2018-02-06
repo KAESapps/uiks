@@ -1,3 +1,3 @@
-const flex = require('./flex')
-
-module.exports = flex({ orientation: 'row', defaultChildOpts: { weight: 1 } })
+const flex = require("./flex")
+const cfg = require("./flex/configs/hFlex")
+module.exports = flex(cfg)

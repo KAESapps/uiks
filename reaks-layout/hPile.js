@@ -1,7 +1,3 @@
 const flex = require("./flex")
-
-module.exports = flex({
-  orientation: "row",
-  defaultChildOpts: { weight: null },
-  overflowAllowed: true,
-})
+const cfg = require("./flex/configs/hPile")
+module.exports = flex(cfg)

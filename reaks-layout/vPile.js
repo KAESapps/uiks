@@ -1,7 +1,3 @@
 const flex = require("./flex")
-
-module.exports = flex({
-  orientation: "column",
-  defaultChildOpts: { weight: null },
-  overflowAllowed: true,
-})
+const cfg = require("./flex/configs/vPile")
+module.exports = flex(cfg)

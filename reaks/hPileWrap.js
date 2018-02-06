@@ -1,7 +1,3 @@
 const flex = require("./flex")
-
-module.exports = flex({
-  orientation: "row",
-  wrap: true,
-  defaultChildOpts: { weight: null },
-})
+const cfg = require("../reaks-layout/flex/configs/hPileWrap")
+module.exports = flex(cfg)

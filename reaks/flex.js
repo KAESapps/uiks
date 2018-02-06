@@ -1,3 +1,4 @@
+const isFunction = require("lodash/isFunction")
 const flex = require("../reaks-layout/flex")
 const contextualize = require("./ctx-level-helpers/contextualize")
 const contextualizeOrderedArgs = require("./ctx-level-helpers/contextualizeOrderedArgs")
@@ -16,7 +17,10 @@ module.exports = flexConfig => {
     }
 
     return ctx =>
-      reaksFlex(contextualize(opts, ctx), contextualizeOrderedArgs(args, ctx))
+      reaksFlex(
+        contextualize(opts, ctx),
+        isFunction(args) ? args(ctx) : contextualizeOrderedArgs(args, ctx)
+      )
   }
 
   ctxCmp.reaks = reaksFlex

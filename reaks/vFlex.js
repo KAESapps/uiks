@@ -1,3 +1,3 @@
-const flex = require('./flex')
-
-module.exports = flex({ orientation: 'column', defaultChildOpts: { weight: 1 } })
+const flex = require("./flex")
+const cfg = require("../reaks-layout/flex/configs/vFlex")
+module.exports = flex(cfg)
