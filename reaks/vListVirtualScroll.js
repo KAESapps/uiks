@@ -186,7 +186,7 @@ module.exports = ({
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
 }) => {
   return withSize(ctx => {
-    const getItemIds = ctx.value
+    const getItemIds = observable(ctx.value)
     itemHeight = isFunction(itemHeight) ? itemHeight(ctx) : itemHeight
     const getItemTop = isFunction(itemHeight)
       ? id => {
@@ -245,7 +245,7 @@ module.exports = ({
           const scrollTop = scrollTopObs()
           let idx = 0
           let heightSum = 0
-          const ids = ctx.value()
+          const ids = getItemIds()
           while (heightSum < Math.max(0, scrollTop - overscanPx)) {
             heightSum += itemHeight(ids[idx])
             idx++
@@ -275,7 +275,7 @@ module.exports = ({
             Math.floor(scrollTop / itemHeight) - overscanNbItems,
             0
           )
-          const maxIndex = ctx.value().length
+          const maxIndex = getItemIds().length
           return [
             Math.min(startIndex, maxIndex),
             Math.min(startIndex + nbItemsRendered, maxIndex),
@@ -306,10 +306,10 @@ module.exports = ({
           style(
             isFunction(itemHeight)
               ? () => ({
-                  height: sum(ctx.value().map(itemHeight)),
+                  height: sum(getItemIds().map(itemHeight)),
                 })
               : () => ({
-                  height: ctx.value().length * itemHeight,
+                  height: getItemIds().length * itemHeight,
                 })
           ),
           listWindow({
