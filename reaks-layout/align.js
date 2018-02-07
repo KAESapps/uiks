@@ -1,6 +1,6 @@
 const style = require("reaks/style")
-const child = require('reaks/child')
-const seq = require('reaks/seq')
+const child = require("reaks/child")
+const seq = require("reaks/seq")
 
 const alignStyle = ({ h, v }) => {
   let alignItems = v
@@ -18,17 +18,25 @@ const alignStyle = ({ h, v }) => {
     justifyContent = "flex-end"
   }
 
-  return style({
-    display: "flex",
-    alignItems,
-    justifyContent,
-  })
+  return {
+    parent: style({
+      display: "flex",
+      alignItems,
+      justifyContent,
+    }),
+    child:
+      !justifyContent &&
+      style({
+        flex: 1,
+      }),
+  }
 }
 
-module.exports = function (arg, cmp) {
+module.exports = function(arg, cmp) {
   if (arguments.length === 1) {
     // return mixin
-    return alignStyle(arg)
+    return alignStyle(arg).parent
   }
-  return seq([alignStyle(arg), child(cmp)])
+  const { parent: parentStyle, child: childStyle } = alignStyle(arg)
+  return seq([parentStyle, child(childStyle ? seq([childStyle, cmp]) : cmp)])
 }
