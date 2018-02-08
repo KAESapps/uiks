@@ -72,12 +72,12 @@ const table = function(arg1, arg2) {
 
   args = normalizeColumnArgs(args)
 
-  let row = border({ t: true }, hFlex(args.map(createCell)))
+  let row = border({ b: true }, hFlex(args.map(createCell)))
   if (opts.rowMixin) {
     row = group([row, opts.rowMixin])
   }
 
-  const header = hFlex(args.map(createColumnHeader))
+  const header = border({ b: true }, hFlex(args.map(createColumnHeader)))
   const body = scroll(list(row))
   const table = vFlex([[{ weight: null }, header], body])
 
