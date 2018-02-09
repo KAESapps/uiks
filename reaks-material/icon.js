@@ -1,5 +1,4 @@
 const defaults = require("lodash/defaults")
-const isFunction = require("lodash/isFunction")
 const svgIcon = require("reaks/svgIcon")
 const seq = require("reaks/seq")
 const child = require("reaks/child")
