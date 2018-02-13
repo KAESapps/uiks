@@ -7,23 +7,33 @@ const hoverable = require("../reaks/hoverable").reaksWrapper
 const style = require("../reaks/style").reaksMixin
 const ctxCmp = require("../reaks/ctx-level-helpers/component")
 
-module.exports = ctxCmp((arg, action) => {
-  const { icon: iconDef, iconSize } = arg
-  let { size: btnSize } = arg
-  btnSize = defaults({}, btnSize, { h: 40, w: 40 })
-  return hoverable(
-    {
-      over: style({ backgroundColor: "rgba(0,0,0,0.1)" }),
-    },
-    clickable(
-      action,
-      size(
-        btnSize,
-        align(
-          { v: "center", h: "center" },
-          icon({ icon: iconDef, size: iconSize })
+module.exports = ctxCmp(
+  (arg, action) => {
+    const { icon: iconDef, iconSize, color } = arg
+    let { size: btnSize } = arg
+    btnSize = defaults({}, btnSize, { h: 40, w: 40 })
+    return hoverable(
+      {
+        over: style({ backgroundColor: "rgba(0,0,0,0.1)" }),
+      },
+      clickable(
+        action,
+        size(
+          btnSize,
+          align(
+            { v: "center", h: "center" },
+            icon({ icon: iconDef, size: iconSize, color })
+          )
         )
       )
     )
-  )
-})
+  },
+  function(arg, action) {
+    return [
+      defaults({}, arg, {
+        color: ctx => ctx.colors.iconDefault,
+      }),
+      action,
+    ]
+  }
+)
