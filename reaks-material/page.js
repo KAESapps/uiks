@@ -5,7 +5,10 @@ const margin = require("../reaks/margin")
 
 module.exports = function(args) {
   const action = isArray(args.action)
-    ? hPile(args.action.map(actionItem => margin({ l: 16 }, actionItem)))
+    ? hPile(
+        { align: "center" },
+        args.action.map(actionItem => margin({ l: 16 }, actionItem))
+      )
     : args.action
   return ctx => {
     return {
