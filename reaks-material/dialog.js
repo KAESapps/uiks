@@ -97,8 +97,11 @@ const alert = ({
   })
 }
 
-const cancelButton = (cancelLabel = "Annuler") =>
-  flatButton({ label: cancelLabel, primary: false }, ctx => ctx.closePopup)
+const cancelButton = (cancelLabel = "Annuler", cb) =>
+  flatButton({ label: cancelLabel, primary: false }, ctx => () => {
+    cb && cb(ctx)()
+    ctx.closePopup()
+  })
 
 const confirm = ({
   title,
