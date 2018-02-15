@@ -1,6 +1,5 @@
 const create = require("lodash/create")
 const hFlex = require("../reaks/hFlex")
-const displayIf = require("../reaks/displayIf")
 const swap = require("reaks/swap")
 const vFlex = require("../reaks/vFlex")
 const hPile = require("../reaks/hPile")
@@ -58,10 +57,10 @@ module.exports = ({ master, detail, detailActions }) => {
                       innerMargin(
                         { r: 8 },
                         iconButton(
-                          ctx => ({
+                          {
                             icon: closeIcon,
-                            color: ctx.colors.iconDefault,
-                          }),
+                            color: ctx => ctx.colors.iconDefault,
+                          },
                           ctx => () => ctx.setActiveItem(null)
                         )
                       )
