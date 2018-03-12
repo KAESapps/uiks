@@ -72,6 +72,7 @@ const listWindow = ({
       style({
         position: "absolute",
         width: "100%",
+        boxSizing: "border-box",
       }),
       style(
         isFunction(itemHeight)
@@ -199,7 +200,8 @@ module.exports = ({
         }
       : id => getItemIds().indexOf(id) * itemHeight
 
-    let getDefaultVisibleItem = getDefaultVisibleItemGetter(ctx),
+    let getDefaultVisibleItem =
+        getDefaultVisibleItemGetter && getDefaultVisibleItemGetter(ctx),
       disableEnsureItemVisible,
       scrollTop = 0,
       defaultScrollTop = () => 0
