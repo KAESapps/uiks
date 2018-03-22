@@ -9,10 +9,11 @@
 const create = require("lodash/create")
 const isFunction = require("lodash/isFunction")
 const { observable, transaction } = require("kobs")
+const getValue = ctx => ctx.value
 
 module.exports = (arg, view) => ctx => {
   const { entity, prop } =
-    typeof arg === "string" ? { entity: "value", prop: arg } : arg
+    typeof arg === "string" ? { entity: getValue, prop: arg } : arg
   const getEntity = isFunction(entity) ? entity(ctx) : entity
   const getProp = isFunction(prop) ? prop(ctx) : prop
 
