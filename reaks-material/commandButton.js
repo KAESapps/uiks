@@ -65,17 +65,14 @@ module.exports = ctxComponent(
           "success",
           align(
             { h: "center", v: "center" },
-            seq([
-              size({ h: 28, w: 28 }),
-              svgIcon(successIcon, { color: textColor }),
-            ])
+            svgIcon(successIcon, { size: { h: 28, w: 28 }, color: textColor })
           )
         ),
         visibleIf(
           "error",
           align(
             { h: "center", v: "center" },
-            seq([size({ h: 28, w: 28 }), svgIcon(errorIcon, { color: "red" })])
+            svgIcon(errorIcon, { size: { h: 28, w: 28 }, color: "red" })
           )
         ),
       ]),
