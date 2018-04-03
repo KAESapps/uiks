@@ -33,7 +33,7 @@ module.exports = (arg = defaultPartialArg) => {
     {},
     arg,
     mapValues(pick(arg, SIDES), border =>
-      defaults({}, border, localDefaultPartialArg)
+      defaults({}, border, border && localDefaultPartialArg)
     )
   )
 
