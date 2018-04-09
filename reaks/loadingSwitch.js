@@ -6,6 +6,6 @@ module.exports = ({ loaded, loading }) => ctx => {
     () =>
       ctx.value().loaded
         ? loaded(create(ctx, { value: () => ctx.value().value }))
-        : loading(ctx)
+        : loading && loading(ctx)
   )
 }
