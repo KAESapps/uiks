@@ -22,8 +22,14 @@ module.exports = args => ctx => {
     pages.pop()
     pageIndex(index - 1)
   }
-  const next = page => {
-    pages.push(page), pageIndex(pageIndex() + 1)
+  const next = (page, ctx) => {
+    let ctxPage = page(ctx)
+    // TODO: remove backward-compat one day
+    if (!ctx) {
+      console.warn("deprecated: navigator.next(): ctx should be provided")
+      ctxPage = page
+    }
+    pages.push(ctxPage), pageIndex(pageIndex() + 1)
   }
   const subCtx = create(ctx, { back, next })
   pages.push(firstPage(subCtx))
