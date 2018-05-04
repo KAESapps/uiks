@@ -1,11 +1,5 @@
 const value = require("./value")
-const isFunction = require("lodash/isFunction")
+const mapValue = require("./mapValue")
 
 module.exports = (formatter, cmp) =>
-  value(
-    ctx =>
-      isFunction(ctx.value)
-        ? () => formatter(ctx.value())
-        : formatter(ctx.value),
-    cmp
-  )
+  value(mapValue(formatter, ctx => ctx.value), cmp)
