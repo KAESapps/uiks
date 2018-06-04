@@ -8,7 +8,7 @@ module.exports = (arg, views) => ctx => {
   const ctxPromise = isFunction(arg) ? arg(ctx) : arg
   const currentView = new Obs(views["loading"](ctx)) // on démarre avec la vue de loading
   ctxPromise.then(
-    successCtx => currentView.set(views["success"](successCtx)),
+    successCtx => currentView.set(views["success"](create(ctx, successCtx))),
     error => currentView.set(views["error"](create(ctx, { error })))
   )
   return swap(currentView.get.bind(currentView))
