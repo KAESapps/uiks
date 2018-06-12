@@ -72,7 +72,7 @@ const table = function(arg1, arg2) {
 
   args = normalizeColumnArgs(args)
 
-  let row = border({ b: true }, hFlex(args.map(createCell)))
+  let row = hFlex(args.map(createCell))
   if (opts.rowMixin) {
     row = group([row, opts.rowMixin])
   }
