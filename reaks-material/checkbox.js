@@ -31,9 +31,11 @@ module.exports = ctxCmp(
       color: uncheckedIconColor,
     })
 
+    const checkbox = swap(() => (value() ? checked : unchecked))
+
     return clickable(() => {
       setValue(!value())
-    }, hFlex([[{ weight: null }, swap(() => (value() ? checked : unchecked))], seq([margin({ l: 8 }), align({ v: "center" }, label(labelText))])]))
+    }, labelText ? hFlex([[{ weight: null, align: "center" }, checkbox], seq([margin({ l: 8 }), label(labelText)])]) : align({ h: "center", v: "center" }, checkbox))
   },
   function(arg) {
     return [
