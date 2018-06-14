@@ -76,8 +76,8 @@ module.exports = orderedArgsCmp(
       }
       return [
         defaults({}, opts, {
-          activeBackgroundColor: ctx => ctx.colors.secondary,
-          activeTextColor: ctx => ctx.colors.textOnSecondary,
+          activeBackgroundColor: ctx => ctx.colors.primary,
+          activeTextColor: ctx => ctx.colors.textOnPrimary,
           defaultTextColor: ctx => ctx.colors.fadedDarkText,
         }),
         items,
