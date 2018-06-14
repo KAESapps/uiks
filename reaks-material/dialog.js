@@ -50,7 +50,7 @@ const dialogPopupLayer = ({ title, content, actions = [] }) =>
       [
         innerMargin.mixin({ t: 24 }),
         style.mixin({
-          minWidth: "75%",
+          width: "100%",
           maxWidth: 768,
           maxHeight: "100%",
           boxSizing: "border-box",
