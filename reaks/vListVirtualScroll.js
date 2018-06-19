@@ -5,12 +5,17 @@ const isFunction = require("lodash/isFunction")
 const seq = require("reaks/seq")
 const child = require("reaks/child")
 const style = require("reaks/style")
-const attr = require("reaks/attr")
 const onEvent = require("reaks/onEvent")
 const { observable } = require("kobs")
 const withSize = require("./withSize")
 
 const { autorun } = require("kobs")
+
+const attrDefer = (attr, getValue) => domNode =>
+  autorun(() => {
+    const val = getValue()
+    setTimeout(() => (domNode[attr] = val))
+  })
 
 const diffArrays = (oldArray, newArray) => {
   return [
@@ -324,7 +329,9 @@ module.exports = ({
         ])
       ),
       getDefaultVisibleItem &&
-        attr("scrollTop", () => {
+        attrDefer("scrollTop", () => {
+          // on utilise attrDefer pour être sûr que le scrollTop est appliqué après l'application du height (ci-dessus)
+          // sinon le scroll ne fonctionnera pas si la hauteur scrollable n'a pas d'abord été mise à jour et que l'on veut scroller au maximum (en bas)
           programmaticScroll = true
           return defaultScrollTop()
         }),
