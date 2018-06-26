@@ -1,4 +1,4 @@
-const assignObservable = require("../core/assignObservable")
+const assignObservable = require("./assignObservable")
 
 module.exports = cmp =>
   assignObservable(

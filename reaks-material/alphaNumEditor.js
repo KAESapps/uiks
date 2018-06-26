@@ -1,13 +1,12 @@
-const textInput = require("./textInput")
+const alphanumericPad = require("./alphanumericPad")
 const textInputLook = require("./textInputLook")
 const label = require("uiks/reaks/label")
-const dialogEditor = require("./dialogEditor")
 
 const textFieldDisplayer = textInputLook(label())
 
+const dialogEditor = require("./dialogEditor")
+
 module.exports = dialogEditor(
-  textInput({
-    autoFocus: true,
-  }),
+  alphanumericPad({ decimal: false }),
   textFieldDisplayer
 )

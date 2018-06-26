@@ -1,9 +1,9 @@
 // composant qui affiche value() dans un displayer mais qui sur clic/action ouvre un popup pour le modifier au lieu de le modifier inline
-const flatButton = require("uiks/reaks-material/flatButton")
-const button = require("uiks/reaks-material/button")
+const flatButton = require("./flatButton")
+const button = require("./button")
 const observableAsValue = require("uiks/core/observableAsValue")
 const assignObservable = require("uiks/core/assignObservable")
-const dialog = require("uiks/reaks-material/dialog")
+const dialog = require("./dialog")
 const popup = require("uiks/reaks/popup")
 
 module.exports = (picker, opts = {}) => {

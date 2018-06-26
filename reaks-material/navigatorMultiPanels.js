@@ -1,7 +1,7 @@
-const withResponsiveSize = require("./withResponsiveSize")
-const menuIcon = require("../reaks-material/icons/navigation/menu")
+const withResponsiveSize = require("../reaks/withResponsiveSize")
+const menuIcon = require("./icons/navigation/menu")
 const isString = require("lodash/isString")
-const label = require("./label").reaks
+const label = require("../reaks/label").reaks
 const border = require("../reaks-layout/border")
 const vFlex = require("../reaks-layout/vFlex")
 const hFlex = require("../reaks-layout/hFlex")
@@ -20,11 +20,11 @@ const size = require("reaks/size")
 
 const svgIcon = require("reaks/svgIcon")
 
-const backIcon = require("../reaks-material/icons/navigation/arrowBack")
-const closeIcon = require("../reaks-material/icons/content/clear")
+const backIcon = require("./icons/navigation/arrowBack")
+const closeIcon = require("./icons/content/clear")
 
 const margin = require("../reaks-layout/margin")
-const clickable = require("./clickable").reaksMixin
+const clickable = require("../reaks/clickable").reaksMixin
 
 const previousPanelWidth = 500
 const mainPanelMinWidth = 700
