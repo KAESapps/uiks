@@ -27,7 +27,7 @@ module.exports = (arg = defaultPartialArg) => {
     defaultPartialArg
   )
   if (arg.all || !(arg.t || arg.r || arg.b || arg.l)) {
-    arg = assign(allBorders(arg.all), arg)
+    arg = allBorders(assign(arg.all, arg))
   }
   arg = assign(
     {},
