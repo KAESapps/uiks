@@ -22,8 +22,8 @@ module.exports = fields =>
           { r: 25, b: 15 },
           labelledField(isString(opts) ? opts : opts.label, field)
         )
-        if (opts.width) {
-          return size({ w: opts.width }, cmp)
+        if (opts.width || opts.widthMin) {
+          return size({ w: opts.width, wMin: opts.widthMin }, cmp)
         } else return cmp
       })
     )

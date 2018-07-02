@@ -1,4 +1,5 @@
-// composant qui affiche value() dans un displayer mais qui sur clic/action ouvre un popup pour le modifier au lieu de le modifier inline
+// callback d'action ouvrant un picker dans un popup
+// initialise le picker avec ctx.value() et passe la valeur modifiée à ctx.setValue() à la validation
 const flatButton = require("./flatButton")
 const button = require("./button")
 const observableAsValue = require("uiks/core/observableAsValue")
