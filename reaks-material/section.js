@@ -24,6 +24,7 @@ module.exports = args => {
             ctx => ({
               fontWeight: 500,
               backgroundColor: ctx.colors.primary,
+              color: ctx.colors.textOnPrimary,
               height: 36,
             }),
             innerMargin(
