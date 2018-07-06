@@ -29,6 +29,7 @@ module.exports = ctxComponent(
       innerMargin({ h: 16 }),
       style({
         color,
+        backgroundColor: "rgba(0,0,0,0.03)",
         textTransform: "uppercase",
         fontSize: "14px",
         fontWeight: 500,
