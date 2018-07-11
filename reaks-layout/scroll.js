@@ -12,10 +12,8 @@ module.exports = function(opts, content) {
   return seq([
     style({
       overflow: "auto",
-      display: "flex",
-      flexDirection: "column",
     }),
     onScroll && onEvent("scroll", onScroll),
-    child(seq([style({ flex: 1 }), content])),
+    child(content),
   ])
 }
