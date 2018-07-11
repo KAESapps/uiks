@@ -44,14 +44,14 @@ const bodyText = message =>
     text(message || "")
   )
 
-const dialogPopupLayer = ({ title, content, actions = [] }) =>
+const dialogPopupLayer = ({ title, content, actions = [], maxWidth = 768 }) =>
   withPopup.popupBuilder(
     mix(
       [
         innerMargin.mixin({ t: 24 }),
         style.mixin({
           width: "100%",
-          maxWidth: 768,
+          maxWidth,
           maxHeight: "100%",
           boxSizing: "border-box",
           backgroundColor: "white",

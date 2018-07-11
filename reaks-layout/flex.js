@@ -1,8 +1,10 @@
 /**
  * crée un transform d'un domNode qui va créer autant de childNodes que nécessaire et les confier à chaque composant
  */
-const createDiv = require("reaks/child")
+const intersperse = require("intersperse-array")
+const appendDiv = require("reaks/child")
 const seq = require("reaks/seq")
+const size = require("reaks/size")
 const repeat = require("reaks/repeat")
 const concat = require("lodash/concat")
 const assign = require("lodash/assign")
@@ -18,7 +20,7 @@ const convertChildOpts = childOpts => {
 
 const normalizeChildArg = c => (Array.isArray(c) ? c : [{}, c])
 
-const createChild = ({
+const childCreator = ({
   orientation,
   defaultChildOpts,
   wrap,
@@ -26,25 +28,42 @@ const createChild = ({
 }) => childArg => {
   const [childOpts, childMixin] = normalizeChildArg(childArg)
 
-  const { child: createChild = createDiv, weight, align } = defaults(
+  const { weight, align } = defaults(
     {},
     convertChildOpts(childOpts),
     { weight: defaultWeight },
     defaultChildOpts
   )
-  return createChild(
-    seq([flexChildStyle({ orientation, wrap, weight, align }), childMixin])
-  )
+  return seq([flexChildStyle({ orientation, wrap, weight, align }), childMixin])
 }
 
 const staticFlex = (config, childrenArg) => {
-  return seq(concat(asFlexParent(config), childrenArg.map(createChild(config))))
+  const { child: appendChildNode = appendDiv } = config
+  const createChild = childCreator(config)
+  return seq(
+    concat(
+      asFlexParent(config),
+      (config.gap
+        ? intersperse(childrenArg, [{ weight: null }, size({ w: config.gap })])
+        : childrenArg
+      ).map(childArg => appendChildNode(createChild(childArg)))
+    )
+  )
 }
 
 const dynamicFlex = (config, getChildrenArg) => {
   return seq([
     asFlexParent(config),
-    repeat(getChildrenArg, createChild(config)),
+    repeat(
+      config.gap
+        ? () =>
+            intersperse(getChildrenArg(), () => [
+              { weight: null },
+              size({ w: config.gap }),
+            ])
+        : getChildrenArg,
+      childCreator(config)
+    ),
   ])
 }
 
