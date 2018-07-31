@@ -7,13 +7,14 @@ const observableAsValue = require("uiks/core/observableAsValue")
 const assignObservable = require("uiks/core/assignObservable")
 const dialog = require("./dialog")
 const popup = require("uiks/reaks/popup")
+const getStaticValue = require("kobs/getStaticValue")
 
 module.exports = (picker, opts = {}) => {
   const { title = "Saisir une nouvelle valeur", customActions } = opts
   return popup(
     assignObservable(
       {
-        internalValue: ctx => ctx.value(),
+        internalValue: ctx => getStaticValue(ctx.value),
       },
       dialog.popupLayer({
         title,
