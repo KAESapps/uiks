@@ -44,7 +44,10 @@ const staticFlex = (config, childrenArg) => {
     concat(
       asFlexParent(config),
       (config.gap
-        ? intersperse(childrenArg, [{ weight: null }, size({ w: config.gap })])
+        ? intersperse(childrenArg, [
+            { weight: null },
+            size({ [config.orientation === "row" ? "w" : "h"]: config.gap }),
+          ])
         : childrenArg
       ).map(childArg => appendChildNode(createChild(childArg)))
     )
