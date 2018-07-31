@@ -18,6 +18,7 @@ const defaultPartialArg = {
 }
 
 module.exports = (arg = defaultPartialArg) => {
+  const borderRadius = arg.radius
   const localDefaultPartialArg = defaults(
     {
       width: arg.width,
@@ -43,6 +44,6 @@ module.exports = (arg = defaultPartialArg) => {
     borderRight: borderStyle(r),
     borderBottom: borderStyle(b),
     borderLeft: borderStyle(l),
-    borderRadius: arg.radius,
+    borderRadius,
   })
 }
