@@ -197,13 +197,19 @@ module.exports = ({
     const getItemTop = isFunction(itemHeight)
       ? id => {
           const idx = getItemIds().indexOf(id)
+          if (idx === -1) return
+
           return sum(
             getItemIds()
               .slice(0, idx)
               .map(itemHeight)
           )
         }
-      : id => getItemIds().indexOf(id) * itemHeight
+      : id => {
+          const idx = getItemIds().indexOf(id)
+          if (idx === -1) return
+          return idx * itemHeight
+        }
 
     let getDefaultVisibleItem =
         getDefaultVisibleItemGetter && getDefaultVisibleItemGetter(ctx),
@@ -234,6 +240,9 @@ module.exports = ({
         } else if (itemTop < scrollWindowTop) {
           return itemTop
         }
+
+        // in other cases, don't scroll
+        return scrollWindowTop
       }
     }
 
@@ -313,7 +322,11 @@ module.exports = ({
           style(
             isFunction(itemHeight)
               ? () => ({
-                  height: sum(getItemIds().map(itemHeight)),
+                  height: sum(
+                    getItemIds()
+                      .map(itemHeight)
+                      .filter(v => v)
+                  ),
                 })
               : () => ({
                   height: getItemIds().length * itemHeight,
