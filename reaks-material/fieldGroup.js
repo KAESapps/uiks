@@ -17,9 +17,10 @@ module.exports = fields =>
   margin(
     { b: 5 },
     hPileWrap(
+      { gap: 25 },
       fields.map(([opts, field]) => {
         const cmp = margin(
-          { r: 25, b: 15 },
+          { b: 15 },
           labelledField(isString(opts) ? opts : opts.label, field)
         )
         if (opts.width || opts.widthMin) {

@@ -43,7 +43,7 @@ const staticFlexChildStyle = ({ weight, wrap, align }) => {
           flex: weight,
           overflow: wrap ? null : "hidden",
         }
-      : { display: "flex", flexShrink: 0 },
+      : { display: "flex", flexShrink: wrap ? null : 0 },
     { alignSelf: flexAlign(align) }
   )
 }
