@@ -9,7 +9,15 @@ const size = require("uiks/reaks/size")
 const margin = require("uiks/reaks/margin")
 
 module.exports = args => {
-  const { title, content, action } = args
+  const {
+    title,
+    content,
+    action,
+    colors = ctx => ({
+      backgroundColor: ctx.colors.primary,
+      color: ctx.colors.textOnPrimary,
+    }),
+  } = args
   return style(
     {
       borderRadius: 2,
@@ -21,15 +29,16 @@ module.exports = args => {
         [
           "fixed",
           style(
-            ctx => ({
+            {
               fontWeight: 500,
-              backgroundColor: ctx.colors.primary,
-              color: ctx.colors.textOnPrimary,
               height: 36,
-            }),
-            innerMargin(
-              { h: 12 },
-              align({ v: "center" }, isString(title) ? label(title) : title)
+            },
+            style(
+              colors,
+              innerMargin(
+                { h: 12 },
+                align({ v: "center" }, isString(title) ? label(title) : title)
+              )
             )
           ),
         ],
