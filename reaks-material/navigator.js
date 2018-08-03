@@ -50,7 +50,9 @@ const appBar = function({
           margin({ l: 16 }),
           firstPage ? svgRootIcon : svgBackIcon,
           firstPage
-            ? rootAction.action ? clickable(rootAction.action) : null
+            ? rootAction.action
+              ? clickable(rootAction.action)
+              : null
             : clickable(back),
         ]),
       ],
