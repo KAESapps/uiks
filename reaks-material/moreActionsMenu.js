@@ -6,7 +6,7 @@ const dialog = require("./dialog")
 
 module.exports = actions => rootCtx =>
   iconButton(
-    { icon: menuIcon },
+    { icon: menuIcon, color: ctx => ctx.colors.textOnPrimary },
     dialog({
       content: vPile(
         actions.map(([text, action]) =>

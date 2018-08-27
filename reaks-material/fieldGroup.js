@@ -15,13 +15,15 @@ const labelledField = (label, field) => {
 
 module.exports = fields =>
   margin(
-    { b: 5 },
+    { b: 10 },
     hPileWrap(
       fields.map(([opts, field], i) => {
-        let cmp = labelledField(isString(opts) ? opts : opts.label, field)
-        if (i + 1 < fields.length) {
-          cmp = margin({ r: 25, b: 15 }, cmp)
-        }
+        const isLastItem = i + 1 === fields.length
+        let cmp = margin(
+          { r: isLastItem ? 0 : 25, b: 5 },
+          labelledField(isString(opts) ? opts : opts.label, field)
+        )
+
         if (opts.width || opts.widthMin) {
           return size({ w: opts.width, wMin: opts.widthMin }, cmp)
         } else return cmp
