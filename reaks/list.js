@@ -9,6 +9,7 @@ module.exports = (item, emptyView) => ctx => {
     style(
       {
         flexDirection: "column",
+        flex: 1,
       },
       repeat(ctx => ctx.value, style({ flexShrink: 0 }, item))
     )
