@@ -16,21 +16,27 @@ module.exports = (picker, opts = {}) => {
       {
         internalValue: ctx => getStaticValue(ctx.value),
       },
-      dialog.popupLayer({
-        title,
-        content: observableAsValue("internalValue", picker),
-        actions: concat(
-          flatButton(
-            { label: "Annuler", primary: false },
-            ctx => ctx.closePopup
-          ),
-          customActions,
-          button("Valider", ctx => () => {
+      assignObservable(
+        {
+          // donne accès à la validation dans le picker
+          validate: ctx => () => {
             ctx.setValue(ctx.internalValue())
             ctx.closePopup()
-          })
-        ),
-      })
+          },
+        },
+        dialog.popupLayer({
+          title,
+          content: observableAsValue("internalValue", picker),
+          actions: concat(
+            flatButton(
+              { label: "Annuler", primary: false },
+              ctx => ctx.closePopup
+            ),
+            customActions,
+            button("Valider", ctx => ctx.validate)
+          ),
+        })
+      )
     )
   )
 }
