@@ -1,6 +1,7 @@
 /* 
 permet de placer un composant dans un dialog avec un state observable propre
 */
+const concat = require("lodash/concat")
 const assignObservable = require("../core/assignObservable")
 const dialog = require("./dialog")
 const flatButton = require("./flatButton")
@@ -12,8 +13,9 @@ module.exports = args =>
     dialog.popupLayer({
       title: args.title,
       content: args.content,
-      actions: [
+      actions: concat(
         flatButton({ label: "Annuler", primary: false }, ctx => ctx.closePopup),
+        args.actions,
         button("Valider", ctx => {
           const onSubmit = args.onSubmit(ctx)
           return () =>
@@ -24,7 +26,7 @@ module.exports = args =>
                 ctx.alert({ title: "Erreur", message: err.message })
                 //TODO: afficher l'erreur à l'utilisateur... mais comment ?
               })
-        }),
-      ],
+        })
+      ),
     })
   )
