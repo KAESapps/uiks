@@ -53,7 +53,10 @@ module.exports = ctxComponent(
       ),
       // text, spinner & icons, conditionally displayed
       zPile([
-        [{ sizer: true }, visibleIf("idle", label(text))],
+        [
+          { sizer: true },
+          visibleIf("idle", align({ h: "center", v: "center" }, label(text))),
+        ],
         visibleIf(
           "running",
           align(
@@ -81,7 +84,9 @@ module.exports = ctxComponent(
         backgroundColor:
           state() === "success"
             ? "limegreen"
-            : state() === "error" ? "#EEE" : backgroundColor,
+            : state() === "error"
+              ? "#EEE"
+              : backgroundColor,
       })),
       align({ h: "center", v: "center" }),
       size({ h: 40 }),
