@@ -17,21 +17,26 @@ module.exports = (arg, view) => ctx => {
   const getEntity = isFunction(entity) ? entity(ctx) : entity
   const getProp = isFunction(prop) ? prop(ctx) : prop
 
-  let beforeSubmitTimeout, afterSubmitTimeout
+  let beforeSubmitTimeout, exitEditModeAfterSubmit
   const defaultValue = "" // TODO: rendre paramétrable ?
   const submitDelay = 100 // délai avant soumission du input (debounce)
-  const displayModeDelay = 1000 // délai avant passage du mode edit au mode display
   const editMode = observable(false)
   const inputValue = observable(defaultValue)
+
   const submit = () => {
     const newValue = inputValue()
-    ctx.patch({
-      [isFunction(getEntity) ? getEntity() : getEntity]: {
-        [isFunction(getProp) ? getProp() : getProp]: newValue,
-      },
-    })
-    clearTimeout(afterSubmitTimeout)
-    afterSubmitTimeout = setTimeout(() => editMode(false), displayModeDelay) // on repasse en mode display
+    exitEditModeAfterSubmit = true
+    ctx
+      .patch({
+        [isFunction(getEntity) ? getEntity() : getEntity]: {
+          [isFunction(getProp) ? getProp() : getProp]: newValue,
+        },
+      })
+      .then(() => {
+        if (exitEditModeAfterSubmit) {
+          editMode(false)
+        }
+      })
   }
 
   const value = observable(() => {
@@ -49,6 +54,9 @@ module.exports = (arg, view) => ctx => {
       inputValue(newValue)
       if (!editMode()) editMode(true)
       clearTimeout(beforeSubmitTimeout)
+      // dans le cas d'une saisie lors d'une soumission en cours,
+      // on annule le passage automatique au mode display au retour de la soumission
+      exitEditModeAfterSubmit = false
       beforeSubmitTimeout = setTimeout(submit, submitDelay)
     })
 
