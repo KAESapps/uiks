@@ -39,7 +39,7 @@ module.exports = arg => {
         onTouchStart(
           multiple
             ? () => {
-                const selectedValues = ctx.selectedValue()
+                const selectedValues = ctx.selectedValue() || []
                 if (includes(selectedValues, ctx.value)) {
                   ctx.setValue(without(selectedValues, ctx.value))
                 } else {
