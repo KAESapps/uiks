@@ -3,7 +3,7 @@ const style = require("reaks/style")
 const size = require("reaks/size")
 const seq = require("reaks/seq")
 const ctxCmp = require("../reaks/ctx-level-helpers/component")
-const border = require("../reaks-layout/border")
+const textInputLook = require("./textInputLook")
 const valueAttr = require("reaks/valueAttr")
 const attrs = require("reaks/attrs")
 const onEvent = require("reaks/onEvent")
@@ -23,15 +23,10 @@ module.exports = ctxCmp(
           border: "none",
           outline: "none",
           font: "inherit",
-          paddingTop: 8,
-          paddingBottom: 8,
+          backgroundColor: "transparent",
         }),
         size({ w: "100%" }),
-        border({
-          b: {
-            width: 1,
-          },
-        }),
+        textInputLook.reaksMixin(),
         attrs({
           placeholder: placeholder,
           type: password ? "password" : null,
