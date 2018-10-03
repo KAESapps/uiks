@@ -27,69 +27,76 @@ const popupBuilder = (
     ),
   ])
 
-const withPopup = view => ctx => {
-  const popupParams = observable(disableState)
-
-  const closePopup = () => popupParams(disableState)
-
-  const popup = (popupLayer, ctx, opts = {}) => {
-    if (popupLayer === false) {
-      // close popup
-      closePopup()
-      return
-    }
-    if (!ctx) {
-      throw new Error("popup(): ctx must be defined")
-    }
-
-    const { modal = false, nested = true } = opts
-
-    popupParams({
-      popupLayer,
-      modal,
-      enabled: true,
-      ctx,
-      nested,
-    })
+const withPopup = function(opts, view) {
+  if (arguments.length === 1) {
+    view = opts
+    opts = {}
   }
+  const { ctxProp = "popup", setPositionRelative = false } = opts
+  return ctx => {
+    const popupParams = observable(disableState)
 
-  return seq([
-    style({ pointerEvents: "none" }),
-    zPile({ setPositionRelative: false }, [
-      seq([
-        style({ pointerEvents: "all" }),
-        view(
-          create(ctx, {
-            popup,
-          })
-        ),
-      ]),
-      seq([
-        style(() => ({
-          display: popupParams().enabled ? "flex" : "none",
-        })),
-        zPile({ setPositionRelative: false }, [
-          seq([
-            style({
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              pointerEvents: "all",
-            }),
-            swap(() => !popupParams().modal && clickable(closePopup)),
-          ]),
-          swap(() => {
-            const { enabled, popupLayer, ctx, nested } = popupParams()
+    const closePopup = () => popupParams(disableState)
 
-            return (
-              enabled &&
-              (nested ? withPopup(popupLayer) : popupLayer)(
-                create(ctx, { selfPopup: popup, closePopup })
+    const popup = (popupLayer, ctx, opts = {}) => {
+      if (popupLayer === false) {
+        // close popup
+        closePopup()
+        return
+      }
+      if (!ctx) {
+        throw new Error("popup(): ctx must be defined")
+      }
+
+      const { modal = false, nested = true } = opts
+
+      popupParams({
+        popupLayer,
+        modal,
+        enabled: true,
+        ctx,
+        nested,
+      })
+    }
+
+    return seq([
+      style({ pointerEvents: "none" }),
+      zPile({ setPositionRelative }, [
+        seq([
+          style({ pointerEvents: "all" }),
+          view(
+            create(ctx, {
+              [ctxProp]: popup,
+            })
+          ),
+        ]),
+        seq([
+          style(() => ({
+            display: popupParams().enabled ? "flex" : "none",
+          })),
+          zPile({ setPositionRelative: false }, [
+            seq([
+              style({
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                pointerEvents: "all",
+              }),
+              swap(() => !popupParams().modal && clickable(closePopup)),
+            ]),
+            swap(() => {
+              const { enabled, popupLayer, ctx, nested } = popupParams()
+
+              return (
+                enabled &&
+                (nested ? withPopup(popupLayer) : popupLayer)(
+                  create(ctx, { selfPopup: popup, closePopup })
+                )
               )
-            )
-          }),
+            }),
+          ]),
         ]),
       ]),
-    ]),
-  ])
+    ])
+  }
 }
 
 withPopup.popupBuilder = popupBuilder
