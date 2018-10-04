@@ -5,20 +5,20 @@ const style = require("reaks/style")
 
 module.exports = wrapper(action => {
   let canTriggerAction = true
-  const preventTriggerAction = () => {
-    console.log("preventTriggerAction")
-    canTriggerAction = false
-  }
+
   const allowTriggerAction = () => {
-    console.log("allowTriggerAction")
+    // console.log("allowTriggerAction")
     canTriggerAction = true
   }
   return seq([
     onEvent("click", ev => {
       ev.stopPropagation()
-      canTriggerAction &&
+      if (canTriggerAction) {
         Promise.resolve(action(ev)).finally(allowTriggerAction)
-      preventTriggerAction()
+        canTriggerAction = false
+      } else {
+        console.log("did prevent triggering action")
+      }
     }),
     style({ cursor: "pointer" }),
   ])
