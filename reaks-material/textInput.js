@@ -35,7 +35,11 @@ module.exports = ctxCmp(
         onEvent("input", ev => {
           setValue(ev.target.value)
         }),
-        autoFocus && (domNode => domNode.focus()),
+        autoFocus &&
+          (domNode => {
+            domNode.focus()
+            process.env.PLATFORM === "windows" && domNode.click()
+          }),
       ]),
       () => document.createElement("input")
     ),
