@@ -5,16 +5,17 @@ const { Obs } = require("kobs")
 
 /* prend un promise de context en argument et instancie la vue "success" avec ce contexte, en attendant il affiche la vue "loading" et en cas d'erreur, la vue "error" */
 module.exports = (arg, views) => ctx => {
-  const currentView = new Obs(views["loading"](ctx)) // on démarre avec la vue de loading
+  const { loading, success, error: errorView } = views
+  const currentView = new Obs(loading && loading(ctx)) // on démarre avec la vue de loading
   const load = ctxPromise =>
     ctxPromise.then(
-      successCtx => currentView.set(views["success"](create(ctx, successCtx))),
+      successCtx => currentView.set(success(create(ctx, successCtx))),
       error => {
         const subCtx = { error }
         if (isFunction(arg)) {
           subCtx.retry = () => load(arg(ctx))
         }
-        return currentView.set(views["error"](create(ctx, subCtx)))
+        return currentView.set(errorView && errorView(create(ctx, subCtx)))
       }
     )
 

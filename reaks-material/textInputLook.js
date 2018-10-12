@@ -6,11 +6,11 @@ const align = require("uiks/reaks-layout/align")
 const innerMargin = require("uiks/reaks-layout/innerMargin")
 
 // make a label look like a text input
-module.exports = wrapper(() =>
+module.exports = wrapper(({ borderColor = "#AAA" } = {}) =>
   seq([
     size({ hMin: 32 }),
-    innerMargin({ h: 3 }),
+    innerMargin({ h: 6 }),
     align({ v: "center" }),
-    border({ b: { color: "#AAA" } }),
+    border({ color: borderColor, radius: 3 }),
   ])
 )
