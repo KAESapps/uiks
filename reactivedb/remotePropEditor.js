@@ -4,6 +4,7 @@
  * mais quand il n'y a pas de modif effectuée par le serveur
  * et que l'on n'a pas besoin d'afficher à l'utilisateur les phases de
  * submit, success, error
+ * TODO : se baser sur remoteEditor
  */
 
 const create = require("lodash/create")
