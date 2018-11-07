@@ -1,3 +1,4 @@
+const compact = require("lodash/compact")
 const isFunction = require("lodash/isFunction")
 const concat = require("lodash/concat")
 const toString = require("lodash/toString")
@@ -21,6 +22,7 @@ const iconButton = require("./iconButton").reaks
 const clearIconDef = require("./icons/content/clear")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
+const formatDate = require("reactivedb/operators/formatDate")
 
 const hFlexGrid = ({ colMinWidth }, items) => {
   return seq(
@@ -33,20 +35,6 @@ const hFlexGrid = ({ colMinWidth }, items) => {
     )
   )
 }
-
-const formatDate = getValue => () => {
-  const v = getValue()
-  return v ? new Date(v).toLocaleDateString("fr") : ""
-}
-const display = val =>
-  seq([
-    label(formatDate(val)),
-    align({ v: "center" }),
-    innerMargin({ h: 10 }),
-    style({
-      fontSize: 18,
-    }),
-  ])
 
 const padKeyStyle = (isActive, ctx) =>
   seq([
@@ -71,32 +59,53 @@ const padKeyStyle = (isActive, ctx) =>
     ),
   ])
 
-const internalValuetoISOString = value => {
-  if (!value) return null
+module.exports = ({ precision = "day" } = {}) => {
+  const ISOStringToInternalValue = value => {
+    if (!value) return null
+    let regexp = "(\\d{4})"
+    if (precision !== "year") {
+      regexp += "-([01]\\d)"
+    }
+    if (precision === "day") {
+      regexp += "-([0-3]\\d)"
+    }
 
-  let str = ""
+    const matchingValue = value.match(new RegExp(regexp))
+    if (!matchingValue) return null
 
-  if (value.year) {
-    str += value.year
+    const [, year, month, day] = matchingValue.map(toInteger)
+    return { year, month, day }
   }
-  if (value.month) {
-    str += "-" + padStart(value.month, 2, "0")
-  }
-  if (value.day) {
-    str += "-" + padStart(value.day, 2, "0")
-  }
-  return str
-}
-const ISOStringToInternalValue = value => {
-  if (!value) return null
+  const internalValuetoISOString = value => {
+    if (!value) return null
 
-  const [, year, month, day] = value
-    .match(/(\d{4})-([01]\d)-([0-3]\d)/)
-    .map(toInteger)
-  return { year, month, day }
-}
+    let str = value.year
 
-module.exports = () => {
+    if (precision !== "year") {
+      str += "-" + padStart(value.month, 2, "0")
+    }
+    if (precision === "day") {
+      str += "-" + padStart(value.day, 2, "0")
+    }
+    return str
+  }
+
+  const display = val =>
+    seq([
+      label(() =>
+        formatDate(val(), {
+          year: "numeric",
+          month: precision !== "year" ? "numeric" : undefined,
+          day: precision === "day" ? "numeric" : undefined,
+        })
+      ),
+      align({ v: "center" }),
+      innerMargin({ h: 10 }),
+      style({
+        fontSize: 18,
+      }),
+    ])
+
   return ctx => {
     const { setValue, value } = ctx
     const internalValue = observable()
@@ -111,12 +120,24 @@ module.exports = () => {
       const baseValue = internalValue()
       const patch = { [type]: value }
 
-      if (type === "day") {
-        if (!get(baseValue, "month")) {
-          assign(patch, { month: new Date().getMonth() + 1 })
+      if (precision === "day") {
+        if (type !== "day") {
+          if (!get(baseValue, "day")) {
+            assign(patch, { day: new Date().getDate() })
+          }
         }
       }
-      if (type === "day" || type === "month") {
+
+      // if precision is month, at least (month or day)
+      if (precision !== "year") {
+        if (type !== "month") {
+          if (!get(baseValue, "month")) {
+            assign(patch, { month: new Date().getMonth() + 1 })
+          }
+        }
+      }
+
+      if (type !== "year") {
         if (!get(baseValue, "year")) {
           assign(patch, { year: new Date().getFullYear() })
         }
@@ -185,19 +206,21 @@ module.exports = () => {
             ],
           ]),
         ]),
-        vPile([
-          label("Année"),
-          keysRow("year", [
-            () => refYear() - 1,
-            () => refYear(),
-            () => refYear() + 1,
-            () => refYear() + 2,
-          ]),
-          label("Mois"),
-          keysRow("month", range(1, 13)),
-          label("Jour"),
-          keysRow("day", range(1, 32)),
-        ]),
+        vPile(
+          compact([
+            label("Année"),
+            keysRow("year", [
+              () => refYear() - 1,
+              () => refYear(),
+              () => refYear() + 1,
+              () => refYear() + 2,
+            ]),
+            precision !== "year" && label("Mois"),
+            precision !== "year" && keysRow("month", range(1, 13)),
+            precision === "day" && label("Jour"),
+            precision === "day" && keysRow("day", range(1, 32)),
+          ])
+        ),
       ]),
       style({
         minWidth: 180,
