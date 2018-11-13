@@ -19,7 +19,7 @@ module.exports = ({ decimals }) => {
       const integerString = toString(integer)
       const intPart = integerString.slice(0, -decimals)
       const decPart = integerString.slice(-decimals)
-      return intPart + "," + decPart
+      return (intPart || "0") + "," + decPart
     },
     toExternalValue: decimalString => {
       const [intPart, decPart] = decimalString.split(",")
