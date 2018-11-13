@@ -38,17 +38,25 @@ const normalizeInternalValue = val => {
   return val
 }
 
-const fromExternalValue = val => toString(val).replace(".", ",")
+const defaultFromExternalValue = val => toString(val).replace(".", ",")
 
-const createToExternalValue = toNumber => stringVal => {
+const defaultToExternalValue = toNumber => stringVal => {
   stringVal = trim(stringVal, ",").replace(",", ".")
   return stringVal ? (toNumber ? _toNumber(stringVal) : stringVal) : null
 }
 
 module.exports = (opts = {}) => {
-  const { decimal = true, toNumber = true, customDisplay } = opts
+  const {
+    decimal = true,
+    toNumber = true,
+    customDisplay,
+    validateValue,
+    toExternalValue: toExternalValueArg,
+    fromExternalValue: fromExternalValueArg,
+  } = opts
 
-  const toExternalValue = createToExternalValue(toNumber)
+  const fromExternalValue = fromExternalValueArg || defaultFromExternalValue
+  const toExternalValue = toExternalValueArg || defaultToExternalValue(toNumber)
 
   return ctx => {
     const display = customDisplay
@@ -70,7 +78,12 @@ module.exports = (opts = {}) => {
       if (char === "," && currentValue.indexOf(",") !== -1) {
         return
       }
-      $stringValue(normalizeInternalValue(currentValue + toString(char)))
+
+      const nextValue = normalizeInternalValue(currentValue + char)
+      if (validateValue && !validateValue(nextValue)) {
+        return
+      }
+      $stringValue(nextValue)
       onUserInput()
     }
     function eraseLastChar() {
