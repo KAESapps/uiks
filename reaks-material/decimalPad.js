@@ -16,12 +16,16 @@ module.exports = ({ decimals }) => {
     toNumber: false,
     validateValue,
     fromExternalValue: integer => {
+      if (integer == null) return ""
+
       const integerString = toString(integer)
       const intPart = integerString.slice(0, -decimals)
       const decPart = integerString.slice(-decimals)
       return (intPart || "0") + "," + decPart
     },
     toExternalValue: decimalString => {
+      if (decimalString === "") return null
+
       const [intPart, decPart] = decimalString.split(",")
       return (
         toInteger(intPart) * Math.pow(10, decimals) +
