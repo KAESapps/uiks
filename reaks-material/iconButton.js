@@ -9,11 +9,12 @@ const ctxCmp = require("../reaks/ctx-level-helpers/component")
 
 module.exports = ctxCmp(
   (arg, action) => {
-    const { icon: iconDef, iconSize, color } = arg
+    const { icon: iconDef, iconSize, color, backgroundColor } = arg
     let { size: btnSize } = arg
     btnSize = defaults({}, btnSize, { h: 40, w: 40 })
     return hoverable(
       {
+        out: style({ backgroundColor }),
         over: style({ backgroundColor: "rgba(0,0,0,0.1)" }),
       },
       clickable(

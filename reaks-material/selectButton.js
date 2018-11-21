@@ -10,7 +10,7 @@ const dropDownIcon = require("./icons/navigation/arrowDropDown")
 const hoverable = require("../reaks/hoverable")
 
 module.exports = function(opts, onAction) {
-  const { label: labelArg, iconColor, borderColor } =
+  const { label: labelArg, iconColor } =
     isString(opts) || isFunction(opts) ? { label: opts } : opts
 
   return hoverable(
@@ -20,7 +20,7 @@ module.exports = function(opts, onAction) {
     clickable(
       onAction,
       textInputLook(
-        { borderColor },
+        opts,
         hFlex([
           label(labelArg),
           ["fixed", icon({ icon: dropDownIcon, color: iconColor })],

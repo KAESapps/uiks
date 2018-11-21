@@ -69,7 +69,7 @@ const dialogPopupLayer = ({ title, content, actions = [], maxWidth = 768 }) =>
   )
 
 const dialog = arg => ctx => {
-  const popup = arg.selfPopup ? ctx.selfPopup : ctx.popup
+  const popup = arg.selfPopup || arg.replace ? ctx.selfPopup : ctx.popup
   return () => {
     return popup(dialogPopupLayer(arg), ctx, arg)
   }
