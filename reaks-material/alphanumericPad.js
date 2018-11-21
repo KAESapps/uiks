@@ -1,7 +1,9 @@
+const includes = require("lodash/includes")
 const isString = require("lodash/isString")
 const range = require("lodash/range")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
+const onDocumentEvent = require("reaks/onDocumentEvent")
 const hFlex = require("uiks/reaks-layout/hFlex")
 const vPile = require("uiks/reaks-layout/vPile")
 const innerMargin = require("uiks/reaks-layout/innerMargin")
@@ -38,6 +40,39 @@ const padKeyStyle = seq([
     fontSize: 20,
   }),
 ])
+
+const numericKeys = range(1, 10)
+  .concat([0])
+  .map(toString)
+const alphaKeys = [
+  "A",
+  "Z",
+  "E",
+  "R",
+  "T",
+  "Y",
+  "U",
+  "I",
+  "O",
+  "P",
+  "Q",
+  "S",
+  "D",
+  "F",
+  "G",
+  "H",
+  "J",
+  "K",
+  "L",
+  "M",
+  "W",
+  "X",
+  "C",
+  "V",
+  "B",
+  "N",
+]
+const validKeys = numericKeys.concat(alphaKeys)
 
 module.exports = () => {
   return ctx => {
@@ -123,14 +158,10 @@ module.exports = () => {
           ]),
         ]),
         vPile([
-          keysRow(
-            range(1, 10)
-              .concat([0])
-              .map(toString)
-          ),
-          keysRow(["A", "Z", "E", "R", "T", "Y", "U", "I", "O", "P"]),
-          keysRow(["Q", "S", "D", "F", "G", "H", "J", "K", "L", "M"]),
-          keysRow(["W", "X", "C", "V", "B", "N", backspaceButton]),
+          keysRow(numericKeys),
+          keysRow(alphaKeys.slice(0, 10)),
+          keysRow(alphaKeys.slice(10, 20)),
+          keysRow(alphaKeys.slice(20, 26).concat(backspaceButton)),
         ]),
       ]),
       style({
@@ -138,6 +169,19 @@ module.exports = () => {
       }),
       observeExternalChange,
       observeActiveItemChange,
+      ctx.withPhysicalKeyboard &&
+        onDocumentEvent("keydown", ev => {
+          let c = ev.key
+          if (c === "Backspace") {
+            backspace()
+            return
+          }
+
+          c = c.toUpperCase()
+          if (includes(validKeys, c)) {
+            appendChar(c)
+          }
+        }),
     ])
   }
 }

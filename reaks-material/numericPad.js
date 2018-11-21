@@ -1,8 +1,10 @@
+const includes = require("lodash/includes")
 const range = require("lodash/range")
 const create = require("lodash/create")
 const trim = require("lodash/trim")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
+const onDocumentEvent = require("reaks/onDocumentEvent")
 const hFlex = require("uiks/reaks-layout/hFlex")
 const vPile = require("uiks/reaks-layout/vPile")
 const innerMargin = require("uiks/reaks-layout/innerMargin")
@@ -57,6 +59,9 @@ module.exports = (opts = {}) => {
 
   const fromExternalValue = fromExternalValueArg || defaultFromExternalValue
   const toExternalValue = toExternalValueArg || defaultToExternalValue(toNumber)
+
+  const validKeys = range(0, 10).map(toString)
+  if (decimal) validKeys.push(",")
 
   return ctx => {
     const display = customDisplay
@@ -158,6 +163,18 @@ module.exports = (opts = {}) => {
       }),
       observeExternalChange,
       observeActiveItemChange,
+      ctx.withPhysicalKeyboard &&
+        onDocumentEvent("keydown", ev => {
+          const c = ev.key
+          if (c === "Backspace") {
+            eraseLastChar()
+            return
+          }
+
+          if (includes(validKeys, c)) {
+            appendChar(c)
+          }
+        }),
     ])
   }
 }

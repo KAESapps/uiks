@@ -1,6 +1,9 @@
 // callback d'action ouvrant un picker dans un popup
 // initialise le picker avec ctx.value() et passe la valeur modifiée à ctx.setValue() à la validation
 const concat = require("lodash/concat")
+const onDocumentEvent = require("reaks/onDocumentEvent")
+const ctxAssign = require("uiks/core/assign")
+const mix = require("uiks/reaks/mix")
 const flatButton = require("./flatButton")
 const button = require("./button")
 const observableAsValue = require("uiks/core/observableAsValue")
@@ -24,18 +27,35 @@ module.exports = (picker, opts = {}) => {
             ctx.closePopup()
           },
         },
-        dialog.popupLayer({
-          title,
-          content: observableAsValue("internalValue", picker),
-          actions: concat(
-            flatButton(
-              { label: "Annuler", primary: false },
-              ctx => ctx.closePopup
+        mix(
+          [
+            ctx =>
+              onDocumentEvent("keydown", ev => {
+                const key = ev.key
+                if (key === "Enter") {
+                  return ctx.validate()
+                }
+                if (key === "Escape") {
+                  return ctx.closePopup()
+                }
+              }),
+          ],
+          dialog.popupLayer({
+            title,
+            content: ctxAssign(
+              { withPhysicalKeyboard: true },
+              observableAsValue("internalValue", picker)
             ),
-            customActions,
-            button("Valider", ctx => ctx.validate)
-          ),
-        })
+            actions: concat(
+              flatButton(
+                { label: "Annuler", primary: false },
+                ctx => ctx.closePopup
+              ),
+              customActions,
+              button("Valider", ctx => ctx.validate)
+            ),
+          })
+        )
       )
     )
   )

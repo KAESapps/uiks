@@ -14,7 +14,7 @@
   },
   "peerDependencies": {
     "kobs": "kaesapps/kobs#b54dbb4",
-    "reaks": "kaesapps/reaks#28f9c65"
+    "reaks": "kaesapps/reaks#1e04fd6"
   },
   "devDependencies": {
     "eslint": "5.6.0",
