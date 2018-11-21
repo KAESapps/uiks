@@ -165,12 +165,13 @@ module.exports = (opts = {}) => {
       observeActiveItemChange,
       ctx.withPhysicalKeyboard &&
         onDocumentEvent("keydown", ev => {
-          const c = ev.key
+          let c = ev.key
           if (c === "Backspace") {
             eraseLastChar()
             return
           }
 
+          if (c === ".") c = ","
           if (includes(validKeys, c)) {
             appendChar(c)
           }
