@@ -77,7 +77,7 @@ module.exports = arg => {
               }
         ),
       ],
-      align({ h: "left", v: "center" }, label({ ellipsis: false }, itemLabel))
+      align({ h: "center", v: "center" }, label({ ellipsis: false }, itemLabel))
     )
   )
 
