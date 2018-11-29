@@ -12,19 +12,21 @@ module.exports = ({ decimals }) => {
     )
   }
   return numericPad({
-    decimal: true,
+    decimal: !!decimals,
     toNumber: false,
     validateValue,
     fromExternalValue: integer => {
       if (integer == null) return ""
 
       const integerString = toString(integer)
+      if (!decimals) return integerString
       const intPart = integerString.slice(0, -decimals)
       const decPart = integerString.slice(-decimals)
       return (intPart || "0") + "," + decPart
     },
     toExternalValue: decimalString => {
       if (decimalString === "") return null
+      if (!decimals) return toInteger(decimalString)
 
       const [intPart, decPart] = decimalString.split(",")
       return (
