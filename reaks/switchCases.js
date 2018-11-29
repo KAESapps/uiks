@@ -1,5 +1,7 @@
 const swap = require("reaks/swap")
-module.exports = (condition, cases, def) => ctx => {
+const empty = require("./empty")
+
+module.exports = (condition, cases, def = empty) => ctx => {
   const cond = condition(ctx)
   return swap(() => {
     const c = cond()
