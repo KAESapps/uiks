@@ -43,6 +43,8 @@ const navigatorCore = args => ctx => {
       return
     }
     const page = pages[index]
+    if (!page) return
+
     if (page.canExit) {
       return page.canExit().then(res => {
         if (res !== true) return
@@ -55,6 +57,10 @@ const navigatorCore = args => ctx => {
   }
 
   const next = fromIndex => (page, ctx) => {
+    if (page == null) {
+      return closePage(fromIndex + 1)
+    }
+
     pages.splice(
       fromIndex + 1,
       pages.length - fromIndex - 1,
