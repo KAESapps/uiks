@@ -1,6 +1,7 @@
 const toInteger = require("lodash/toInteger")
 const padEnd = require("lodash/padEnd")
 const toString = require("lodash/toString")
+const padStart = require("lodash/padStart")
 const numericPad = require("./numericPad")
 
 module.exports = ({ decimals }) => {
@@ -18,8 +19,9 @@ module.exports = ({ decimals }) => {
     fromExternalValue: integer => {
       if (integer == null) return ""
 
-      const integerString = toString(integer)
+      const integerString = padStart(toString(integer), decimals, "0")
       if (!decimals) return integerString
+
       const intPart = integerString.slice(0, -decimals)
       const decPart = integerString.slice(-decimals)
       return (intPart || "0") + "," + decPart
