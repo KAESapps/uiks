@@ -23,8 +23,8 @@ module.exports = (picker, opts = {}) => {
         {
           // donne accès à la validation dans le picker
           validate: ctx => () => {
-            ctx.setValue(ctx.internalValue())
             ctx.closePopup()
+            ctx.setValue(ctx.internalValue())
           },
         },
         mix(
