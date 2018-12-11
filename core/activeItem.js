@@ -5,7 +5,7 @@ module.exports = (cbGenerator, nextPage) => ctx => {
   const cb = cbGenerator(ctx)
   const activeItem = item => {
     ctx.setActiveItem(item)
-    ctx.ensureItemVisible(true)
+    ctx.ensureItemVisible && ctx.ensureItemVisible(true)
     return nextPage && ctx.next(nextPage, create(ctx, { value: item }))
   }
   return arg => {
