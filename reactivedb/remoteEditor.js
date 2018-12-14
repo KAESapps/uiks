@@ -8,21 +8,24 @@
  * seulement value/setValue
  */
 
+const random = require("lodash/random")
 const create = require("lodash/create")
 const { observable, transaction } = require("kobs")
+const submitDelay = 500 // délai avant soumission du input (debounce)
+const defaultValue = null // TODO: rendre paramétrable ?
 
 module.exports = view => ctx => {
   let beforeSubmitTimeout, exitEditModeAfterSubmit
-  const defaultValue = "" // TODO: rendre paramétrable ?
-  const submitDelay = 100 // délai avant soumission du input (debounce)
   const editMode = observable(false)
   const inputValue = observable(defaultValue)
 
   const submit = () => {
+    const submitId = random(0, 1e6)
     const newValue = inputValue()
-    exitEditModeAfterSubmit = true
+    exitEditModeAfterSubmit = submitId
     ctx.setValue(newValue).then(() => {
-      if (exitEditModeAfterSubmit) {
+      if (exitEditModeAfterSubmit === submitId) {
+        // si aucun autre submit n'a été fait depuis, on peut revenir en display
         editMode(false)
       }
     })

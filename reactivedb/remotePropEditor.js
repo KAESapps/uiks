@@ -6,11 +6,13 @@
  * submit, success, error
  * TODO : se baser sur remoteEditor
  */
-
+const random = require("lodash/random")
 const create = require("lodash/create")
 const isFunction = require("lodash/isFunction")
 const { observable, transaction } = require("kobs")
 const getValue = ctx => ctx.value
+const defaultValue = null // TODO: rendre paramétrable ?
+const submitDelay = 500 // délai avant soumission du input (debounce)
 
 module.exports = (arg, view) => ctx => {
   const { entity, prop } =
@@ -19,12 +21,11 @@ module.exports = (arg, view) => ctx => {
   const getProp = isFunction(prop) ? prop(ctx) : prop
 
   let beforeSubmitTimeout, exitEditModeAfterSubmit
-  const defaultValue = "" // TODO: rendre paramétrable ?
-  const submitDelay = 100 // délai avant soumission du input (debounce)
   const editMode = observable(false)
   const inputValue = observable(defaultValue)
 
   const submit = () => {
+    const submitId = random(0, 1e6)
     const newValue = inputValue()
     exitEditModeAfterSubmit = true
     ctx
@@ -34,7 +35,7 @@ module.exports = (arg, view) => ctx => {
         },
       })
       .then(() => {
-        if (exitEditModeAfterSubmit) {
+        if (exitEditModeAfterSubmit === submitId) {
           editMode(false)
         }
       })
