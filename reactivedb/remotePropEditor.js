@@ -27,7 +27,7 @@ module.exports = (arg, view) => ctx => {
   const submit = () => {
     const submitId = random(0, 1e6)
     const newValue = inputValue()
-    exitEditModeAfterSubmit = true
+    exitEditModeAfterSubmit = submitId
     ctx
       .patch({
         [isFunction(getEntity) ? getEntity() : getEntity]: {
