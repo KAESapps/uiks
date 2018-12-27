@@ -56,7 +56,11 @@ const navigatorCore = args => ctx => {
     lastPageIndex(index - 1)
   }
 
-  const next = fromIndex => (page, ctx) => {
+  const next = fromIndexArg => (page, ctx, { replace = false } = {}) => {
+    let fromIndex = fromIndexArg
+    if (replace) {
+      fromIndex = fromIndex - 1
+    }
     if (page == null) {
       return closePage(fromIndex + 1)
     }
