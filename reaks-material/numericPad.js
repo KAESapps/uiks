@@ -1,3 +1,4 @@
+const compact = require("lodash/compact")
 const includes = require("lodash/includes")
 const range = require("lodash/range")
 const create = require("lodash/create")
@@ -51,6 +52,7 @@ module.exports = (opts = {}) => {
   const {
     decimal = true,
     toNumber = true,
+    allowNegative = false,
     customDisplay,
     validateValue,
     toExternalValue: toExternalValueArg,
@@ -95,6 +97,17 @@ module.exports = (opts = {}) => {
       $stringValue($stringValue().slice(0, -1))
       onUserInput()
     }
+    function toggleSign() {
+      const currentValue = $stringValue()
+      let nextValue
+      if (currentValue[0] === "-") {
+        nextValue = currentValue.slice(1)
+      } else {
+        nextValue = "-" + currentValue
+      }
+      $stringValue(nextValue)
+      onUserInput()
+    }
 
     const updateFromExternalValue = function(externalValue) {
       $stringValue(fromExternalValue(externalValue))
@@ -118,12 +131,12 @@ module.exports = (opts = {}) => {
         updateFromExternalValue(value())
       })
 
-    const padKey = (content, action) => {
+    const padKey = (content, action, { size: sizeArg = { h: 48 } } = {}) => {
       return seq([
         content,
         onTouchStart(action),
         align({ h: "center", v: "center" }),
-        size({ h: 48 }),
+        size(sizeArg),
         style({
           color: colors.grey[800],
           backgroundColor: colors.grey[100],
@@ -139,7 +152,17 @@ module.exports = (opts = {}) => {
 
     return seq([
       vPile([
-        seq([size({ h: 36 }), display($stringValue)]),
+        hFlex(
+          compact([
+            allowNegative && [
+              "fixed",
+              seq([
+                padKey(label("+/-"), toggleSign, { size: { w: 48, h: 36 } }),
+              ]),
+            ],
+            seq([size({ h: 36 }), display($stringValue)]),
+          ])
+        ),
         vPile([
           numberKeysRow(7, 9),
           numberKeysRow(4, 6),
@@ -168,6 +191,11 @@ module.exports = (opts = {}) => {
           let c = ev.key
           if (c === "Backspace") {
             eraseLastChar()
+            return
+          }
+
+          if (c === "-" && allowNegative) {
+            toggleSign()
             return
           }
 
