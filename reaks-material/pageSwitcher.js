@@ -1,29 +1,13 @@
 const mapValues = require("lodash/mapValues")
-const isString = require("lodash/isString")
-const swap = require("reaks/swap")
-const label = require("../reaks/label").reaks
+const pageSwap = require("./pageSwap")
 
-module.exports = (cond, cases) => {
-  return ctx => {
+module.exports = (cond, cases) =>
+  pageSwap(ctx => {
     const ctxCond = cond(ctx)
     const ctxCases = mapValues(cases, c => c(ctx))
-    return {
-      title: swap(() => {
-        const c = ctxCond()
-        const page = ctxCases[c]
-        const title = page.title
-        return isString(title) ? label(title) : title
-      }),
-      content: swap(() => {
-        const c = ctxCond()
-        const page = ctxCases[c]
-        return page.content
-      }),
-      action: swap(() => {
-        const c = ctxCond()
-        const page = ctxCases[c]
-        return page.action
-      }),
+
+    return () => {
+      const c = ctxCond()
+      return ctxCases[c]
     }
-  }
-}
+  })
