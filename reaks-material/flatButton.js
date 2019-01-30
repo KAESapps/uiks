@@ -1,5 +1,6 @@
 const isPlainObject = require("lodash/isPlainObject")
 const defaults = require("lodash/defaults")
+const hPile = require("../reaks-layout/hPile")
 const label = require("../reaks/label").reaks
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
@@ -9,6 +10,7 @@ const innerMargin = require("../reaks-layout/innerMargin")
 const align = require("../reaks-layout/align")
 const hoverable = require("../reaks/hoverable")
 const size = require("reaks/size")
+const svgIcon = require("reaks/svgIcon")
 const colors = require("material-colors")
 
 module.exports = ctxComponent(
@@ -16,17 +18,23 @@ module.exports = ctxComponent(
     if (!isPlainObject(arg)) {
       arg = { label: arg }
     }
-    const { label: text, color = colors.black } = arg
+    const { label: text, color = colors.black, icon } = arg
 
     return seq([
       hoverable.reaksMixin({
         over: style({ backgroundColor: "rgba(0,0,0,0.1)" }),
       }),
       clickable(action),
-      label(text),
+      icon
+        ? hPile([
+            svgIcon(icon, { size: { h: 24, w: 24 }, color }),
+            size({ w: 8 }),
+            label(text),
+          ])
+        : label(text),
       align({ h: "center", v: "center" }),
       size({ h: 40 }),
-      innerMargin({ h: 16 }),
+      innerMargin(icon ? { l: 8, r: 16 } : { h: 16 }),
       style({
         color,
         backgroundColor: "rgba(0,0,0,0.03)",
