@@ -22,7 +22,9 @@ const iconButton = require("./iconButton").reaks
 const clearIconDef = require("./icons/content/clear")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
-const formatDate = require("reactivedb/operators/formatDate")
+const formatDateTime = require("reactivedb/operators/formatDateTime")
+const datePrecisionAtLeast = require("reactivedb/operators/utils/datePrecision")
+  .atLeast
 
 const hFlexGrid = ({ colMinWidth }, items) => {
   return seq(
@@ -45,47 +47,55 @@ const padKeyStyle = (isActive, ctx) =>
       fontWeight: 500,
       fontSize: 20,
     }),
-    style(
-      () =>
-        isActive()
-          ? {
-              color: ctx.colors.textOnPrimary,
-              backgroundColor: ctx.colors.primary,
-            }
-          : {
-              color: colors.grey[800],
-              backgroundColor: colors.grey[100],
-            }
+    style(() =>
+      isActive()
+        ? {
+            color: ctx.colors.textOnPrimary,
+            backgroundColor: ctx.colors.primary,
+          }
+        : {
+            color: colors.grey[800],
+            backgroundColor: colors.grey[100],
+          }
     ),
   ])
 
-module.exports = ({ precision = "day" } = {}) => {
+module.exports = ({
+  precision = "day",
+  hourMin = 0,
+  hourMax = 23,
+  minuteInterval = 5,
+} = {}) => {
+  const precisionAtLeast = datePrecisionAtLeast(precision)
+
   const ISOStringToInternalValue = value => {
     if (!value) return null
-    let regexp = "(\\d{4})"
-    if (precision !== "year") {
-      regexp += "-([01]\\d)"
+    const date = new Date(value)
+    if (isNaN(date)) return null
+    return {
+      year: date.getFullYear(),
+      month: precisionAtLeast("month") && date.getMonth() + 1,
+      day: precisionAtLeast("day") && date.getDate(),
+      hour: precisionAtLeast("hour") && date.getHours(),
+      minute: precisionAtLeast("minute") && date.getMinutes(),
     }
-    if (precision === "day") {
-      regexp += "-([0-3]\\d)"
-    }
-
-    const matchingValue = value.match(new RegExp(regexp))
-    if (!matchingValue) return null
-
-    const [, year, month, day] = matchingValue.map(toInteger)
-    return { year, month, day }
   }
   const internalValuetoISOString = value => {
     if (!value) return null
 
     let str = value.year
 
-    if (precision !== "year") {
+    if (precisionAtLeast("month")) {
       str += "-" + padStart(value.month, 2, "0")
     }
-    if (precision === "day") {
+    if (precisionAtLeast("day")) {
       str += "-" + padStart(value.day, 2, "0")
+    }
+    if (precisionAtLeast("hour")) {
+      str += "T" + padStart(value.hour, 2, "0")
+    }
+    if (precisionAtLeast("minute")) {
+      str += ":" + padStart(value.minute, 2, "0")
     }
     return str
   }
@@ -93,10 +103,8 @@ module.exports = ({ precision = "day" } = {}) => {
   const display = val =>
     seq([
       label(() =>
-        formatDate(val(), {
-          year: "numeric",
-          month: precision !== "year" ? "numeric" : undefined,
-          day: precision === "day" ? "numeric" : undefined,
+        formatDateTime(val(), {
+          precision,
         })
       ),
       align({ v: "center" }),
@@ -120,7 +128,23 @@ module.exports = ({ precision = "day" } = {}) => {
       const baseValue = internalValue()
       const patch = { [type]: value }
 
-      if (precision === "day") {
+      if (precisionAtLeast("minute")) {
+        if (type !== "minute") {
+          if (!get(baseValue, "minute")) {
+            assign(patch, { minute: new Date().getMinutes() })
+          }
+        }
+      }
+
+      if (precisionAtLeast("hour")) {
+        if (type !== "hour") {
+          if (!get(baseValue, "hour")) {
+            assign(patch, { hour: new Date().getHours() })
+          }
+        }
+      }
+
+      if (precisionAtLeast("day")) {
         if (type !== "day") {
           if (!get(baseValue, "day")) {
             assign(patch, { day: new Date().getDate() })
@@ -128,8 +152,7 @@ module.exports = ({ precision = "day" } = {}) => {
         }
       }
 
-      // if precision is month, at least (month or day)
-      if (precision !== "year") {
+      if (precisionAtLeast("month")) {
         if (type !== "month") {
           if (!get(baseValue, "month")) {
             assign(patch, { month: new Date().getMonth() + 1 })
@@ -215,10 +238,16 @@ module.exports = ({ precision = "day" } = {}) => {
               () => refYear() + 1,
               () => refYear() + 2,
             ]),
-            precision !== "year" && label("Mois"),
-            precision !== "year" && keysRow("month", range(1, 13)),
-            precision === "day" && label("Jour"),
-            precision === "day" && keysRow("day", range(1, 32)),
+            precisionAtLeast("month") && label("Mois"),
+            precisionAtLeast("month") && keysRow("month", range(1, 13)),
+            precisionAtLeast("day") && label("Jour"),
+            precisionAtLeast("day") && keysRow("day", range(1, 32)),
+            precisionAtLeast("hour") && label("Heure"),
+            precisionAtLeast("hour") &&
+              keysRow("hour", range(hourMin, hourMax + 1)),
+            precisionAtLeast("minute") && label("Minute"),
+            precisionAtLeast("minute") &&
+              keysRow("minute", range(0, 60, minuteInterval)),
           ])
         ),
       ]),

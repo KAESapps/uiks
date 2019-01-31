@@ -4,7 +4,7 @@ const textInputLook = require("./textInputLook")
 const size = require("uiks/reaks/size")
 const align = require("uiks/reaks/align")
 const label = require("uiks/reaks/label")
-const formatDate = require("reactivedb/operators/formatDate")
+const formatDateTime = require("reactivedb/operators/formatDateTime")
 
 const textFieldDisplayer = formatter =>
   size(
@@ -14,14 +14,10 @@ const textFieldDisplayer = formatter =>
 
 const dialogEditor = require("./dialogEditor")
 
-module.exports = ({ precision }) =>
+module.exports = (opts = {}) =>
   dialogEditor(
-    datePicker({ precision }),
+    datePicker(opts),
     textFieldDisplayer(val =>
-      formatDate(val, {
-        year: "numeric",
-        month: precision !== "year" ? "numeric" : undefined,
-        day: precision === "day" ? "numeric" : undefined,
-      })
+      formatDateTime(val, { precision: opts.precision })
     )
   )
