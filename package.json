@@ -10,7 +10,7 @@
     "intersperse-array": "1.0.0",
     "lodash": "4.17.11",
     "material-colors": "1.2.6",
-    "reactivedb": "KAESapps/reactivedb#ce80139"
+    "reactivedb": "KAESapps/reactivedb#fd1a0f3"
   },
   "peerDependencies": {
     "kobs": "kaesapps/kobs#b54dbb4",
