@@ -6,9 +6,15 @@ module.exports = (cbGenerator, nextPage) => ctx => {
   const activeItem = item => {
     ctx.setActiveItem(item)
     ctx.ensureItemVisible && ctx.ensureItemVisible(true)
-    return nextPage && ctx.next(nextPage, create(ctx, { value: item }))
+    return (
+      nextPage &&
+      ctx.next(
+        nextPage,
+        create(ctx, { value: item, selfOpenItem: arg => selfOpenItem(arg) })
+      )
+    )
   }
-  return arg => {
+  const selfOpenItem = arg => {
     const res = cb(arg)
     if (res.then) {
       return res.then(activeItem).catch(err => {
@@ -18,4 +24,5 @@ module.exports = (cbGenerator, nextPage) => ctx => {
       return activeItem(res)
     }
   }
+  return selfOpenItem
 }
