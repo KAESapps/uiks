@@ -18,7 +18,13 @@ module.exports = ctxComponent(
     if (!isPlainObject(arg)) {
       arg = { label: arg }
     }
-    const { label: text, color = colors.black, icon } = arg
+    const {
+      label: text,
+      color = colors.black,
+      icon,
+      height = 40,
+      fontSize = 14,
+    } = arg
 
     return seq([
       hoverable.reaksMixin({
@@ -33,13 +39,13 @@ module.exports = ctxComponent(
           ])
         : label(text),
       align({ h: "center", v: "center" }),
-      size({ h: 40 }),
+      size({ h: height }),
       innerMargin(icon ? { l: 8, r: 16 } : { h: 16 }),
       style({
         color,
         backgroundColor: "rgba(0,0,0,0.03)",
         textTransform: "uppercase",
-        fontSize: "14px",
+        fontSize,
         fontWeight: 500,
         borderRadius: 2,
       }),
