@@ -61,7 +61,7 @@ module.exports = ctxComponent(
           "running",
           align(
             { h: "center", v: "center" },
-            seq([size({ h: 28, w: 28 }), spinner(textColor)])
+            spinner({ color: textColor, size: 28 })
           )
         ),
         visibleIf(
@@ -85,8 +85,8 @@ module.exports = ctxComponent(
           state() === "success"
             ? "limegreen"
             : state() === "error"
-              ? "#EEE"
-              : backgroundColor,
+            ? "#EEE"
+            : backgroundColor,
       })),
       align({ h: "center", v: "center" }),
       size({ h: 40 }),
