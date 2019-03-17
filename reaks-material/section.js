@@ -7,6 +7,7 @@ const style = require("uiks/reaks/style")
 const align = require("uiks/reaks/align")
 const size = require("uiks/reaks/size")
 const margin = require("uiks/reaks/margin")
+const border = require("uiks/reaks/border")
 
 module.exports = args => {
   const {
@@ -35,9 +36,12 @@ module.exports = args => {
             },
             style(
               colors,
-              innerMargin(
-                { h: 12 },
-                align({ v: "center" }, isString(title) ? label(title) : title)
+              border(
+                { b: { color: "#999" } },
+                innerMargin(
+                  { h: 12 },
+                  align({ v: "center" }, isString(title) ? label(title) : title)
+                )
               )
             )
           ),
