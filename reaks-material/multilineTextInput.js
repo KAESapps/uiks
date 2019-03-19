@@ -28,6 +28,13 @@ module.exports = ctxCmp(
         onEvent("input", ev => {
           setValue(ev.target.value)
         }),
+        onEvent("keydown", ev => {
+          const key = ev.key
+          if (key === "Enter") {
+            // pour la compatibilité avec pickerInDialog
+            ev.stopPropagation()
+          }
+        }),
         autoFocus && (domNode => domNode.focus()),
       ]),
       () => document.createElement("textarea")
