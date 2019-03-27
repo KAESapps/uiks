@@ -1,8 +1,6 @@
 const compact = require("lodash/compact")
 const isFunction = require("lodash/isFunction")
-const concat = require("lodash/concat")
 const toString = require("lodash/toString")
-const toInteger = require("lodash/toInteger")
 const get = require("lodash/get")
 const padStart = require("lodash/padStart")
 const assign = require("lodash/assign")
@@ -16,7 +14,6 @@ const clickable = require("uiks/reaks/clickable").reaksMixin
 const label = require("uiks/reaks/label").reaks
 const align = require("uiks/reaks-layout/align")
 const size = require("reaks/size")
-const child = require("reaks/child")
 const colors = require("material-colors")
 const iconButton = require("./iconButton").reaks
 const clearIconDef = require("./icons/content/clear")
@@ -25,18 +22,6 @@ const { observe } = require("kobs")
 const formatDateTime = require("reactivedb/operators/formatDateTime")
 const datePrecisionAtLeast = require("reactivedb/operators/utils/datePrecision")
   .atLeast
-
-const hFlexGrid = ({ colMinWidth }, items) => {
-  return seq(
-    concat(
-      style({
-        display: "grid",
-        gridTemplateColumns: `repeat(auto-fit, minmax(${colMinWidth}px, 1fr))`,
-      }),
-      items.map(c => child(c))
-    )
-  )
-}
 
 const padKeyStyle = (isActive, ctx) =>
   seq([
@@ -200,8 +185,7 @@ module.exports = ({
     }
 
     const keysRow = (fragmentType, keys) =>
-      hFlexGrid(
-        { colMinWidth: 48 },
+      hFlex(
         keys.map(val => {
           let getValue = val
           if (!isFunction(val)) {
@@ -241,10 +225,26 @@ module.exports = ({
             precisionAtLeast("month") && label("Mois"),
             precisionAtLeast("month") && keysRow("month", range(1, 13)),
             precisionAtLeast("day") && label("Jour"),
-            precisionAtLeast("day") && keysRow("day", range(1, 32)),
+            precisionAtLeast("day") && keysRow("day", range(1, 11)),
+            precisionAtLeast("day") && keysRow("day", range(11, 21)),
+            precisionAtLeast("day") && keysRow("day", range(21, 32)),
             precisionAtLeast("hour") && label("Heure"),
             precisionAtLeast("hour") &&
-              keysRow("hour", range(hourMin, hourMax + 1)),
+              keysRow(
+                "hour",
+                range(
+                  hourMin,
+                  Math.floor(hourMin + (hourMax - hourMin) / 2) + 1
+                )
+              ),
+            precisionAtLeast("hour") &&
+              keysRow(
+                "hour",
+                range(
+                  Math.floor(hourMin + (hourMax - hourMin) / 2) + 1,
+                  hourMax + 1
+                )
+              ),
             precisionAtLeast("minute") && label("Minute"),
             precisionAtLeast("minute") &&
               keysRow("minute", range(0, 60, minuteInterval)),
