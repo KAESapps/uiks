@@ -12,7 +12,7 @@ const isFunction = require("lodash/isFunction")
 const { observable, transaction } = require("kobs")
 const getValue = ctx => ctx.value
 const defaultValue = null // TODO: rendre paramétrable ?
-const submitDelay = 1000 // délai avant soumission du input (debounce)
+const submitDelay = 400 // délai avant soumission du input (debounce)
 
 module.exports = (arg, view) => ctx => {
   const { entity, prop } =

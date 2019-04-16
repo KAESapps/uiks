@@ -11,7 +11,7 @@
 const random = require("lodash/random")
 const create = require("lodash/create")
 const { observable, transaction } = require("kobs")
-const submitDelay = 1000 // délai avant soumission du input (debounce)
+const submitDelay = 400 // délai avant soumission du input (debounce)
 const defaultValue = null // TODO: rendre paramétrable ?
 
 module.exports = view => ctx => {
