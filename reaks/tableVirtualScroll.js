@@ -62,13 +62,18 @@ module.exports = function(arg1, arg2) {
         }
       : null
 
-  return vFlex([
-    ["fixed", header],
-    vListVirtualScroll({
-      itemHeight: opts.itemHeight || 43,
-      item: row,
-      getDefaultVisibleItem,
-      disableEnsureItemVisible,
-    }),
-  ])
+  const body = vListVirtualScroll({
+    itemHeight: opts.itemHeight || 43,
+    item: row,
+    getDefaultVisibleItem,
+    disableEnsureItemVisible,
+  })
+
+  const fullTable = vFlex([["fixed", header], body])
+
+  fullTable.header = header
+  fullTable.body = body
+  fullTable.row = row
+
+  return fullTable
 }

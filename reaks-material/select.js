@@ -20,5 +20,5 @@ module.exports = args =>
         }
       },
     }),
-    actions: concat(dialog.cancelButton(), args.actions),
+    actions: concat(args.actions, dialog.cancelButton()),
   })

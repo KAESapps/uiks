@@ -7,7 +7,7 @@ const label = require("uiks/reaks/label")
 const formatDate = require("reactivedb/operators/formatDate")
 
 const textFieldDisplayer = size(
-  { wMin: 86 },
+  { wMin: 100 },
   align({ v: "bottom" }, textInputLook(formatValue(formatDate, label())))
 )
 

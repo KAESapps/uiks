@@ -33,7 +33,7 @@ module.exports = ({ title, listValue, itemLabel, actions }) =>
               ],
               observableAsValue(
                 "search",
-                textInput({ placeholder: "Recherche" })
+                textInput({ placeholder: "Recherche", autoFocus: true })
               ),
             ]),
           ],
