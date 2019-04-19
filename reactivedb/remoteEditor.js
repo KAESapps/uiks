@@ -11,11 +11,10 @@
 const random = require("lodash/random")
 const create = require("lodash/create")
 const { observable, transaction } = require("kobs")
-const submitDelay = 400 // délai avant soumission du input (debounce)
 const defaultValue = null // TODO: rendre paramétrable ?
 
 module.exports = view => ctx => {
-  let beforeSubmitTimeout, exitEditModeAfterSubmit
+  let exitEditModeAfterSubmit
   const editMode = observable(false)
   const inputValue = observable(defaultValue)
 
@@ -40,11 +39,10 @@ module.exports = view => ctx => {
     transaction(() => {
       inputValue(newValue)
       if (!editMode()) editMode(true)
-      clearTimeout(beforeSubmitTimeout)
       // dans le cas d'une saisie lors d'une soumission en cours,
       // on annule le passage automatique au mode display au retour de la soumission
       exitEditModeAfterSubmit = false
-      beforeSubmitTimeout = setTimeout(submit, submitDelay)
+      submit()
     })
 
   return view(create(ctx, { value, setValue }))

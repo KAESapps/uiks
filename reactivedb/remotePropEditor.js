@@ -12,7 +12,6 @@ const isFunction = require("lodash/isFunction")
 const { observable, transaction } = require("kobs")
 const getValue = ctx => ctx.value
 const defaultValue = null // TODO: rendre paramétrable ?
-const submitDelay = 400 // délai avant soumission du input (debounce)
 
 module.exports = (arg, view) => ctx => {
   const { entity, prop } =
@@ -20,7 +19,7 @@ module.exports = (arg, view) => ctx => {
   const getEntity = isFunction(entity) ? entity(ctx) : entity
   const getProp = isFunction(prop) ? prop(ctx) : prop
 
-  let beforeSubmitTimeout, exitEditModeAfterSubmit
+  let exitEditModeAfterSubmit
   const editMode = observable(false)
   const inputValue = observable(defaultValue)
 
@@ -55,11 +54,10 @@ module.exports = (arg, view) => ctx => {
     transaction(() => {
       inputValue(newValue)
       if (!editMode()) editMode(true)
-      clearTimeout(beforeSubmitTimeout)
       // dans le cas d'une saisie lors d'une soumission en cours,
       // on annule le passage automatique au mode display au retour de la soumission
       exitEditModeAfterSubmit = false
-      beforeSubmitTimeout = setTimeout(submit, submitDelay)
+      submit()
     })
 
   return view(create(ctx, { value, setValue }))
