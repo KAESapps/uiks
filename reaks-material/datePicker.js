@@ -1,4 +1,5 @@
 const compact = require("lodash/compact")
+const pickBy = require("lodash/pickBy")
 const isFunction = require("lodash/isFunction")
 const toString = require("lodash/toString")
 const get = require("lodash/get")
@@ -16,6 +17,7 @@ const align = require("uiks/reaks-layout/align")
 const size = require("reaks/size")
 const colors = require("material-colors")
 const iconButton = require("./iconButton").reaks
+const button = require("./button").reaks
 const clearIconDef = require("./icons/content/clear")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
@@ -159,6 +161,18 @@ module.exports = ({
       internalValue(null)
       onUserInput()
     }
+    function setToNow() {
+      internalValue(
+        pickBy({
+          year: new Date().getFullYear(),
+          month: precisionAtLeast("month") && new Date().getMonth() + 1,
+          day: precisionAtLeast("day") && new Date().getDate(),
+          hour: precisionAtLeast("hour") && new Date().getHours(),
+          minute: precisionAtLeast("minute") && new Date().getMinutes(),
+        })
+      )
+      onUserInput()
+    }
 
     const updateFromExternalValue = function(externalValue) {
       if (externalValue !== internalValuetoISOString(internalValue())) {
@@ -211,6 +225,7 @@ module.exports = ({
                 clearValue
               ),
             ],
+            [{ weight: null, align: "center" }, button("Maintenant", setToNow)],
           ]),
         ]),
         vPile(
