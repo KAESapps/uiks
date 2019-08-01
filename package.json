@@ -8,16 +8,16 @@
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
     "intersperse-array": "1.0.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.15",
     "material-colors": "1.2.6",
-    "reactivedb": "KAESapps/reactivedb#fd1a0f3"
+    "reactivedb": "KAESapps/reactivedb#94545e6"
   },
   "peerDependencies": {
     "kobs": "kaesapps/kobs#b54dbb4",
     "reaks": "kaesapps/reaks#1e04fd6"
   },
   "devDependencies": {
-    "eslint": "5.12.0",
+    "eslint": "6.1.0",
     "update-git-packages": "github:kaesapps/update-git-packages"
   },
   "scripts": {
