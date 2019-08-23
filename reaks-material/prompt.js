@@ -5,7 +5,7 @@ const concat = require("lodash/concat")
 const assignObservable = require("../core/assignObservable")
 const dialog = require("./dialog")
 const flatButton = require("./flatButton")
-const button = require("./button")
+const button = require("./commandButton")
 
 module.exports = args =>
   assignObservable(
@@ -23,8 +23,9 @@ module.exports = args =>
               .then(onSubmit)
               .then(ctx.closePopup, err => {
                 console.warn(err)
-                ctx.alert({ title: "Erreur", message: err.message })
-                //TODO: afficher l'erreur à l'utilisateur... mais comment ?
+                return ctx
+                  .alert({ title: "Erreur", message: err.message })
+                  .then(() => Promise.reject()) // affiche une erreur sur le command button
               })
         })
       ),
