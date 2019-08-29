@@ -4,6 +4,7 @@ const empty = require("./empty")
 
 module.exports = (condition, cases, def = empty) => ctx => {
   const cond = condition(ctx)
+  cases = isFunction(cases) ? cases(ctx) : cases
   return isFunction(cond)
     ? swap(() => {
         const c = cond()
