@@ -31,8 +31,7 @@ const display = val =>
 
 const padKeyStyle = seq([
   align({ h: "center", v: "center" }),
-  size({ h: 48, wMin: 40 }),
-  innerMargin({ h: 16 }),
+  size({ h: 48, wMin: 24 }),
   style({
     color: colors.grey[800],
     backgroundColor: colors.grey[100],
