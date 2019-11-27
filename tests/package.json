@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "budo": "10.0.4",
-    "eslint": "4.8.0",
+    "eslint": "6.7.1",
     "kobs": "kaesapps/kobs#a95a4c9",
     "reaks": "kaesapps/reaks#205cc29",
     "smooth-move": "1.0.1"
