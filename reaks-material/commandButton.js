@@ -1,4 +1,5 @@
 const defaults = require("lodash/defaults")
+const isString = require("lodash/isString")
 const label = require("../reaks/label").reaks
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
@@ -14,9 +15,12 @@ const swap = require("reaks/swap")
 const svgIcon = require("reaks/svgIcon")
 const successIcon = require("./icons/action/done")
 const errorIcon = require("./icons/alert/error")
+const hPile = require("../reaks-layout/hPile")
+const icon = require("./icon").reaks
 
 module.exports = ctxComponent(
-  (text, action, opts) => {
+  (arg, action, opts) => {
+    const { text, icon: iconDef } = isString(arg) ? { text: arg } : arg
     const { textColor, backgroundColor } = defaults({}, opts, {
       textColor: colors.black,
       backgroundColor: colors.grey[300],
@@ -31,6 +35,13 @@ module.exports = ctxComponent(
       ])
 
     let timeoutId
+
+    const iconCmp = iconDef && icon({ icon: iconDef, color: textColor })
+    const textCmp = text && label(text)
+    const content =
+      iconCmp && textCmp
+        ? hPile({ gap: 6, align: "center" }, [iconCmp, textCmp])
+        : iconCmp || textCmp
 
     return seq([
       // action call, disabled when already running
@@ -55,7 +66,7 @@ module.exports = ctxComponent(
       zPile([
         [
           { sizer: true },
-          visibleIf("idle", align({ h: "center", v: "center" }, label(text))),
+          visibleIf("idle", align({ h: "center", v: "center" }, content)),
         ],
         visibleIf(
           "running",
@@ -96,8 +107,8 @@ module.exports = ctxComponent(
         borderRadius: 2,
         boxShadow:
           "rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px",
-        paddingLeft: 16,
-        paddingRight: 16,
+        paddingLeft: iconDef ? 8 : 16,
+        paddingRight: text ? 16 : 8,
         fontSize: 14,
         fontWeight: 500,
       }),
