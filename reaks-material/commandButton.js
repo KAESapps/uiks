@@ -21,9 +21,10 @@ const icon = require("./icon").reaks
 module.exports = ctxComponent(
   (arg, action, opts) => {
     const { text, icon: iconDef } = isString(arg) ? { text: arg } : arg
-    const { textColor, backgroundColor } = defaults({}, opts, {
+    const { textColor, backgroundColor, height } = defaults({}, opts, {
       textColor: colors.black,
       backgroundColor: colors.grey[300],
+      height: 40,
     })
     const state = observable("idle")
     const visibleIf = (visibleState, cmp) =>
@@ -100,7 +101,7 @@ module.exports = ctxComponent(
             : backgroundColor,
       })),
       align({ h: "center", v: "center" }),
-      size({ h: 40 }),
+      size({ h: height }),
       style({
         color: textColor,
         textTransform: "uppercase",

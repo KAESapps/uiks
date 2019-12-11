@@ -31,17 +31,19 @@ module.exports = args => {
           style(
             {
               fontWeight: 500,
-              height: 36,
+              height: 32,
             },
             style(
               colors,
               border(
                 { b: { color: "#999" } },
                 innerMargin(
-                  { h: 12 },
-                  hFlex({ align: "center" }, [
-                    isString(title) ? label(title) : title,
-                    action && ["fixed", align({ h: "right" }, action)],
+                  { h: 12, v: 2 },
+                  hFlex([
+                    isString(title)
+                      ? align({ v: "center" }, label(title))
+                      : title,
+                    ["fixed", action && align({ h: "right" }, action)],
                   ])
                 )
               )
