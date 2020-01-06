@@ -112,28 +112,29 @@ const confirm = ({
   onConfirm: onConfirmCtx,
   onCancel: onCancelCtx,
 }) => {
-  const closeAction = res => ctx => {
-    const onClose = onCloseCtx && onCloseCtx(ctx)
+  const closeAction = res => rootCtx => ctx => {
+    // les cb ne prennent pas le contexte de la popup de confirmation ce qui leur permet de s'éxécuter comme si il n'y avait pas eu de demande de confirmation préalable
+    const onClose = onCloseCtx && onCloseCtx(rootCtx)
     const onResponse = res
-      ? onConfirmCtx && onConfirmCtx(ctx)
-      : onCancelCtx && onCancelCtx(ctx)
+      ? onConfirmCtx && onConfirmCtx(rootCtx)
+      : onCancelCtx && onCancelCtx(rootCtx)
 
     return () => {
+      ctx.closePopup()// on ferme le dialogue de confirmation avant d'éxécuter les cb (ce qui leur permet de rouvrir une popup si ils veulent sans conflit)
       onClose && onClose(res)
       onResponse && onResponse()
-      ctx.closePopup()
     }
   }
-  return dialog({
+  return rootCtx => dialog({
     title,
     content: bodyText(message),
     actions: [
-      flatButton({ label: cancelLabel, primary: false }, closeAction(false)),
-      button(confirmLabel, closeAction(true)),
+      flatButton({ label: cancelLabel, primary: false }, closeAction(false)(rootCtx)),
+      button(confirmLabel, closeAction(true)(rootCtx)),
     ],
     modal: true,
     nested: false,
-  })
+  })(rootCtx)
 }
 
 dialog.dialogPopupLayer = dialog.popupLayer = dialogPopupLayer
