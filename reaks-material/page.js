@@ -7,9 +7,9 @@ module.exports = function(args) {
   const actions = isArray(args.action)
     ? args.action
     : args.action
-      ? [args.action]
-      : []
-  if (args.moreActions) {
+    ? [args.action]
+    : []
+  if (args.moreActions && args.moreActions.length) {
     actions.push(moreActionsMenu(args.moreActions))
   }
 
