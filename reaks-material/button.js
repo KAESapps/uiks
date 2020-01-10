@@ -10,15 +10,16 @@ const colors = require("material-colors")
 
 module.exports = ctxComponent(
   (text, action, opts) => {
-    const { textColor, backgroundColor } = defaults({}, opts, {
+    const { textColor, backgroundColor, height } = defaults({}, opts, {
       textColor: colors.black,
       backgroundColor: colors.grey[300],
+      height: 40,
     })
     return seq([
       clickable(action),
       label(text),
       align({ h: "center", v: "center" }),
-      size({ h: 40 }),
+      size({ h: height }),
       style({
         color: textColor,
         backgroundColor,

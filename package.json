@@ -4,6 +4,7 @@
   "description": "High-level components for compositing UIs",
   "main": "index.js",
   "dependencies": {
+    "color": "3.1.2",
     "element-resize-detector": "1.2.0",
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",

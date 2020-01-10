@@ -17,15 +17,21 @@ const successIcon = require("./icons/action/done")
 const errorIcon = require("./icons/alert/error")
 const hPile = require("../reaks-layout/hPile")
 const icon = require("./icon").reaks
+const hoverable = require("../reaks/hoverable").reaksMixin
+const color = require("color")
 
 module.exports = ctxComponent(
   (arg, action, opts) => {
     const { text, icon: iconDef } = isString(arg) ? { text: arg } : arg
-    const { textColor, backgroundColor, height } = defaults({}, opts, {
+    let { textColor, backgroundColor, height, flat } = defaults({}, opts, {
       textColor: colors.black,
       backgroundColor: colors.grey[300],
       height: 40,
+      flat: false,
     })
+
+    if (flat) backgroundColor = null
+
     const state = observable("idle")
     const visibleIf = (visibleState, cmp) =>
       seq([
@@ -107,11 +113,22 @@ module.exports = ctxComponent(
         textTransform: "uppercase",
         borderRadius: 2,
         boxShadow:
+          !flat &&
           "rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px",
         paddingLeft: iconDef ? 8 : 16,
         paddingRight: text ? 16 : 8,
         fontSize: 14,
         fontWeight: 500,
+      }),
+      hoverable({
+        out: style({ backgroundColor }),
+        over: style({
+          backgroundColor: backgroundColor
+            ? color(backgroundColor)
+                .darken(0.1)
+                .string()
+            : "rgba(0, 0, 0, 0.1)",
+        }),
       }),
     ])
   },
