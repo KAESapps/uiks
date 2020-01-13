@@ -33,7 +33,7 @@ module.exports = ctxCmp(
         }),
         valueAttr(value), // specialized attr handler that prevent cursor jumping
         onEvent("input", ev => {
-          setValue(ev.target.value)
+          setValue(ev.target.value || null)
         }),
         autoFocus &&
           (domNode => {
