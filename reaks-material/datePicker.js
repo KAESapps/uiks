@@ -2,33 +2,48 @@ const compact = require("lodash/compact")
 const pickBy = require("lodash/pickBy")
 const isFunction = require("lodash/isFunction")
 const toString = require("lodash/toString")
+const toInteger = require("lodash/toInteger")
 const get = require("lodash/get")
 const padStart = require("lodash/padStart")
 const assign = require("lodash/assign")
 const range = require("lodash/range")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
-const hFlex = require("uiks/reaks-layout/hFlex")
-const vPile = require("uiks/reaks-layout/vPile")
-const innerMargin = require("uiks/reaks-layout/innerMargin")
-const clickable = require("uiks/reaks/clickable").reaksMixin
-const label = require("uiks/reaks/label").reaks
-const align = require("uiks/reaks-layout/align")
-const size = require("reaks/size")
+const hFlex = require("../reaks-layout/hFlex")
+const hPile = require("../reaks-layout/hPile")
+const vPile = require("../reaks-layout/vPile")
+const innerMargin = require("../reaks-layout/innerMargin")
+const clickable = require("../reaks/clickable").reaksMixin
+const label = require("../reaks/label").reaks
+const displayIf = require("../reaks/displayIf").reaks
+const align = require("../reaks-layout/align")
+const size = require("../reaks/size")
+const empty = require("../reaks/empty")
 const colors = require("material-colors")
 const iconButton = require("./iconButton").reaks
+const icon = require("./icon").reaks
 const button = require("./button").reaks
+const textInput = require("./textInput").reaks
+const labelled = require("./labelled")
 const clearIconDef = require("./icons/content/clear")
+const arrowBack = require("./icons/navigation/arrowBack")
+const arrowForward = require("./icons/navigation/arrowForward")
+const alertIcon = require("./icons/alert/error")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
-const formatDateTime = require("reactivedb/operators/formatDateTime")
 const datePrecisionAtLeast = require("reactivedb/operators/utils/datePrecision")
   .atLeast
+
+const isValidISODate = iso => {
+  const date = new Date(iso)
+  if (isNaN(date)) return false
+  return true
+}
 
 const padKeyStyle = (isActive, ctx) =>
   seq([
     align({ h: "center", v: "center" }),
-    size({ h: 48 }),
+    size.reaksMixin({ h: 48 }),
     innerMargin({ h: 16 }),
     style({
       fontWeight: 500,
@@ -46,6 +61,20 @@ const padKeyStyle = (isActive, ctx) =>
           }
     ),
   ])
+
+const fragmentLabels = {
+  year: "Année",
+  month: "Mois",
+  day: "Jour",
+  hour: "Heure",
+  minute: "Minute",
+}
+
+const integerInput = opts =>
+  size.reaksWrapper(
+    { w: (opts.fragmentId === "year" ? 4 : 2) * 20 },
+    labelled.reaks(fragmentLabels[opts.fragmentId], textInput(opts))
+  )
 
 module.exports = ({
   precision = "day",
@@ -84,15 +113,42 @@ module.exports = ({
     if (precisionAtLeast("minute")) {
       str += ":" + padStart(value.minute, 2, "0")
     }
+
     return str
   }
 
-  const display = val =>
-    seq([
-      label(() =>
-        formatDateTime(val(), {
-          precision,
-        })
+  const internalValuetoExternalValue = value => {
+    const stringVal = internalValuetoISOString(value)
+    return isValidISODate(stringVal) ? stringVal : null
+  }
+
+  return ctx => {
+    const { setValue, value } = ctx
+    const internalValue = observable()
+    const refYear = observable(new Date().getFullYear())
+    const isInternalValueValid = () =>
+      isValidISODate(internalValuetoISOString(internalValue()))
+
+    const displayFragment = fragmentId => {
+      return integerInput({
+        value: () => {
+          return toString(get(internalValue(), fragmentId))
+        },
+        setValue: val =>
+          setDateFragment(fragmentId, val !== "" ? toInteger(val) : null),
+        fragmentId,
+      })
+    }
+    const display = seq([
+      hPile(
+        { gap: 8 },
+        compact([
+          precisionAtLeast("day") && displayFragment("day"),
+          precisionAtLeast("month") && displayFragment("month"),
+          precisionAtLeast("year") && displayFragment("year"),
+          precisionAtLeast("hour") && displayFragment("hour"),
+          precisionAtLeast("minute") && displayFragment("minute"),
+        ])
       ),
       align({ v: "center" }),
       innerMargin({ h: 10 }),
@@ -101,14 +157,8 @@ module.exports = ({
       }),
     ])
 
-  return ctx => {
-    const { setValue, value } = ctx
-    const internalValue = observable()
-    const refYear = observable(new Date().getFullYear())
-
     function onUserInput() {
-      const stringVal = internalValuetoISOString(internalValue())
-      setValue(stringVal)
+      setValue(internalValuetoExternalValue(internalValue()))
     }
 
     function setDateFragment(type, value) {
@@ -175,7 +225,7 @@ module.exports = ({
     }
 
     const updateFromExternalValue = function(externalValue) {
-      if (externalValue !== internalValuetoISOString(internalValue())) {
+      if (externalValue !== internalValuetoExternalValue(internalValue())) {
         internalValue(ISOStringToInternalValue(externalValue))
         // on affiche les boutons d'année en cohérence avec la valeur externe
         get(internalValue(), "year") && refYear(internalValue().year)
@@ -187,36 +237,47 @@ module.exports = ({
       updateFromExternalValue(value())
     })
 
-    const key = (getValue, fragmentType) => {
+    const key = (getValue, fragmentId) => {
       return seq([
         label(() => toString(getValue())),
-        clickable(() => setDateFragment(fragmentType, getValue())),
-        padKeyStyle(
-          () => get(internalValue(), fragmentType) === getValue(),
-          ctx
-        ),
+        clickable(() => setDateFragment(fragmentId, getValue())),
+        padKeyStyle(() => get(internalValue(), fragmentId) === getValue(), ctx),
       ])
     }
 
-    const keysRow = (fragmentType, keys) =>
+    const keysRow = (fragmentId, keys) =>
       hFlex(
         keys.map(val => {
           let getValue = val
           if (!isFunction(val)) {
             getValue = () => val
           }
-          return key(getValue, fragmentType)
+          return key(getValue, fragmentId)
         })
       )
 
     return seq([
-      vPile([
+      vPile({ gap: 12 }, [
         seq([
-          size({ h: 48 }),
-          hFlex([
-            display(() => internalValuetoISOString(internalValue())),
+          size.reaksMixin({ h: 48 }),
+          hFlex({ align: "bottom" }, [
+            ["fixed", display],
             [
-              { weight: null, align: "center" },
+              "fixed",
+              displayIf(
+                () => !isInternalValueValid(),
+                size.reaksWrapper(
+                  { h: 32 },
+                  align(
+                    { v: "center" },
+                    icon({ icon: alertIcon, color: "red" })
+                  )
+                )
+              ),
+            ],
+            empty,
+            [
+              "fixed",
               iconButton(
                 {
                   icon: clearIconDef,
@@ -225,17 +286,31 @@ module.exports = ({
                 clearValue
               ),
             ],
-            [{ weight: null, align: "center" }, button("Maintenant", setToNow)],
+            ["fixed", button("Maintenant", setToNow)],
           ]),
         ]),
         vPile(
           compact([
             label("Année"),
-            keysRow("year", [
-              () => refYear() - 1,
-              () => refYear(),
-              () => refYear() + 1,
-              () => refYear() + 2,
+            hFlex([
+              [
+                "fixed",
+                iconButton({ icon: arrowBack, size: { h: 48 } }, () =>
+                  refYear(refYear() - 1)
+                ),
+              ],
+              keysRow("year", [
+                () => refYear() - 1,
+                () => refYear(),
+                () => refYear() + 1,
+                () => refYear() + 2,
+              ]),
+              [
+                "fixed",
+                iconButton({ icon: arrowForward, size: { h: 48 } }, () =>
+                  refYear(refYear() + 1)
+                ),
+              ],
             ]),
             precisionAtLeast("month") && label("Mois"),
             precisionAtLeast("month") && keysRow("month", range(1, 13)),
