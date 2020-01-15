@@ -1,4 +1,8 @@
+const parseISO = require("date-fns/parseISO").default
+const formatISO = require("date-fns/formatISO").default
+const getISOWeek = require("date-fns/getISOWeek").default
 const compact = require("lodash/compact")
+const defaults = require("lodash/defaults")
 const pickBy = require("lodash/pickBy")
 const isFunction = require("lodash/isFunction")
 const toString = require("lodash/toString")
@@ -35,7 +39,7 @@ const datePrecisionAtLeast = require("reactivedb/operators/utils/datePrecision")
   .atLeast
 
 const isValidISODate = iso => {
-  const date = new Date(iso)
+  const date = parseISO(iso)
   if (isNaN(date)) return false
   return true
 }
@@ -65,6 +69,7 @@ const padKeyStyle = (isActive, ctx) =>
 const fragmentLabels = {
   year: "Année",
   month: "Mois",
+  week: "Semaine",
   day: "Jour",
   hour: "Heure",
   minute: "Minute",
@@ -86,10 +91,12 @@ module.exports = ({
 
   const ISOStringToInternalValue = value => {
     if (!value) return null
-    const date = new Date(value)
+    const date = parseISO(value)
     if (isNaN(date)) return null
+
     return {
       year: date.getFullYear(),
+      week: precisionAtLeast("week") && getISOWeek(date),
       month: precisionAtLeast("month") && date.getMonth() + 1,
       day: precisionAtLeast("day") && date.getDate(),
       hour: precisionAtLeast("hour") && date.getHours(),
@@ -103,6 +110,9 @@ module.exports = ({
 
     if (precisionAtLeast("month")) {
       str += "-" + padStart(value.month, 2, "0")
+    }
+    if (precisionAtLeast("week")) {
+      str += "-W" + padStart(value.week, 2, "0")
     }
     if (precisionAtLeast("day")) {
       str += "-" + padStart(value.day, 2, "0")
@@ -118,16 +128,33 @@ module.exports = ({
   }
 
   const internalValuetoExternalValue = value => {
-    const stringVal = internalValuetoISOString(value)
-    return isValidISODate(stringVal) ? stringVal : null
+    const isoStr = internalValuetoISOString(value)
+    if (!isValidISODate(isoStr)) return null
+
+    if (precision === "week") {
+      return formatISO(parseISO(isoStr), { representation: "date" })
+    }
+    return isoStr
   }
+
+  const nowAsInternalValue = () =>
+    pickBy({
+      year: new Date().getFullYear(),
+      month: precisionAtLeast("month") && new Date().getMonth() + 1,
+      week: precisionAtLeast("week") && getISOWeek(new Date()),
+      day: precisionAtLeast("day") && new Date().getDate(),
+      hour: precisionAtLeast("hour") && new Date().getHours(),
+      minute: precisionAtLeast("minute") && new Date().getMinutes(),
+    })
 
   return ctx => {
     const { setValue, value } = ctx
-    const internalValue = observable()
+    const internalValue = observable(nowAsInternalValue())
     const refYear = observable(new Date().getFullYear())
-    const isInternalValueValid = () =>
-      isValidISODate(internalValuetoISOString(internalValue()))
+    const isInternalValueValid = () => {
+      const val = internalValue()
+      return val === null || isValidISODate(internalValuetoISOString(val))
+    }
 
     const displayFragment = fragmentId => {
       return integerInput({
@@ -137,6 +164,7 @@ module.exports = ({
         setValue: val =>
           setDateFragment(fragmentId, val !== "" ? toInteger(val) : null),
         fragmentId,
+        autoFocus: precision === fragmentId,
       })
     }
     const display = seq([
@@ -145,6 +173,7 @@ module.exports = ({
         compact([
           precisionAtLeast("day") && displayFragment("day"),
           precisionAtLeast("month") && displayFragment("month"),
+          precisionAtLeast("week") && displayFragment("week"),
           precisionAtLeast("year") && displayFragment("year"),
           precisionAtLeast("hour") && displayFragment("hour"),
           precisionAtLeast("minute") && displayFragment("minute"),
@@ -164,44 +193,13 @@ module.exports = ({
     function setDateFragment(type, value) {
       const baseValue = internalValue()
       const patch = { [type]: value }
+      const now = nowAsInternalValue()
 
-      if (precisionAtLeast("minute")) {
-        if (type !== "minute") {
-          if (!get(baseValue, "minute")) {
-            assign(patch, { minute: new Date().getMinutes() })
-          }
-        }
-      }
-
-      if (precisionAtLeast("hour")) {
-        if (type !== "hour") {
-          if (!get(baseValue, "hour")) {
-            assign(patch, { hour: new Date().getHours() })
-          }
-        }
-      }
-
-      if (precisionAtLeast("day")) {
-        if (type !== "day") {
-          if (!get(baseValue, "day")) {
-            assign(patch, { day: new Date().getDate() })
-          }
-        }
-      }
-
-      if (precisionAtLeast("month")) {
-        if (type !== "month") {
-          if (!get(baseValue, "month")) {
-            assign(patch, { month: new Date().getMonth() + 1 })
-          }
-        }
-      }
-
-      if (type !== "year") {
-        if (!get(baseValue, "year")) {
-          assign(patch, { year: new Date().getFullYear() })
-        }
-      }
+      // fill-in other fragments from current date
+      defaults(
+        patch,
+        pickBy(now, (v, fragmentId) => !get(baseValue, fragmentId))
+      )
 
       internalValue(assign(baseValue, patch))
       onUserInput()
@@ -211,16 +209,9 @@ module.exports = ({
       internalValue(null)
       onUserInput()
     }
+
     function setToNow() {
-      internalValue(
-        pickBy({
-          year: new Date().getFullYear(),
-          month: precisionAtLeast("month") && new Date().getMonth() + 1,
-          day: precisionAtLeast("day") && new Date().getDate(),
-          hour: precisionAtLeast("hour") && new Date().getHours(),
-          minute: precisionAtLeast("minute") && new Date().getMinutes(),
-        })
-      )
+      internalValue(nowAsInternalValue())
       onUserInput()
     }
 
@@ -314,6 +305,12 @@ module.exports = ({
             ]),
             precisionAtLeast("month") && label("Mois"),
             precisionAtLeast("month") && keysRow("month", range(1, 13)),
+            precisionAtLeast("week") && label("Semaine"),
+            precisionAtLeast("week") && keysRow("week", range(1, 11)),
+            precisionAtLeast("week") && keysRow("week", range(11, 21)),
+            precisionAtLeast("week") && keysRow("week", range(21, 32)),
+            precisionAtLeast("week") && keysRow("week", range(32, 43)),
+            precisionAtLeast("week") && keysRow("week", range(43, 54)),
             precisionAtLeast("day") && label("Jour"),
             precisionAtLeast("day") && keysRow("day", range(1, 11)),
             precisionAtLeast("day") && keysRow("day", range(11, 21)),
