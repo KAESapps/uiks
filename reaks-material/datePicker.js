@@ -106,7 +106,7 @@ module.exports = ({
   const internalValuetoISOString = value => {
     if (!value) return null
 
-    let str = value.year
+    let str = padStart(value.year, 4, "0")
 
     if (precisionAtLeast("month")) {
       str += "-" + padStart(value.month, 2, "0")
