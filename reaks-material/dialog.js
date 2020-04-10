@@ -15,15 +15,15 @@ const withPopup = require("../reaks/withPopup")
 // start retrocompat
 const contextualize = require("../reaks/ctx-level-helpers/contextualize")
 
-const dialogArgs = ({ title, content, actions, modal }) => ctx => ({
+const dialogArgs = ({ title, content, actions, modal }) => (ctx) => ({
   title: contextualize(title, ctx),
   content: contextualize(content, ctx),
   modal,
-  actions: actions.map(action => contextualize(action, ctx)),
+  actions: actions.map((action) => contextualize(action, ctx)),
 })
 // end retrocompat
 
-const titleLabel = text =>
+const titleLabel = (text) =>
   mix(
     [
       margin.mixin({ h: 24, b: 20 }),
@@ -34,9 +34,9 @@ const titleLabel = text =>
     label(text)
   )
 
-const contentArea = content => margin({ h: 24, b: 24 }, content)
+const contentArea = (content) => margin({ h: 24, b: 24 }, content)
 
-const bodyText = message =>
+const bodyText = (message) =>
   style(
     {
       color: colors.grey[600],
@@ -63,12 +63,15 @@ const dialogPopupLayer = ({ title, content, actions = [], maxWidth = 768 }) =>
       vPile([
         titleLabel(title),
         [{ weight: 1 }, contentArea(content)],
-        align({ h: "right" }, margin({ v: 8, l: 24, r: 8 }, hPile(actions))),
+        align(
+          { h: "right" },
+          margin({ v: 8, l: 24, r: 8 }, hPile({ gap: 12 }, actions))
+        ),
       ])
     )
   )
 
-const dialog = arg => ctx => {
+const dialog = (arg) => (ctx) => {
   const popup = arg.selfPopup || arg.replace ? ctx.selfPopup : ctx.popup
   return () => {
     return popup(dialogPopupLayer(arg), ctx, arg)
@@ -81,7 +84,7 @@ const alert = ({
   dismissLabel = "OK",
   onClose: onCloseCtx,
 }) => {
-  const dismissAction = ctx => {
+  const dismissAction = (ctx) => {
     const onClose = onCloseCtx && onCloseCtx(ctx)
     return () => {
       ctx.closePopup()
@@ -98,7 +101,7 @@ const alert = ({
 }
 
 const cancelButton = (cancelLabel = "Annuler", cb) =>
-  flatButton({ label: cancelLabel, primary: false }, ctx => () => {
+  flatButton({ label: cancelLabel, primary: false }, (ctx) => () => {
     cb && cb(ctx)()
     ctx.closePopup()
   })
@@ -112,7 +115,7 @@ const confirm = ({
   onConfirm: onConfirmCtx,
   onCancel: onCancelCtx,
 }) => {
-  const closeAction = res => rootCtx => ctx => {
+  const closeAction = (res) => (rootCtx) => (ctx) => {
     // les cb ne prennent pas le contexte de la popup de confirmation ce qui leur permet de s'éxécuter comme si il n'y avait pas eu de demande de confirmation préalable
     const onClose = onCloseCtx && onCloseCtx(rootCtx)
     const onResponse = res
@@ -120,21 +123,25 @@ const confirm = ({
       : onCancelCtx && onCancelCtx(rootCtx)
 
     return () => {
-      ctx.closePopup()// on ferme le dialogue de confirmation avant d'éxécuter les cb (ce qui leur permet de rouvrir une popup si ils veulent sans conflit)
+      ctx.closePopup() // on ferme le dialogue de confirmation avant d'éxécuter les cb (ce qui leur permet de rouvrir une popup si ils veulent sans conflit)
       onClose && onClose(res)
       onResponse && onResponse()
     }
   }
-  return rootCtx => dialog({
-    title,
-    content: bodyText(message),
-    actions: [
-      flatButton({ label: cancelLabel, primary: false }, closeAction(false)(rootCtx)),
-      button(confirmLabel, closeAction(true)(rootCtx)),
-    ],
-    modal: true,
-    nested: false,
-  })(rootCtx)
+  return (rootCtx) =>
+    dialog({
+      title,
+      content: bodyText(message),
+      actions: [
+        flatButton(
+          { label: cancelLabel, primary: false },
+          closeAction(false)(rootCtx)
+        ),
+        button(confirmLabel, closeAction(true)(rootCtx)),
+      ],
+      modal: true,
+      nested: false,
+    })(rootCtx)
 }
 
 dialog.dialogPopupLayer = dialog.popupLayer = dialogPopupLayer
