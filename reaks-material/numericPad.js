@@ -17,13 +17,15 @@ const align = require("uiks/reaks-layout/align")
 const size = require("reaks/size")
 const colors = require("material-colors")
 const icon = require("./icon").reaks
+const iconButton = require("uiks/reaks-material/iconButton").reaks
+const clearIconDef = require("uiks/reaks-material/icons/content/clear")
 const backspaceIcon = require("./icons/content/backspace")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
 
 const onTouchStart = require("../reaks/onTouchStart")
 
-const defaultDisplay = val =>
+const defaultDisplay = (val) =>
   seq([
     label(val),
     align({ v: "center", h: "right" }),
@@ -34,16 +36,16 @@ const defaultDisplay = val =>
     }),
   ])
 
-const normalizeInternalValue = val => {
+const normalizeInternalValue = (val) => {
   if (val.substr(0, 1) === ",") {
     return "0" + val
   }
   return val
 }
 
-const defaultFromExternalValue = val => toString(val).replace(".", ",")
+const defaultFromExternalValue = (val) => toString(val).replace(".", ",")
 
-const defaultToExternalValue = toNumber => stringVal => {
+const defaultToExternalValue = (toNumber) => (stringVal) => {
   stringVal = trim(stringVal, ",").replace(",", ".")
   return stringVal ? (toNumber ? _toNumber(stringVal) : stringVal) : null
 }
@@ -65,9 +67,9 @@ module.exports = (opts = {}) => {
   const validKeys = range(0, 10).map(toString)
   if (decimal) validKeys.push(",")
 
-  return ctx => {
+  return (ctx) => {
     const display = customDisplay
-      ? val => customDisplay(val)(create(ctx, { defaultDisplay }))
+      ? (val) => customDisplay(val)(create(ctx, { defaultDisplay }))
       : defaultDisplay
     const { setValue, value, activeRow } = ctx
     const $stringValue = observable("")
@@ -93,6 +95,10 @@ module.exports = (opts = {}) => {
       $stringValue(nextValue)
       onUserInput()
     }
+    function clearValue() {
+      $stringValue("")
+      onUserInput()
+    }
     function eraseLastChar() {
       $stringValue($stringValue().slice(0, -1))
       onUserInput()
@@ -109,12 +115,12 @@ module.exports = (opts = {}) => {
       onUserInput()
     }
 
-    const updateFromExternalValue = function(externalValue) {
+    const updateFromExternalValue = function (externalValue) {
       $stringValue(fromExternalValue(externalValue))
     }
 
     // sur changement de la valeur externe, on vérifie s'il faut mettre à jour la valeur interne
-    const observeExternalChange = observe(value, function(externalValue) {
+    const observeExternalChange = observe(value, function (externalValue) {
       const internalValue = $stringValue()
 
       // si la conversation en nombre de la valeur interne est identique à la valeur externe
@@ -127,7 +133,7 @@ module.exports = (opts = {}) => {
     // on active item change, re-init value
     const observeActiveItemChange =
       activeRow &&
-      observe(activeRow, function() {
+      observe(activeRow, function () {
         updateFromExternalValue(value())
       })
 
@@ -146,7 +152,7 @@ module.exports = (opts = {}) => {
       ])
     }
 
-    const charPadKey = n => padKey(label(toString(n)), () => appendChar(n))
+    const charPadKey = (n) => padKey(label(toString(n)), () => appendChar(n))
     const numberKeysRow = (from, to) =>
       hFlex(range(from, to + 1).map(charPadKey))
 
@@ -161,6 +167,16 @@ module.exports = (opts = {}) => {
               ]),
             ],
             seq([size({ h: 36 }), display($stringValue)]),
+            [
+              { weight: null, align: "center" },
+              iconButton(
+                {
+                  icon: clearIconDef,
+                  color: colors.grey[600],
+                },
+                clearValue
+              ),
+            ],
           ])
         ),
         vPile([
@@ -187,7 +203,7 @@ module.exports = (opts = {}) => {
       observeExternalChange,
       observeActiveItemChange,
       ctx.withPhysicalKeyboard &&
-        onDocumentEvent("keydown", ev => {
+        onDocumentEvent("keydown", (ev) => {
           let c = ev.key
           if (c === "Backspace") {
             eraseLastChar()
