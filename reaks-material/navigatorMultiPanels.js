@@ -1,6 +1,9 @@
+const castArray = require("lodash/castArray")
+const isString = require("lodash/isString")
+const memoize = require("lodash/memoize")
+const range = require("lodash/range")
 const withResponsiveSize = require("../reaks/withResponsiveSize")
 const menuIcon = require("./icons/navigation/menu")
-const isString = require("lodash/isString")
 const label = require("../reaks/label").reaks
 const border = require("../reaks-layout/border")
 const vFlex = require("../reaks-layout/vFlex")
@@ -32,63 +35,64 @@ const mainPanelMinWidth = 700
 const create = require("lodash/create")
 const { observable } = require("kobs")
 
-const navigatorCore = args => ctx => {
-  const { renderer, firstPage } = args
-  let pages = []
+const navigatorCore = (args) => (ctx) => {
+  const { renderer, pages: customPages, lastPageIndex: getLastPageIndex } = args
 
-  const lastPageIndex = observable(0, "navigator/lastPageIndex")
+  const lastPageIndex =
+    (getLastPageIndex && getLastPageIndex(ctx)) ||
+    observable(0, "navigator/lastPageIndex")
 
-  const closePage = index => {
+  // Créateur de page à partir de l'index
+  const createPage = (i, baseCtx = ctx, pageCreator) => {
+    if (!pageCreator) pageCreator = customPages[i]
+    const pageCtx = create(baseCtx, {
+      back,
+      next: next(i),
+      close: () => closePage(i),
+    })
+    const pg = pageCreator(pageCtx)
+    pg.index = i // utile pour le renderer
+    return pg
+  }
+
+  // memoize les pages créées
+  // TODO : invalider une page si elle change
+  const getPage = memoize(createPage)
+
+  const closePage = (index) => {
     if (index === 0) {
       return
     }
-    const page = pages[index]
+    const page = getPage.cache.get(index)
     if (!page) return
 
     if (page.canExit) {
-      return page.canExit().then(res => {
+      return page.canExit().then((res) => {
         if (res !== true) return
         pages.pop()
         lastPageIndex(index - 1)
       })
     }
-    pages.splice(index)
+    // pages.splice(index)
     lastPageIndex(index - 1)
   }
+  const back = () => closePage(lastPageIndex())
 
-  const next = fromIndexArg => (page, ctx, { replace = false } = {}) => {
-    let fromIndex = fromIndexArg
-    if (replace) {
-      fromIndex = fromIndex - 1
-    }
-    if (page == null) {
-      return closePage(fromIndex + 1)
+  const next = (fromIndex) => (pageCreator, ctx, { replace = false } = {}) => {
+    let pageIndex = replace ? fromIndex : fromIndex + 1
+    if (pageCreator == null) {
+      return closePage(pageIndex)
     }
 
-    pages.splice(
-      fromIndex + 1,
-      pages.length - fromIndex - 1,
-      page(
-        create(ctx, {
-          next: next(fromIndex + 1),
-          close: () => closePage(fromIndex + 1),
-        })
-      )
-    )
-    lastPageIndex(fromIndex + 1)
+    const page = createPage(pageIndex, ctx, pageCreator)
+    // màj du cache
+    getPage.cache.set(pageIndex, page)
+    lastPageIndex(pageIndex)
   }
-  const back = () => {
-    if (pages.length <= 1) return
-    // supprime la dernière page
-    pages.splice(-1)
-    lastPageIndex(pages.length - 1)
-  }
-  const subCtx = create(ctx, { back, next: next(0) })
-  pages.push(firstPage(subCtx))
 
   return seq([
     renderer(
-      create(ctx, { pages, getPageIndex: lastPageIndex, closePage, back })
+      create(ctx, { getPage, getPageIndex: lastPageIndex, closePage, back })
     ),
     () => {
       document.addEventListener("backbutton", back)
@@ -97,7 +101,7 @@ const navigatorCore = args => ctx => {
   ])
 }
 
-const appBar = function({
+const appBar = function ({
   page,
   backgroundColor = colors.teal["500"],
   textColor = colors.white,
@@ -136,9 +140,11 @@ const appBar = function({
 }
 
 const renderer = withResponsiveSize(
-  w => 1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
-  function(ctx) {
-    const { pages, getPageIndex, back, responsiveSize, closePage } = ctx
+  (w) =>
+    1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
+  function (ctx) {
+    const { getPage, getPageIndex, back, responsiveSize, closePage } = ctx
+
     const getRange = observable(() => {
       const nbMaxPanels = responsiveSize() || 1
       const lastPageIndex = getPageIndex()
@@ -147,15 +153,17 @@ const renderer = withResponsiveSize(
 
       const leftPageIndex = lastPageIndex + 1 - nbPanels
 
-      return pages.slice(leftPageIndex, lastPageIndex + 1)
+      // on fait appel à getPage ici pour s'assurer qu'un changement de page sans changement d'index provoque bien un rafraîchissement de la page qui change
+      // (ex. pages affichées de 0 à 2, la page 2 change)
+      return range(leftPageIndex, lastPageIndex + 1).map((i) => getPage(i))
     })
 
     return seq([
       flexParentStyle({ orientation: "row" }),
-      repeat(getRange, page => {
-        const pageIndex = pages.indexOf(page)
+      repeat(getRange, (page) => {
+        const pageIndex = page.index
         const rootAction = observable(() => {
-          const leftPageIndex = pages.indexOf(getRange()[0])
+          const leftPageIndex = getRange()[0].index
           if (pageIndex === 0) {
             // side menu toggle on first panel
             return {
@@ -201,9 +209,17 @@ const renderer = withResponsiveSize(
   }
 )
 
-module.exports = function(page) {
+module.exports = function (opts, pages) {
+  if (!pages) {
+    pages = opts
+    opts = {}
+  }
+
+  pages = castArray(pages)
+
   return navigatorCore({
-    firstPage: page,
+    pages,
     renderer: renderer,
+    lastPageIndex: opts.lastPageIndex,
   })
 }

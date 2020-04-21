@@ -1,13 +1,14 @@
 const value = require("../core/value")
 const clickable = require("../reaks/clickable")
-const border = require("../reaks/border")
-const label = require("../reaks/label")
-const align = require("../reaks/align")
-const hoverable = require("../reaks/hoverable")
-const style = require("../reaks/style")
-const innerMargin = require("../reaks/innerMargin")
+const border = require("./border")
+const label = require("./label")
+const align = require("./align")
+const hoverable = require("./hoverable")
+const style = require("./style")
+const activeStyle = require("./activeStyle")
+const innerMargin = require("./innerMargin")
+const vListVirtualScroll = require("./vListVirtualScroll")
 const assignCtx = require("../core/assign")
-const vListVirtualScroll = require("uiks/reaks/vListVirtualScroll")
 
 module.exports = args => {
   const cmp = value(
@@ -17,15 +18,17 @@ module.exports = args => {
         itemHeight: 42,
         item: border(
           { b: true },
-          hoverable(
-            {
-              over: style.mixin({ backgroundColor: "rgba(0,0,0,0.1)" }),
-            },
-            clickable(
-              ctx => () => ctx.setValue(ctx.value),
-              align(
-                { v: "center" },
-                innerMargin({ h: 8 }, label(args.itemLabel))
+          activeStyle(
+            hoverable(
+              {
+                over: style.mixin({ backgroundColor: "rgba(0,0,0,0.1)" }),
+              },
+              clickable(
+                ctx => () => ctx.setValue(ctx.value),
+                align(
+                  { v: "center" },
+                  innerMargin({ h: 8 }, label(args.itemLabel))
+                )
               )
             )
           )
