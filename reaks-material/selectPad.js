@@ -20,22 +20,29 @@ const {
   child: flexChildStyle,
 } = require("../reaks-layout/flex/style")
 const vPileCfg = require("../reaks-layout/flex/configs/vPile")
+const hPileCfg = require("../reaks-layout/flex/configs/hPile")
 const vList = (arg1, arg2) =>
   mix(
     [() => asFlexParent(vPileCfg)],
     repeat(arg1, mix([() => flexChildStyle(vPileCfg)], arg2))
   )
+const hList = (arg1, arg2) =>
+  mix(
+    [() => asFlexParent(hPileCfg)],
+    repeat(arg1, mix([() => flexChildStyle(hPileCfg)], arg2))
+  )
 
-module.exports = arg => {
+module.exports = (arg) => {
   const {
     items,
     itemLabel = valueLoadingAs("", propQuery("label")),
     multiple = false,
+    horizontal = false,
   } = isFunction(arg) ? { items: arg } : arg
 
   const padKey = mix(
     [
-      ctx =>
+      (ctx) =>
         onTouchStart(
           multiple
             ? () => {
@@ -63,10 +70,12 @@ module.exports = arg => {
           fontWeight: 500,
           fontSize: 16,
         }),
-        style.mixin(ctx => () =>
-          (multiple
-          ? includes(ctx.selectedValue(), ctx.value)
-          : ctx.selectedValue() === ctx.value)
+        style.mixin((ctx) => () =>
+          (
+            multiple
+              ? includes(ctx.selectedValue(), ctx.value)
+              : ctx.selectedValue() === ctx.value
+          )
             ? {
                 backgroundColor: colors.teal[500],
                 color: colors.white,
@@ -81,5 +90,8 @@ module.exports = arg => {
     )
   )
 
-  return assignCtx({ selectedValue: ctx => ctx.value }, vList(items, padKey))
+  return assignCtx(
+    { selectedValue: (ctx) => ctx.value },
+    (horizontal ? hList : vList)(items, padKey)
+  )
 }
