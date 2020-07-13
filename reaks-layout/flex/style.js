@@ -38,19 +38,21 @@ exports.parent = ({ orientation, wrap, align, overflowAllowed }) =>
   )
 
 const staticFlexChildStyle = arg => {
-  const { weight, wrap, align, shrinkable = true } = defaults(
+  const { weight, wrap, align, shrinkable } = defaults(
     arg,
     arg.defaultChildOpts
   )
   return assign(
     weight !== null
       ? {
+          flex: weight,
           overflow: wrap ? null : "hidden",
-          flexGrow: weight,
-          flexShrink: shrinkable ? 1 : 0,
-          flexBasis: shrinkable ? 0 : "auto",
         }
       : { flexShrink: wrap ? null : 0 },
+    shrinkable === false && {
+      flexShrink: 0,
+      flexBasis: "auto",
+    },
     { alignSelf: flexAlign(align) }
   )
 }
