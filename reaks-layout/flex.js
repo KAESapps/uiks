@@ -20,21 +20,18 @@ const convertChildOpts = childOpts => {
 
 const normalizeChildArg = c => (Array.isArray(c) ? c : [{}, c])
 
-const childCreator = ({
-  orientation,
-  defaultChildOpts,
-  wrap,
-  weight: defaultWeight,
-}) => childArg => {
+const childCreator = ({ orientation, defaultChildOpts, wrap }) => childArg => {
   const [childOpts, childMixin] = normalizeChildArg(childArg)
 
-  const { weight, align } = defaults(
+  const { weight, align, shrinkable } = defaults(
     {},
     convertChildOpts(childOpts),
-    { weight: defaultWeight },
     defaultChildOpts
   )
-  return seq([flexChildStyle({ orientation, wrap, weight, align }), childMixin])
+  return seq([
+    flexChildStyle({ orientation, wrap, weight, align, shrinkable }),
+    childMixin,
+  ])
 }
 
 const staticFlex = (config, childrenArg) => {
@@ -71,7 +68,7 @@ const dynamicFlex = (config, getChildrenArg) => {
 }
 
 module.exports = config =>
-  function(arg1, arg2) {
+  function (arg1, arg2) {
     let opts, arg
 
     if (arguments.length === 1) {
@@ -89,8 +86,11 @@ module.exports = config =>
         overflowAllowed: false,
       },
       config,
-      opts
+      opts // pour "gap"
     )
+
+    // opts définit les options d'un enfant par défaut, en prenant la priorité sur la config de base
+    localConfig.defaultChildOpts = defaults(opts, localConfig.defaultChildOpts)
 
     if (isFunction(arg)) {
       return dynamicFlex(localConfig, arg)

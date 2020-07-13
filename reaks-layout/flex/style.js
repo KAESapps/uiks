@@ -1,5 +1,6 @@
-const isFunction = require("lodash/isFunction")
 const assign = require("lodash/assign")
+const defaults = require("lodash/defaults")
+const isFunction = require("lodash/isFunction")
 const style = require("reaks/style")
 
 const flexAlign = a => {
@@ -36,12 +37,18 @@ exports.parent = ({ orientation, wrap, align, overflowAllowed }) =>
     )
   )
 
-const staticFlexChildStyle = ({ weight, wrap, align }) => {
+const staticFlexChildStyle = arg => {
+  const { weight, wrap, align, shrinkable = true } = defaults(
+    arg,
+    arg.defaultChildOpts
+  )
   return assign(
     weight !== null
       ? {
-          flex: weight,
           overflow: wrap ? null : "hidden",
+          flexGrow: weight,
+          flexShrink: shrinkable ? 1 : 0,
+          flexBasis: shrinkable ? 0 : "auto",
         }
       : { flexShrink: wrap ? null : 0 },
     { alignSelf: flexAlign(align) }
