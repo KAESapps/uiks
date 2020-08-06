@@ -9,14 +9,17 @@ const reaksSwitch = (condition, cases) => {
     : cases[condition ? "truthy" : "falsy"] || reaksEmpty
 }
 
-const uiksSwitch = (arg1, arg2) => ctx => {
-  const conditionArg = arg2 ? arg1 : ctx.value
+const uiksSwitch = (arg1, arg2) => {
+  const conditionArg = arg2 ? arg1 : ctx => ctx.value
   const cases = arg2 ? arg2 : arg1
-
-  const cond = isFunction(conditionArg) ? conditionArg(ctx) : conditionArg
-  return isFunction(cond)
-    ? swap(() => (cases[cond() ? "truthy" : "falsy"] || empty)(ctx))
-    : (cases[cond ? "truthy" : "falsy"] || empty)(ctx)
+  return ctx => {
+    const cond = isFunction(conditionArg) ? conditionArg(ctx) : conditionArg
+    return isFunction(cond)
+      ? swap(() => {
+          return (cases[cond() ? "truthy" : "falsy"] || empty)(ctx)
+        })
+      : (cases[cond ? "truthy" : "falsy"] || empty)(ctx)
+  }
 }
 
 uiksSwitch.reaks = reaksSwitch
