@@ -37,6 +37,7 @@
   "homepage": "https://github.com/KAESapps/uiks#readme",
   "prettier": {
     "trailingComma": "es5",
-    "semi": false
+    "semi": false,
+    "arrowParens": "avoid"
   }
 }
