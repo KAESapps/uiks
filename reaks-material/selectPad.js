@@ -3,9 +3,11 @@ const includes = require("lodash/includes")
 const without = require("lodash/without")
 const concat = require("lodash/concat")
 const assignCtx = require("uiks/core/assign")
+const group = require("uiks/reaks/group")
 const mix = require("uiks/reaks/mix")
 const style = require("uiks/reaks/style")
 const repeat = require("uiks/reaks/repeat")
+const switchBoolean = require("uiks/reaks/switchBoolean")
 const innerMargin = require("../reaks/innerMargin")
 const onTouchStart = require("../reaks/onTouchStart")
 const label = require("../reaks/label")
@@ -32,66 +34,81 @@ const hList = (arg1, arg2) =>
     repeat(arg1, mix([() => flexChildStyle(hPileCfg)], arg2))
   )
 
-module.exports = (arg) => {
+module.exports = arg => {
   const {
     items,
     itemLabel = valueLoadingAs("", propQuery("label")),
+    itemEnabled,
     multiple = false,
     horizontal = false,
   } = isFunction(arg) ? { items: arg } : arg
 
   const padKey = mix(
     [
-      (ctx) =>
-        onTouchStart(
-          multiple
-            ? () => {
-                const selectedValues = ctx.selectedValue() || []
-                if (includes(selectedValues, ctx.value)) {
-                  ctx.setValue(without(selectedValues, ctx.value))
-                } else {
-                  ctx.setValue(concat(selectedValues, [ctx.value]))
+      size.mixin({ h: 36 }),
+      innerMargin.mixin({ h: 8 }),
+      style.mixin({
+        fontWeight: 500,
+        fontSize: 16,
+      }),
+      switchBoolean(!itemEnabled || itemEnabled, {
+        truthy: group([
+          ctx =>
+            onTouchStart(
+              multiple
+                ? () => {
+                    const selectedValues = ctx.selectedValue() || []
+                    if (includes(selectedValues, ctx.value)) {
+                      ctx.setValue(without(selectedValues, ctx.value))
+                    } else {
+                      ctx.setValue(concat(selectedValues, [ctx.value]))
+                    }
+                  }
+                : () => {
+                    if (ctx.selectedValue() !== ctx.value) {
+                      ctx.setValue(ctx.value)
+                    } else {
+                      ctx.setValue(null)
+                    }
+                  }
+            ),
+          style.mixin(ctx => () =>
+            (
+              multiple
+                ? includes(ctx.selectedValue(), ctx.value)
+                : ctx.selectedValue() === ctx.value
+            )
+              ? {
+                  backgroundColor: ctx.colors.primary,
+                  color: ctx.colors.textOnPrimary,
                 }
-              }
-            : () => {
-                if (ctx.selectedValue() !== ctx.value) {
-                  ctx.setValue(ctx.value)
-                } else {
-                  ctx.setValue(null)
+              : {
+                  backgroundColor: colors.grey[100],
+                  color: colors.grey[800],
                 }
-              }
-        ),
-    ],
-    mix(
-      [
-        size.mixin({ h: 36 }),
-        innerMargin.mixin({ h: 8 }),
-        style.mixin({
-          fontWeight: 500,
-          fontSize: 16,
-        }),
-        style.mixin((ctx) => () =>
+          ),
+        ]),
+        falsy: style.mixin(ctx => () =>
           (
             multiple
               ? includes(ctx.selectedValue(), ctx.value)
               : ctx.selectedValue() === ctx.value
           )
             ? {
-                backgroundColor: colors.teal[500],
-                color: colors.white,
+                backgroundColor: ctx.colors.lightPrimary,
+                color: ctx.colors.textOnPrimary,
               }
             : {
-                backgroundColor: colors.grey[100],
-                color: colors.grey[800],
+                color: colors.grey[400],
               }
         ),
-      ],
-      align({ h: "center", v: "center" }, label({ ellipsis: false }, itemLabel))
-    )
+      }),
+    ],
+    align({ h: "center", v: "center" }, label({ ellipsis: false }, itemLabel))
   )
 
   return assignCtx(
-    { selectedValue: (ctx) => ctx.value },
+    { selectedValue: ctx => ctx.value },
     (horizontal ? hList : vList)(items, padKey)
   )
 }
