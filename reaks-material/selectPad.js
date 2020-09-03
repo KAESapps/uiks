@@ -1,5 +1,6 @@
 const isFunction = require("lodash/isFunction")
 const includes = require("lodash/includes")
+const intersection = require("lodash/intersection")
 const without = require("lodash/without")
 const concat = require("lodash/concat")
 const assignCtx = require("uiks/core/assign")
@@ -51,18 +52,20 @@ module.exports = arg => {
         fontWeight: 500,
         fontSize: 16,
       }),
-      switchBoolean(!itemEnabled || itemEnabled, {
+      switchBoolean(itemEnabled || true, {
         truthy: group([
           ctx =>
             onTouchStart(
               multiple
                 ? () => {
-                    const selectedValues = ctx.selectedValue() || []
+                    let selectedValues = ctx.selectedValue() || []
                     if (includes(selectedValues, ctx.value)) {
-                      ctx.setValue(without(selectedValues, ctx.value))
+                      selectedValues = without(selectedValues, ctx.value)
                     } else {
-                      ctx.setValue(concat(selectedValues, [ctx.value]))
+                      selectedValues = concat(selectedValues, [ctx.value])
                     }
+                    // intersection with items so that no old items stays in selected array
+                    ctx.setValue(intersection(ctx.items(), selectedValues))
                   }
                 : () => {
                     if (ctx.selectedValue() !== ctx.value) {
@@ -108,7 +111,7 @@ module.exports = arg => {
   )
 
   return assignCtx(
-    { selectedValue: ctx => ctx.value },
-    (horizontal ? hList : vList)(items, padKey)
+    { selectedValue: ctx => ctx.value, items },
+    (horizontal ? hList : vList)(ctx => ctx.items, padKey)
   )
 }
