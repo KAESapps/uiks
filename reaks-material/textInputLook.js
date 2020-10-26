@@ -8,11 +8,16 @@ const style = require("reaks/style")
 
 // make a label look like a text input
 module.exports = wrapper(
-  ({ border: withBorder = true, borderColor = "#AAA", backgroundColor } = {}) =>
+  ({
+    border: withBorder = true,
+    borderColor = "#AAA",
+    backgroundColor,
+    hAlign = "left",
+  } = {}) =>
     seq([
       size({ hMin: 32 }),
       innerMargin({ h: 6 }),
-      align({ v: "center" }),
+      align({ v: "center", h: hAlign }),
       withBorder && border({ color: borderColor, radius: 3 }),
       style({ backgroundColor }),
     ])

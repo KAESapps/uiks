@@ -5,7 +5,7 @@ const label = require("uiks/reaks/label")
 const formatDecimalFromInt = require("reactivedb/operators/formatDecimalFromInt")
 
 const decimalDisplayer = ({ decimals }) =>
-  textInputLook(label(mapValue(formatDecimalFromInt(decimals))))
+  textInputLook({hAlign: 'right'}, label(mapValue(formatDecimalFromInt(decimals))))
 
 const dialogEditor = require("./dialogEditor")
 
