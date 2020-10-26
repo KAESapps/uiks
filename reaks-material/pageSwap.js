@@ -1,10 +1,11 @@
 const isString = require("lodash/isString")
 const swap = require("reaks/swap")
 const label = require("uiks/reaks/label").reaks
+const { observable } = require("kobs")
 
 module.exports = pageGenerator => {
   return ctx => {
-    const getPage = pageGenerator(ctx)
+    const getPage = observable(pageGenerator(ctx))
     return {
       title: swap(() => {
         const page = getPage()
