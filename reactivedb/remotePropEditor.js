@@ -14,7 +14,7 @@ const getValue = ctx => ctx.value
 const defaultValue = null // TODO: rendre paramétrable ?
 
 module.exports = (arg, view) => ctx => {
-  const { entity, prop } =
+  const { entity, prop, patchOperator } =
     typeof arg === "string" ? { entity: getValue, prop: arg } : arg
   const getEntity = isFunction(entity) ? entity(ctx) : entity
   const getProp = isFunction(prop) ? prop(ctx) : prop
@@ -27,17 +27,20 @@ module.exports = (arg, view) => ctx => {
     const submitId = random(0, 1e6)
     const newValue = inputValue()
     exitEditModeAfterSubmit = submitId
-    ctx
-      .patch({
-        [isFunction(getEntity) ? getEntity() : getEntity]: {
-          [isFunction(getProp) ? getProp() : getProp]: newValue,
-        },
-      })
-      .then(() => {
-        if (exitEditModeAfterSubmit === submitId) {
-          editMode(false)
-        }
-      })
+    const entity = isFunction(getEntity) ? getEntity() : getEntity
+    const patchPromise = patchOperator
+      ? ctx.patch([{ constant: entity }, { [patchOperator]: newValue }])
+      : ctx.patch({
+          [entity]: {
+            [isFunction(getProp) ? getProp() : getProp]: newValue,
+          },
+        })
+
+    return patchPromise.then(() => {
+      if (exitEditModeAfterSubmit === submitId) {
+        editMode(false)
+      }
+    })
   }
 
   const value = observable(() => {
