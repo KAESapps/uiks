@@ -35,7 +35,7 @@ const mainPanelMinWidth = 700
 const create = require("lodash/create")
 const { observable } = require("kobs")
 
-const navigatorCore = (args) => (ctx) => {
+const navigatorCore = args => ctx => {
   const { renderer, pages: customPages, lastPageIndex: getLastPageIndex } = args
 
   const lastPageIndex =
@@ -59,7 +59,7 @@ const navigatorCore = (args) => (ctx) => {
   // TODO : invalider une page si elle change
   const getPage = memoize(createPage)
 
-  const closePage = (index) => {
+  const closePage = index => {
     if (index === 0) {
       return
     }
@@ -67,7 +67,7 @@ const navigatorCore = (args) => (ctx) => {
     if (!page) return
 
     if (page.canExit) {
-      return page.canExit().then((res) => {
+      return page.canExit().then(res => {
         if (res !== true) return
         pages.pop()
         lastPageIndex(index - 1)
@@ -78,7 +78,7 @@ const navigatorCore = (args) => (ctx) => {
   }
   const back = () => closePage(lastPageIndex())
 
-  const next = (fromIndex) => (pageCreator, ctx, { replace = false } = {}) => {
+  const next = fromIndex => (pageCreator, ctx, { replace = false } = {}) => {
     let pageIndex = replace ? fromIndex : fromIndex + 1
     if (pageCreator == null) {
       return closePage(pageIndex)
@@ -140,30 +140,31 @@ const appBar = function ({
 }
 
 const renderer = withResponsiveSize(
-  (w) =>
-    1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
+  w => 1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
   function (ctx) {
     const { getPage, getPageIndex, back, responsiveSize, closePage } = ctx
 
-    const getRange = observable(() => {
+    const getLeftPageIndex = observable(() => {
       const nbMaxPanels = responsiveSize() || 1
       const lastPageIndex = getPageIndex()
 
       const nbPanels = Math.min(lastPageIndex + 1, nbMaxPanels)
+      return lastPageIndex + 1 - nbPanels
+    })
 
-      const leftPageIndex = lastPageIndex + 1 - nbPanels
-
+    const getRange = observable(() => {
+      const lastPageIndex = getPageIndex()
       // on fait appel à getPage ici pour s'assurer qu'un changement de page sans changement d'index provoque bien un rafraîchissement de la page qui change
       // (ex. pages affichées de 0 à 2, la page 2 change)
-      return range(leftPageIndex, lastPageIndex + 1).map((i) => getPage(i))
+      return range(0, lastPageIndex + 1).map(i => getPage(i))
     })
 
     return seq([
       flexParentStyle({ orientation: "row" }),
-      repeat(getRange, (page) => {
+      repeat(getRange, page => {
         const pageIndex = page.index
         const rootAction = observable(() => {
-          const leftPageIndex = getRange()[0].index
+          const leftPageIndex = getLeftPageIndex()
           if (pageIndex === 0) {
             // side menu toggle on first panel
             return {
@@ -186,6 +187,7 @@ const renderer = withResponsiveSize(
         })
 
         return seq([
+          style(() => pageIndex < getLeftPageIndex() && { display: "none" }),
           flexChildStyle({
             weight: () => (pageIndex === getPageIndex() ? 1 : null),
           }),
