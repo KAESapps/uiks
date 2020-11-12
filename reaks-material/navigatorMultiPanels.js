@@ -118,6 +118,7 @@ const appBar = function ({
           margin({ l: 16 }),
           swap(() => {
             const rootAction = getRootAction()
+            if (!rootAction) return null // arrive dans le cas d'un panneau masqué
             return seq([
               svgIcon(rootAction.icon, {
                 size: { h: 24 },
