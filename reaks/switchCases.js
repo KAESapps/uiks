@@ -1,6 +1,5 @@
 const isFunction = require("lodash/isFunction")
 const reaksEmpty = require("lodash/noop")
-const mapValues = require("lodash/mapValues")
 const swap = require("reaks/swap")
 const empty = require("./empty")
 
