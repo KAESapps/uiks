@@ -9,6 +9,7 @@ module.exports = cmp => ctx => {
   const reaksCmp = cmp(create(ctx, { size }))
   return seq([
     sizeDetector(node => {
+      if (node.offsetParent === null) return
       size({
         height: node.offsetHeight,
         width: node.offsetWidth,
