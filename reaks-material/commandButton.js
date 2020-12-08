@@ -56,17 +56,20 @@ module.exports = ctxComponent(
         () =>
           state() !== "running" &&
           clickable(() => {
-            timeoutId && clearTimeout(timeoutId)
-            state("running")
-            action()
-              .then(() => state("success"))
-              .catch(() => state("error"))
-              .then(() => {
-                timeoutId = setTimeout(() => {
-                  state("idle")
-                  timeoutId = null
-                }, 2000)
-              })
+            const actionRes = action()
+            if (actionRes && actionRes.then) {
+              state("running")
+              timeoutId && clearTimeout(timeoutId)
+              actionRes
+                .then(() => state("success"))
+                .catch(() => state("error"))
+                .then(() => {
+                  timeoutId = setTimeout(() => {
+                    state("idle")
+                    timeoutId = null
+                  }, 2000)
+                })
+            }
           })
       ),
       // text, spinner & icons, conditionally displayed
@@ -124,15 +127,13 @@ module.exports = ctxComponent(
         out: style({ backgroundColor }),
         over: style({
           backgroundColor: backgroundColor
-            ? color(backgroundColor)
-                .darken(0.1)
-                .string()
+            ? color(backgroundColor).darken(0.1).string()
             : "rgba(0, 0, 0, 0.1)",
         }),
       }),
     ])
   },
-  function(text, action, opts) {
+  function (text, action, opts) {
     return [
       text,
       action,
