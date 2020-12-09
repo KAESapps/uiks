@@ -10,7 +10,7 @@
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
     "intersperse-array": "1.0.0",
-    "lodash": "4.17.20",
+    "lodash": "4.17.19",
     "material-colors": "1.2.6",
     "reactivedb": "KAESapps/reactivedb#c88d057",
     "reaks": "KAESapps/reaks#2176069"
