@@ -12,11 +12,11 @@
     "intersperse-array": "1.0.0",
     "lodash": "4.17.15",
     "material-colors": "1.2.6",
-    "reactivedb": "KAESapps/reactivedb#c88d057"
+    "reactivedb": "KAESapps/reactivedb#c88d057",
+    "reaks": "KAESapps/reaks#2176069"
   },
   "peerDependencies": {
-    "kobs": "kaesapps/kobs#b54dbb4",
-    "reaks": "kaesapps/reaks#1e04fd6"
+    "kobs": "kaesapps/kobs#master"
   },
   "devDependencies": {
     "eslint": "6.1.0",
