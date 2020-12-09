@@ -192,18 +192,14 @@ module.exports = ({
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
 }) => {
   return withSize(ctx => {
-    const getItemIds = observable(ctx.value)
+    const getItemIds = observable(() => ctx.value() || [])
     itemHeight = isFunction(itemHeight) ? itemHeight(ctx) : itemHeight
     const getItemTop = isFunction(itemHeight)
       ? id => {
           const idx = getItemIds().indexOf(id)
           if (idx === -1) return
 
-          return sum(
-            getItemIds()
-              .slice(0, idx)
-              .map(itemHeight)
-          )
+          return sum(getItemIds().slice(0, idx).map(itemHeight))
         }
       : id => {
           const idx = getItemIds().indexOf(id)
