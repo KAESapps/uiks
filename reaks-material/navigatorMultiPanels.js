@@ -2,6 +2,7 @@ const castArray = require("lodash/castArray")
 const isString = require("lodash/isString")
 const memoize = require("lodash/memoize")
 const range = require("lodash/range")
+const ctxAssign = require("../core/assign")
 const withResponsiveSize = require("../reaks/withResponsiveSize")
 const menuIcon = require("./icons/navigation/menu")
 const label = require("../reaks/label").reaks
@@ -92,7 +93,12 @@ const navigatorCore = args => ctx => {
 
   return seq([
     renderer(
-      create(ctx, { getPage, getPageIndex: lastPageIndex, closePage, back })
+      create(ctx, {
+        getPage,
+        getPageIndex: lastPageIndex,
+        closePage,
+        back,
+      })
     ),
     () => {
       document.addEventListener("backbutton", back)
@@ -140,77 +146,83 @@ const appBar = function ({
   ])
 }
 
-const renderer = withResponsiveSize(
-  w => 1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
-  function (ctx) {
-    const { getPage, getPageIndex, back, responsiveSize, closePage } = ctx
+const renderer = ({
+  firstPanelRootAction,
+  topBarBackgroundColor,
+  topBarTextColor,
+} = {}) =>
+  withResponsiveSize(
+    w =>
+      1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
+    function (ctx) {
+      const { getPage, getPageIndex, back, responsiveSize, closePage } = ctx
 
-    const getLeftPageIndex = observable(() => {
-      const nbMaxPanels = responsiveSize() || 1
-      const lastPageIndex = getPageIndex()
+      const getLeftPageIndex = observable(() => {
+        const nbMaxPanels = responsiveSize() || 1
+        const lastPageIndex = getPageIndex()
 
-      const nbPanels = Math.min(lastPageIndex + 1, nbMaxPanels)
-      return lastPageIndex + 1 - nbPanels
-    })
+        const nbPanels = Math.min(lastPageIndex + 1, nbMaxPanels)
+        return lastPageIndex + 1 - nbPanels
+      })
 
-    const getRange = observable(() => {
-      const lastPageIndex = getPageIndex()
-      // on fait appel à getPage ici pour s'assurer qu'un changement de page sans changement d'index provoque bien un rafraîchissement de la page qui change
-      // (ex. pages affichées de 0 à 2, la page 2 change)
-      return range(0, lastPageIndex + 1).map(i => getPage(i))
-    })
+      const getRange = observable(() => {
+        const lastPageIndex = getPageIndex()
+        // on fait appel à getPage ici pour s'assurer qu'un changement de page sans changement d'index provoque bien un rafraîchissement de la page qui change
+        // (ex. pages affichées de 0 à 2, la page 2 change)
+        return range(0, lastPageIndex + 1).map(i => getPage(i))
+      })
 
-    return seq([
-      flexParentStyle({ orientation: "row" }),
-      repeat(getRange, page => {
-        const pageIndex = page.index
-        const rootAction = observable(() => {
-          const leftPageIndex = getLeftPageIndex()
-          if (pageIndex === 0) {
-            // side menu toggle on first panel
-            return {
-              icon: menuIcon,
-              action: ctx.togglePanel,
-            }
-          } else {
-            if (pageIndex === leftPageIndex && leftPageIndex > 0) {
+      return seq([
+        flexParentStyle({ orientation: "row" }),
+        repeat(getRange, page => {
+          const pageIndex = page.index
+          const rootAction = observable(() => {
+            const leftPageIndex = getLeftPageIndex()
+            if (pageIndex === 0 && firstPanelRootAction) {
+              // side menu toggle on first panel
               return {
-                icon: backIcon,
-                action: back,
+                icon: firstPanelRootAction.icon,
+                action: firstPanelRootAction.action(ctx),
               }
-            } else if (pageIndex > leftPageIndex) {
-              return {
-                icon: closeIcon,
-                action: () => closePage(pageIndex),
+            } else {
+              if (pageIndex === leftPageIndex && leftPageIndex > 0) {
+                return {
+                  icon: backIcon,
+                  action: back,
+                }
+              } else if (pageIndex > leftPageIndex) {
+                return {
+                  icon: closeIcon,
+                  action: () => closePage(pageIndex),
+                }
               }
             }
-          }
-        })
+          })
 
-        return seq([
-          style(() => pageIndex < getLeftPageIndex() && { display: "none" }),
-          flexChildStyle({
-            weight: () => (pageIndex === getPageIndex() ? 1 : null),
-          }),
-          size({ w: previousPanelWidth }),
-          border({ r: true }),
-          vFlex([
-            [
-              "fixed",
-              appBar({
-                page,
-                backgroundColor: ctx.colors.primary,
-                textColor: ctx.colors.textOnPrimary,
-                rootAction,
-              }),
-            ],
-            page.content,
-          ]),
-        ])
-      }),
-    ])
-  }
-)
+          return seq([
+            flexChildStyle({
+              weight: () => (pageIndex === getPageIndex() ? 1 : null),
+            }),
+            size({ w: previousPanelWidth }),
+            border({ r: true }),
+            vFlex([
+              [
+                "fixed",
+                appBar({
+                  page,
+                  backgroundColor: topBarBackgroundColor(ctx),
+                  textColor: topBarTextColor(ctx),
+                  rootAction,
+                }),
+              ],
+              page.content,
+            ]),
+            style(() => pageIndex < getLeftPageIndex() && { display: "none" }),
+          ])
+        }),
+      ])
+    }
+  )
 
 module.exports = function (opts, pages) {
   if (!pages) {
@@ -218,11 +230,29 @@ module.exports = function (opts, pages) {
     opts = {}
   }
 
+  const {
+    firstPanelRootAction = {
+      icon: menuIcon,
+      action: ctx => ctx.togglePanel,
+    },
+    topBarBackgroundColor = ctx => ctx.colors.primary,
+    topBarTextColor = ctx => ctx.colors.textOnPrimary,
+  } = opts
+
   pages = castArray(pages)
 
-  return navigatorCore({
-    pages,
-    renderer: renderer,
-    lastPageIndex: opts.lastPageIndex,
-  })
+  return ctxAssign(
+    {
+      fgColor: topBarTextColor,
+    },
+    navigatorCore({
+      pages,
+      renderer: renderer({
+        firstPanelRootAction,
+        topBarBackgroundColor,
+        topBarTextColor,
+      }),
+      lastPageIndex: opts.lastPageIndex,
+    })
+  )
 }

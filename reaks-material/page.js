@@ -1,5 +1,4 @@
 const concat = require("lodash/concat")
-const isArray = require("lodash/isArray")
 const contextualize = require("../reaks/ctx-level-helpers/contextualize")
 const actionLayout = require("./pageActionLayout")
 const moreActionsMenu = require("./moreActionsMenu")
@@ -12,11 +11,11 @@ module.exports = function (args) {
       : []
   )
 
-  return (ctx) => {
+  return ctx => {
     const createContent = args.content(ctx)
     return {
       title: contextualize(args.title, ctx),
-      content: (domNode) => {
+      content: domNode => {
         ctx._pageContentDomNode = domNode
         return createContent(domNode)
       },
