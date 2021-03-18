@@ -1,6 +1,6 @@
-const parseISO = require("date-fns/parseISO").default
-const formatISO = require("date-fns/formatISO").default
-const getISOWeek = require("date-fns/getISOWeek").default
+const parseISO = require("date-fns/parseISO")
+const formatISO = require("date-fns/formatISO")
+const getISOWeek = require("date-fns/getISOWeek")
 const compact = require("lodash/compact")
 const defaults = require("lodash/defaults")
 const pickBy = require("lodash/pickBy")
@@ -215,7 +215,7 @@ module.exports = ({
       onUserInput()
     }
 
-    const updateFromExternalValue = function(externalValue) {
+    const updateFromExternalValue = function (externalValue) {
       if (externalValue !== internalValuetoExternalValue(internalValue())) {
         internalValue(ISOStringToInternalValue(externalValue))
         // on affiche les boutons d'année en cohérence avec la valeur externe
@@ -224,7 +224,7 @@ module.exports = ({
     }
 
     // sur changement de la valeur externe, on vérifie s'il faut mettre à jour la valeur interne
-    const observeExternalChange = observe(value, function() {
+    const observeExternalChange = observe(value, function () {
       updateFromExternalValue(value())
     })
 
