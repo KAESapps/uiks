@@ -44,7 +44,13 @@ const bodyText = message =>
     multilineText(message || "")
   )
 
-const dialogPopupLayer = ({ title, content, actions = [], maxWidth = 768 }) =>
+const dialogPopupLayer = ({
+  title,
+  content,
+  actions = [],
+  maxWidth = 768,
+  minHeight,
+}) =>
   withPopup.popupBuilder(
     mix(
       [
@@ -53,6 +59,7 @@ const dialogPopupLayer = ({ title, content, actions = [], maxWidth = 768 }) =>
           width: "100%",
           maxWidth,
           maxHeight: "100%",
+          minHeight,
           boxSizing: "border-box",
           backgroundColor: "white",
           borderRadius: 3,
