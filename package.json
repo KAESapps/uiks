@@ -15,9 +15,6 @@
     "reactivedb": "KAESapps/reactivedb#c88d057",
     "reaks": "KAESapps/reaks#2176069"
   },
-  "peerDependencies": {
-    "kobs": "kaesapps/kobs#master"
-  },
   "devDependencies": {
     "eslint": "6.1.0",
     "update-git-packages": "github:kaesapps/update-git-packages"
