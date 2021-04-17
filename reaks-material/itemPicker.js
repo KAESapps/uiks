@@ -11,9 +11,10 @@ module.exports = ({ items, label, title }) =>
       value: Array.isArray(items) ? () => () => items : items,
       itemLabel: ctx => () => label(ctx.value, ctx),
       actions: [
-        flatButton({ label: "Effacer", primary: true }, ctx => () =>
+        flatButton({ label: "Effacer", primary: true }, ctx => () => {
           ctx.setValue(null)
-        ),
+          ctx.closePopup()
+        }),
       ],
     })
   )

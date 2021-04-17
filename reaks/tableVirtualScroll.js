@@ -1,22 +1,11 @@
-const isString = require("lodash/isString")
-const assign = require("lodash/assign")
-const defaults = require("lodash/defaults")
-const label = require("./label")
-const style = require("reaks/style")
-const seq = require("reaks/seq")
-const component = require("./ctx-level-helpers/component")
 const table = require("./table")
 const vFlex = require("./vFlex")
 const vListVirtualScroll = require("./vListVirtualScroll")
 const group = require("./group")
 const border = require("./border")
+const tableColumnDefaultOpts = require("./tableColumnDefaultOpts")
 
-const columnHeader = component(
-  arg => seq([arg, style({ fontSize: 12 })]),
-  arg => (isString(arg) ? [label(arg)] : [arg])
-)
-
-module.exports = function(arg1, arg2) {
+module.exports = function (arg1, arg2) {
   let opts, args
   if (arguments.length === 1) {
     args = arg1
@@ -38,18 +27,7 @@ module.exports = function(arg1, arg2) {
     opts,
     args.map((columnArg, c) => {
       let opts = columnArg[0]
-      if (c === 0) {
-        opts = defaults({}, opts, {
-          margin: { l: 8 },
-        })
-      }
-      if (c === args.length - 1) {
-        opts = defaults({}, opts, {
-          margin: { r: 8 },
-        })
-      }
-      opts = assign({}, opts, { header: columnHeader(opts.header) })
-      return [opts, columnArg[1]]
+      return [tableColumnDefaultOpts(opts, c, args), columnArg[1]]
     })
   )
 
