@@ -9,6 +9,12 @@ module.exports = ({ next, inheritActiveItem, inheritOpenItem }, cmp) =>
     withEnsureItemVisible(
       inheritOpenItem
         ? cmp
-        : ctxAssign({ openItem: activeItem(ctx => id => id, next) }, cmp)
+        : ctxAssign(
+            {
+              openItem: activeItem(ctx => id => id, next),
+              activateItem: activeItem(ctx => id => id),
+            },
+            cmp
+          )
     )
   )
