@@ -6,7 +6,7 @@ const ctxAssign = require("./assign")
 
 module.exports = ({ next, inheritActiveItem, inheritOpenItem }, cmp) =>
   (inheritActiveItem ? identity : withActiveItem)(
-    withEnsureItemVisible(
+    (inheritActiveItem ? identity : withEnsureItemVisible)(
       inheritOpenItem
         ? cmp
         : ctxAssign(
