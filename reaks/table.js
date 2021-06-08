@@ -52,7 +52,7 @@ const createColumnHeader = itemArg => {
   let opts = itemArg[0]
   let headerContent = opts.header
   if (isString(opts.header)) {
-    headerContent = label(opts.header)
+    headerContent = label({ wrap: true }, opts.header)
   }
   return createCell([
     assign({}, opts, { noAlignWrapper: false }),
@@ -60,7 +60,7 @@ const createColumnHeader = itemArg => {
   ])
 }
 
-const table = function(arg1, arg2) {
+const table = function (arg1, arg2) {
   let opts, args
   if (arguments.length === 1) {
     args = arg1

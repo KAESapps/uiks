@@ -75,39 +75,41 @@ module.exports = arg => {
                     }
                   }
             ),
-          style.mixin(ctx => () =>
+          style.mixin(
+            ctx => () =>
+              (
+                multiple
+                  ? includes(ctx.selectedValue(), ctx.value)
+                  : ctx.selectedValue() === ctx.value
+              )
+                ? {
+                    backgroundColor: ctx.colors.primary,
+                    color: ctx.colors.textOnPrimary,
+                  }
+                : {
+                    backgroundColor: colors.grey[100],
+                    color: colors.grey[800],
+                  }
+          ),
+        ]),
+        falsy: style.mixin(
+          ctx => () =>
             (
               multiple
                 ? includes(ctx.selectedValue(), ctx.value)
                 : ctx.selectedValue() === ctx.value
             )
               ? {
-                  backgroundColor: ctx.colors.primary,
+                  backgroundColor: ctx.colors.lightPrimary,
                   color: ctx.colors.textOnPrimary,
                 }
               : {
-                  backgroundColor: colors.grey[100],
-                  color: colors.grey[800],
+                  color: colors.grey[400],
                 }
-          ),
-        ]),
-        falsy: style.mixin(ctx => () =>
-          (
-            multiple
-              ? includes(ctx.selectedValue(), ctx.value)
-              : ctx.selectedValue() === ctx.value
-          )
-            ? {
-                backgroundColor: ctx.colors.lightPrimary,
-                color: ctx.colors.textOnPrimary,
-              }
-            : {
-                color: colors.grey[400],
-              }
         ),
       }),
     ],
-    align({ h: "center", v: "center" }, label({ ellipsis: false }, itemLabel))
+    align({ h: "center", v: "center" }, label({ noEllipsis: true }, itemLabel))
   )
 
   return assignCtx(

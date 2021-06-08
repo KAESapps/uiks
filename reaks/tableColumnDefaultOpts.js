@@ -8,7 +8,7 @@ const seq = require("reaks/seq")
 
 const columnHeader = component(
   arg => seq([arg, style({ fontSize: 12 })]),
-  arg => (isString(arg) ? [label(arg)] : [arg])
+  arg => (isString(arg) ? [label({ wrap: true }, arg)] : [arg])
 )
 module.exports = (colOpts, c, colsArg) => {
   if (c === 0) {

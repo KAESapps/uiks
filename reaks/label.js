@@ -6,11 +6,11 @@ const seq = require("reaks/seq")
 
 const nonBreakingWhitespaceChar = "\xa0"
 module.exports = component(
-  function(arg1, arg2) {
+  function (arg1, arg2) {
     let labelArg, opt
     if (arguments.length === 1) {
       labelArg = arg1
-      opt = { ellipsis: true }
+      opt = {}
     } else {
       labelArg = arg2
       opt = arg1
@@ -26,14 +26,14 @@ module.exports = component(
 
     const styleArg = {
       overflow: "hidden",
-      whiteSpace: "nowrap",
-      textOverflow: opt.ellipsis && "ellipsis",
+      whiteSpace: opt.wrap ? null : "nowrap",
+      textOverflow: opt.noEllipsis ? null : "ellipsis",
     }
 
     return seq([text(textArg), style(styleArg)])
   },
   // map arguments
-  function() {
+  function () {
     if (arguments.length === 0) {
       return [ctx => ctx.value]
     }
