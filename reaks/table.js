@@ -3,9 +3,10 @@ const isPlainObject = require("lodash/isPlainObject")
 const isString = require("lodash/isString")
 const isNumber = require("lodash/isNumber")
 const assign = require("lodash/assign")
+const attr = require("reaks/attr")
+const assignObservable = require("../core/assignObservable")
 const hFlex = require("./hFlex")
 const vFlex = require("./vFlex")
-const scroll = require("./scroll")
 const list = require("./list")
 const align = require("./align")
 const innerMargin = require("./innerMargin")
@@ -13,6 +14,8 @@ const border = require("./border")
 const group = require("./group")
 const label = require("./label")
 const size = require("./size")
+const style = require("./style")
+const scroll = require("./scroll")
 
 const normalizeColumnArgs = args => {
   return args.map((columnArg, c) => {
@@ -37,7 +40,12 @@ const createCell = itemArg => {
   let [opts, cellContent] = itemArg
   let cell = cellContent
   if (!opts.noAlignWrapper) {
-    cell = cell && align({ h: opts.hAlign, v: "center" }, cell)
+    cell =
+      cell &&
+      style(
+        { textAlign: opts.hAlign },
+        align({ h: opts.hAlign, v: "center" }, cell)
+      )
   }
   if (opts.margin) {
     cell = innerMargin(opts.margin, cell)
@@ -75,14 +83,32 @@ const table = function (arg1, arg2) {
 
   args = normalizeColumnArgs(args)
 
-  let row = hFlex(args.map(createCell))
+  let row = size({ wMin: "100%" }, hFlex(args.map(createCell)))
   if (opts.rowMixin) {
     row = group([row, opts.rowMixin])
   }
 
-  const header = border({ b: true }, hFlex(args.map(createColumnHeader)))
-  const body = scroll(list(row))
-  const table = vFlex([[{ weight: null }, header], body])
+  let header = border({ b: true }, hFlex(args.map(createColumnHeader)))
+  if (opts.withHorizontalScroll) {
+    header = group([ctx => attr("scrollLeft", ctx.scrollLeft), header])
+  }
+
+  const body = scroll(
+    {
+      onScroll:
+        opts.withHorizontalScroll &&
+        (ctx => ev => {
+          const scrollLeftValue = ev.currentTarget.scrollLeft
+          if (ctx.scrollLeft() !== scrollLeftValue)
+            ctx.scrollLeft(scrollLeftValue)
+        }),
+    },
+    style({ display: "flex", alignItems: "flex-start" }, list(row))
+  )
+  let table = vFlex([[{ weight: null }, header], body])
+  if (opts.withHorizontalScroll) {
+    table = assignObservable({ scrollLeft: 0 }, table)
+  }
 
   // expose split parts
   table.header = header

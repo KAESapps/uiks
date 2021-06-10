@@ -186,8 +186,11 @@ module.exports = ({
   item,
   getDefaultVisibleItem: getDefaultVisibleItemGetter,
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
+  onScroll,
 }) => {
   return withSize(ctx => {
+    const onScrollCb = onScroll && onScroll(ctx)
+
     const getItemIds = observable(
       isFunction(ctx.value) ? () => ctx.value() || [] : ctx.value || []
     )
@@ -306,6 +309,7 @@ module.exports = ({
         } else if (getDefaultVisibleItem) {
           getDefaultVisibleItem() != null && disableEnsureItemVisible()
         }
+        onScrollCb && onScrollCb(ev)
       }),
       child(
         seq([

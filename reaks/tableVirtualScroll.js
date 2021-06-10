@@ -1,3 +1,4 @@
+const assignObservable = require("../core/assignObservable")
 const table = require("./table")
 const vFlex = require("./vFlex")
 const vListVirtualScroll = require("./vListVirtualScroll")
@@ -45,9 +46,19 @@ module.exports = function (arg1, arg2) {
     item: row,
     getDefaultVisibleItem,
     disableEnsureItemVisible,
+    onScroll:
+      opts.withHorizontalScroll &&
+      (ctx => ev => {
+        const scrollLeftValue = ev.currentTarget.scrollLeft
+        if (ctx.scrollLeft() !== scrollLeftValue)
+          ctx.scrollLeft(scrollLeftValue)
+      }),
   })
 
-  const fullTable = vFlex([["fixed", header], body])
+  let fullTable = vFlex([["fixed", header], body])
+  if (opts.withHorizontalScroll) {
+    fullTable = assignObservable({ scrollLeft: 0 }, fullTable)
+  }
 
   fullTable.header = header
   fullTable.body = body
