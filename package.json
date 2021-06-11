@@ -4,19 +4,19 @@
   "description": "High-level components for compositing UIs",
   "main": "index.js",
   "dependencies": {
-    "color": "3.1.2",
+    "color": "3.1.3",
     "date-fns": "2.19.0",
-    "element-resize-detector": "1.2.0",
+    "element-resize-detector": "1.2.2",
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
     "intersperse-array": "1.0.0",
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "material-colors": "1.2.6",
-    "reactivedb": "KAESapps/reactivedb#c88d057",
-    "reaks": "KAESapps/reaks#2176069"
+    "reactivedb": "KAESapps/reactivedb#3e3081c88c916302f1641edf1aee47f6dfc7f194",
+    "reaks": "KAESapps/reaks#8f935c62465ca8ff44e323e6fab9b39ae77761b0"
   },
   "devDependencies": {
-    "eslint": "6.1.0",
+    "eslint": "7.28.0",
     "update-git-packages": "github:kaesapps/update-git-packages"
   },
   "scripts": {
