@@ -10,6 +10,7 @@ const { observable } = require("kobs")
 const withSize = require("./withSize")
 
 const { autorun } = require("kobs")
+const sizeDetector = require("./sizeDetector")
 
 const attrDefer = (attr, getValue) => domNode =>
   autorun(() => {
@@ -187,9 +188,11 @@ module.exports = ({
   getDefaultVisibleItem: getDefaultVisibleItemGetter,
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
   onScroll,
+  listAvailWidthObs, // observable à fournir pour activer l'option
 }) => {
   return withSize(ctx => {
     const onScrollCb = onScroll && onScroll(ctx)
+    const listAvailWidth = listAvailWidthObs && listAvailWidthObs(ctx)
 
     const getItemIds = observable(
       isFunction(ctx.value) ? () => ctx.value() || [] : ctx.value || []
@@ -313,6 +316,15 @@ module.exports = ({
       }),
       child(
         seq([
+          // si option activée, détection dynamique de la largeur disponible pour le contenu, hors scrollbar
+          listAvailWidth &&
+            sizeDetector(node => {
+              const currentWidth = listAvailWidth()
+              const newWidth = node.offsetWidth
+              if (newWidth !== currentWidth) {
+                listAvailWidth(newWidth)
+              }
+            }),
           style({
             position: "relative",
             //overflow: "hidden", // retiré pour permettre le scroll horizontal si les lignes sont plus larges, à voir si ça peut poser pb dans certains cas ?

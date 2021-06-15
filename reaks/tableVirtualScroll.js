@@ -46,6 +46,7 @@ module.exports = function (arg1, arg2) {
     item: row,
     getDefaultVisibleItem,
     disableEnsureItemVisible,
+    listAvailWidthObs: ctx => ctx.listAvailWidthObs,
     onScroll:
       opts.withHorizontalScroll &&
       (ctx => ev => {
@@ -55,7 +56,10 @@ module.exports = function (arg1, arg2) {
       }),
   })
 
-  let fullTable = vFlex([["fixed", header], body])
+  let fullTable = assignObservable(
+    { listAvailWidthObs: null },
+    vFlex([["fixed", header], body])
+  )
   if (opts.withHorizontalScroll) {
     fullTable = assignObservable({ scrollLeft: 0 }, fullTable)
   }
