@@ -5,6 +5,8 @@ const vListVirtualScroll = require("./vListVirtualScroll")
 const group = require("./group")
 const border = require("./border")
 const tableColumnDefaultOpts = require("./tableColumnDefaultOpts")
+const withSize = require("./withSize")
+const style = require("./style")
 
 module.exports = function (arg1, arg2) {
   let opts, args
@@ -24,12 +26,27 @@ module.exports = function (arg1, arg2) {
   }
   opts.rowMixin = group(rowMixins)
 
-  const { header, row } = table(
+  let { header, row } = table(
     opts,
     args.map((columnArg, c) => {
       let opts = columnArg[0]
       return [tableColumnDefaultOpts(opts, c, args), columnArg[1]]
     })
+  )
+
+  header = withSize(
+    style(
+      ctx => () => {
+        const availWidth = ctx.listAvailWidthObs()
+        const fullWidth = ctx.size().width
+        if (fullWidth && availWidth) {
+          return {
+            paddingRight: fullWidth - availWidth,
+          }
+        }
+      },
+      header
+    )
   )
 
   const disableEnsureItemVisible = ctx =>
