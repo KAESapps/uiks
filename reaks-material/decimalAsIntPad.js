@@ -4,7 +4,8 @@ const toString = require("lodash/toString")
 const padStart = require("lodash/padStart")
 const numericPad = require("./numericPad")
 
-module.exports = ({ decimals, allowNegative }) => {
+module.exports = ({ decimalOffset, decimals, allowNegative }) => {
+  if (decimalOffset != null) decimals = decimalOffset //TODO: tenir compte de "decimals" aussi dans ce cas
   const validateValue = decimalString => {
     const commaPosition = decimalString.indexOf(",")
     return (
