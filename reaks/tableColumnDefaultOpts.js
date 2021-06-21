@@ -21,7 +21,7 @@ module.exports = (colOpts, c, colsArg) => {
       margin: { r: 8 },
     })
   }
-  colOpts = assign({ width: 100 }, colOpts, {
+  colOpts = assign({ growable: true }, colOpts, {
     header: columnHeader(colOpts.header),
   })
   return colOpts

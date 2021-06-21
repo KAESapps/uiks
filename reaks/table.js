@@ -50,12 +50,11 @@ const createCell = itemArg => {
   if (opts.margin) {
     cell = innerMargin(opts.margin, cell)
   }
-  if (isNumber(opts.width)) {
-    cell = [
-      { weight: opts.growable ? 1 : null, shrinkable: false },
-      size({ w: opts.width }, cell),
-    ]
-  }
+  cell = [
+    { weight: opts.growable ? 1 : null, shrinkable: false },
+    size({ w: opts.width || 0 }, cell),
+  ]
+
   return cell
 }
 

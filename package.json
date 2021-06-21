@@ -13,7 +13,7 @@
     "lodash": "4.17.21",
     "material-colors": "1.2.6",
     "reactivedb": "KAESapps/reactivedb#3e3081c88c916302f1641edf1aee47f6dfc7f194",
-    "reaks": "KAESapps/reaks#8f935c62465ca8ff44e323e6fab9b39ae77761b0"
+    "reaks": "KAESapps/reaks#1e98634824f08ec15b3db28c52d6075ca1d7cc47"
   },
   "devDependencies": {
     "eslint": "7.28.0",
