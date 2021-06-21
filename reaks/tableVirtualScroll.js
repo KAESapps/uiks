@@ -25,6 +25,9 @@ module.exports = function (arg1, arg2) {
     rowMixins.push(opts.rowMixin)
   }
   opts.rowMixin = group(rowMixins)
+  if (opts.withHorizontalScroll !== false) {
+    opts.withHorizontalScroll = true
+  }
 
   let { header, row } = table(
     opts,
