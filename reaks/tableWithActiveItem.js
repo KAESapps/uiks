@@ -27,6 +27,7 @@ const tableGenerator = (arg1, arg2) => {
     {
       rowMixin: rowMixin(opts),
       itemHeight: opts.itemHeight,
+      withHorizontalScroll: opts.withHorizontalScroll,
     },
     columns
   )
