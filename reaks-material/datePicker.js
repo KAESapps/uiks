@@ -2,6 +2,7 @@ const parseISO = require("date-fns/parseISO")
 const formatISO = require("date-fns/formatISO")
 const getISOWeek = require("date-fns/getISOWeek")
 const compact = require("lodash/compact")
+const round = require("lodash/round")
 const defaults = require("lodash/defaults")
 const pickBy = require("lodash/pickBy")
 const isFunction = require("lodash/isFunction")
@@ -35,8 +36,8 @@ const arrowForward = require("./icons/navigation/arrowForward")
 const alertIcon = require("./icons/alert/error")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
-const datePrecisionAtLeast = require("reactivedb/operators/utils/datePrecision")
-  .atLeast
+const datePrecisionAtLeast =
+  require("reactivedb/operators/utils/datePrecision").atLeast
 
 const isValidISODate = iso => {
   const date = parseISO(iso)
@@ -124,7 +125,7 @@ module.exports = ({
       str += ":" + padStart(value.minute, 2, "0")
     }
 
-    return str
+    return precisionAtLeast("hour") ? new Date(str).toISOString() : str
   }
 
   const internalValuetoExternalValue = value => {
@@ -198,7 +199,7 @@ module.exports = ({
       // fill-in other fragments from current date
       defaults(
         patch,
-        pickBy(now, (v, fragmentId) => !get(baseValue, fragmentId))
+        pickBy(now, (v, fragmentId) => get(baseValue, fragmentId) == null)
       )
 
       internalValue(assign(baseValue, patch))
