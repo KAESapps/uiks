@@ -20,19 +20,22 @@ const convertChildOpts = childOpts => {
 
 const normalizeChildArg = c => (Array.isArray(c) ? c : [{}, c])
 
-const childCreator = ({ orientation, defaultChildOpts, wrap }) => childArg => {
-  const [childOpts, childMixin] = normalizeChildArg(childArg)
+const childCreator =
+  ({ orientation, defaultChildOpts, wrap }) =>
+  childArg => {
+    const [childOpts, childCmp] = normalizeChildArg(childArg)
 
-  const { weight, align, shrinkable } = defaults(
-    {},
-    convertChildOpts(childOpts),
-    defaultChildOpts
-  )
-  return seq([
-    flexChildStyle({ orientation, wrap, weight, align, shrinkable }),
-    childMixin,
-  ])
-}
+    const { weight, align, shrinkable, childMixin } = defaults(
+      {},
+      convertChildOpts(childOpts),
+      defaultChildOpts
+    )
+    return seq([
+      childMixin,
+      flexChildStyle({ orientation, wrap, weight, align, shrinkable }),
+      childCmp,
+    ])
+  }
 
 const staticFlex = (config, childrenArg) => {
   const { child: appendChildNode = appendDiv } = config
