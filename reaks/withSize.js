@@ -8,11 +8,10 @@ module.exports = cmp => ctx => {
   let destroy
   const reaksCmp = cmp(create(ctx, { size }))
   return seq([
-    sizeDetector(node => {
-      if (node.offsetParent === null) return
+    sizeDetector((node, rect) => {
       size({
-        height: node.offsetHeight,
-        width: node.offsetWidth,
+        height: rect.height,
+        width: rect.width,
       })
       if (!destroy) {
         // create cmp when size is detected
