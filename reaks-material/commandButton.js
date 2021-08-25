@@ -15,7 +15,7 @@ const swap = require("reaks/swap")
 const svgIcon = require("reaks/svgIcon")
 const successIcon = require("./icons/action/done")
 const errorIcon = require("./icons/alert/error")
-const hPile = require("../reaks-layout/hPile")
+const hFlex = require("../reaks-layout/hFlex")
 const icon = require("./icon").reaks
 const hoverable = require("../reaks/hoverable").reaksMixin
 const color = require("color")
@@ -47,7 +47,7 @@ module.exports = ctxComponent(
     const textCmp = text && label(text)
     const content =
       iconCmp && textCmp
-        ? hPile({ gap: 6, align: "center" }, [iconCmp, textCmp])
+        ? hFlex({ gap: 6, align: "center" }, [["fixed", iconCmp], textCmp])
         : iconCmp || textCmp
 
     return seq([
@@ -74,10 +74,7 @@ module.exports = ctxComponent(
       ),
       // text, spinner & icons, conditionally displayed
       zPile([
-        [
-          { sizer: true },
-          visibleIf("idle", align({ h: "center", v: "center" }, content)),
-        ],
+        [{ sizer: true }, visibleIf("idle", content)],
         visibleIf(
           "running",
           align(
