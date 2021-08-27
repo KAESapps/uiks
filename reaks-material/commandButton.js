@@ -44,7 +44,7 @@ module.exports = ctxComponent(
     let timeoutId
 
     const iconCmp = iconDef && icon({ icon: iconDef, color: textColor })
-    const textCmp = text && label(text)
+    const textCmp = text && seq([style({ textAlign: "center" }), label(text)])
     const content =
       iconCmp && textCmp
         ? hFlex({ gap: 6, align: "center" }, [["fixed", iconCmp], textCmp])
