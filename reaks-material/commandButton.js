@@ -4,6 +4,7 @@ const label = require("../reaks/label").reaks
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
 const clickable = require("../reaks/clickable").reaksMixin
+const border = require("uiks/reaks-layout/border")
 const style = require("reaks/style")
 const align = require("../reaks-layout/align")
 const size = require("reaks/size")
@@ -23,14 +24,19 @@ const color = require("color")
 module.exports = ctxComponent(
   (arg, action, opts) => {
     const { text, icon: iconDef } = isString(arg) ? { text: arg } : arg
-    let { textColor, backgroundColor, height, flat } = defaults({}, opts, {
-      textColor: colors.black,
-      backgroundColor: colors.grey[300],
-      height: 40,
-      flat: false,
-    })
+    let { textColor, backgroundColor, height, flat, outline } = defaults(
+      {},
+      opts,
+      {
+        textColor: colors.black,
+        backgroundColor: colors.grey[300],
+        height: 40,
+        flat: false,
+        outline: false,
+      }
+    )
 
-    if (flat) backgroundColor = null
+    if (outline || flat) backgroundColor = null
 
     const state = observable("idle")
     const visibleIf = (visibleState, cmp) =>
@@ -106,6 +112,7 @@ module.exports = ctxComponent(
             ? "#EEE"
             : backgroundColor,
       })),
+      outline && border({ color: textColor }),
       align({ h: "center", v: "center" }),
       size({ h: height }),
       style({
