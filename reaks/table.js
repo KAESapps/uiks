@@ -10,6 +10,7 @@ const vFlex = require("./vFlex")
 const list = require("./list")
 const align = require("./align")
 const innerMargin = require("./innerMargin")
+const backgroundColor = require("./backgroundColor")
 const border = require("./border")
 const group = require("./group")
 const label = require("./label")
@@ -49,6 +50,9 @@ const createCell = itemArg => {
   }
   if (opts.margin) {
     cell = innerMargin(opts.margin, cell)
+  }
+  if (opts.bgColor) {
+    cell = backgroundColor(opts.bgColor, cell)
   }
   cell = [
     { weight: opts.growable ? 1 : null, shrinkable: false },
