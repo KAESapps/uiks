@@ -54,6 +54,7 @@ module.exports = (picker, opts = {}) => {
               customActions,
               button("Valider", ctx => ctx.validate)
             ),
+            minHeight: opts.minHeight,
           })
         )
       )
