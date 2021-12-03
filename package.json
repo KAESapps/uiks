@@ -12,12 +12,10 @@
     "insert-css": "2.0.0",
     "intersperse-array": "1.0.0",
     "lodash": "4.17.21",
-    "material-colors": "1.2.6",
-    "reactivedb": "KAESapps/reactivedb#a9e2d9b4",
-    "reaks": "KAESapps/reaks#1e98634824f08ec15b3db28c52d6075ca1d7cc47"
+    "material-colors": "1.2.6"
   },
   "devDependencies": {
-    "eslint": "8.1.0",
+    "eslint": "8.3.0",
     "update-git-packages": "kaesapps/update-git-packages"
   },
   "scripts": {
