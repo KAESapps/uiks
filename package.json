@@ -4,10 +4,10 @@
   "description": "High-level components for compositing UIs",
   "main": "index.js",
   "dependencies": {
+    "@reach/observe-rect": "1.2.0",
     "color": "3.1.3",
     "date-fns": "2.19.0",
     "element-resize-detector": "1.2.3",
-    "@reach/observe-rect": "1.2.0",
     "font-face-rule": "1.0.0",
     "insert-css": "2.0.0",
     "intersperse-array": "1.0.0",

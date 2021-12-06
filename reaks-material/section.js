@@ -17,13 +17,16 @@ module.exports = args => {
       backgroundColor: ctx.colors.primary,
       color: ctx.colors.textOnPrimary,
     }),
+    noBorder,
   } = args
   return style(
-    {
-      borderRadius: 2,
-      boxShadow:
-        "rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.2) 0px 1px 2px",
-    },
+    noBorder
+      ? {}
+      : {
+          borderRadius: 2,
+          boxShadow:
+            "rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.2) 0px 1px 2px",
+        },
     vFlex(
       compact([
         [
