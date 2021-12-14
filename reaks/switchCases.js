@@ -19,10 +19,11 @@ const uiksSwitchCases =
   (condition, cases, def = empty) =>
   ctx => {
     const cond = condition(ctx)
-    cases = isFunction(cases) ? cases(ctx) : cases
-    cases = mapValues(cases, c => c(ctx))
-    def = def(ctx)
-    return reaksSwitchCases(cond, cases, def)
+    const ctxCases = mapValues(isFunction(cases) ? cases(ctx) : cases, c =>
+      c(ctx)
+    )
+    const ctxDef = def(ctx)
+    return reaksSwitchCases(cond, ctxCases, ctxDef)
   }
 
 uiksSwitchCases.reaks = reaksSwitchCases
