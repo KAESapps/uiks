@@ -1,22 +1,41 @@
-const style = require("./style")
-const repeat = require("./repeat")
+const isFunction = require("lodash/isFunction")
+const seq = require("reaks/seq")
+const child = require("reaks/child")
+const style = require("reaks/style")
 const contextualize = require("./ctx-level-helpers/contextualize")
+const contextualizeOrderedArgs = require("./ctx-level-helpers/contextualizeOrderedArgs")
 
-module.exports = (opts, item) => {
-  if (!item) {
-    item = opts
+const hGridReaks = (opts, items) => {
+  if (!items) {
+    items = opts
     opts = {}
   }
-  return ctx => {
-    const { gap, minWidth = 100 } = contextualize(opts, ctx)
 
-    return style(
-      {
+  const { gap, minWidth = 100 } = opts
+
+  return seq(
+    [
+      style({
         display: "grid",
         gridTemplateColumns: `repeat(auto-fit, minmax(${minWidth}px, 1fr))`,
         gap: gap && `${gap}px`,
-      },
-      repeat(ctx => ctx.value, item)
-    )(ctx)
-  }
+      }),
+    ].concat(items.map(item => child(item)))
+  )
 }
+
+const hGrid = (opts, items) => ctx => {
+  if (!items) {
+    items = opts
+    opts = {}
+  }
+
+  return hGridReaks(
+    contextualize(opts, ctx),
+    isFunction(items) ? items(ctx) : contextualizeOrderedArgs(items, ctx)
+  )
+}
+
+hGrid.reaks = hGridReaks
+
+module.exports = hGrid
