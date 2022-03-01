@@ -1,3 +1,4 @@
+const compact = require("lodash/compact")
 const flatButton = require("./flatButton")
 const button = require("./button")
 const mix = require("../reaks/mix")
@@ -11,16 +12,21 @@ const vPile = require("../reaks/vPile")
 const hPile = require("../reaks/hPile")
 const colors = require("material-colors")
 const withPopup = require("../reaks/withPopup")
+const closeIcon = require("../reaks-material/icons/content/clear")
 
 // start retrocompat
 const contextualize = require("../reaks/ctx-level-helpers/contextualize")
+const iconButton = require("./iconButton")
+const hFlex = require("../reaks/hFlex")
 
-const dialogArgs = ({ title, content, actions, modal }) => ctx => ({
-  title: contextualize(title, ctx),
-  content: contextualize(content, ctx),
-  modal,
-  actions: actions.map(action => contextualize(action, ctx)),
-})
+const dialogArgs =
+  ({ title, content, actions, modal }) =>
+  ctx => ({
+    title: contextualize(title, ctx),
+    content: contextualize(content, ctx),
+    modal,
+    actions: actions.map(action => contextualize(action, ctx)),
+  })
 // end retrocompat
 
 const titleLabel = text =>
@@ -37,12 +43,7 @@ const titleLabel = text =>
 const contentArea = content => margin({ h: 24, b: 24 }, content)
 
 const bodyText = message =>
-  style(
-    {
-      color: colors.grey[600],
-    },
-    multilineText(message || "")
-  )
+  style({ color: colors.grey[600] }, multilineText(message || ""))
 
 const dialogPopupLayer = ({
   title,
@@ -50,33 +51,51 @@ const dialogPopupLayer = ({
   actions = [],
   maxWidth = 768,
   minHeight,
-}) =>
-  withPopup.popupBuilder(
-    mix(
-      [
-        innerMargin.mixin({ t: 24 }),
-        style.mixin({
-          width: "100%",
-          maxWidth,
-          maxHeight: "100%",
-          minHeight,
-          boxSizing: "border-box",
-          backgroundColor: "white",
-          borderRadius: 3,
-          boxShadow:
-            "rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px",
-        }),
-      ],
-      vPile([
-        titleLabel(title),
+  modal,
+}) => {
+  const mainPopup = mix(
+    [
+      style.mixin({
+        width: "100%",
+        maxWidth,
+        maxHeight: "100%",
+        minHeight,
+        boxSizing: "border-box",
+        backgroundColor: "white",
+        borderRadius: 3,
+        boxShadow:
+          "rgba(0, 0, 0, 0.247059) 0px 14px 45px, rgba(0, 0, 0, 0.219608) 0px 10px 18px",
+      }),
+    ],
+    vPile(
+      compact([
+        hFlex({ align: "top" }, [
+          innerMargin({ t: 24 }, title && titleLabel(title)),
+          [
+            "fixed",
+            !modal &&
+              iconButton(
+                {
+                  icon: closeIcon,
+                  color: "#DDD",
+                  iconSize: { w: 30, h: 30 },
+                },
+                ctx => ctx.closePopup
+              ),
+          ],
+        ]),
         [{ weight: 1 }, contentArea(content)],
-        align(
-          { h: "right" },
-          margin({ v: 8, l: 24, r: 8 }, hPile({ gap: 12 }, actions))
-        ),
+        actions.length &&
+          align(
+            { h: "right" },
+            margin({ v: 8, l: 24, r: 8 }, hPile({ gap: 12 }, actions))
+          ),
       ])
     )
   )
+
+  return withPopup.popupBuilder(mainPopup)
+}
 
 const dialog = arg => ctx => {
   const popup = arg.selfPopup || arg.replace ? ctx.selfPopup : ctx.popup
