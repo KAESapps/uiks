@@ -4,7 +4,6 @@ const button = require("./button")
 const mix = require("../reaks/mix")
 const margin = require("../reaks/margin")
 const align = require("../reaks/align")
-const innerMargin = require("../reaks/innerMargin")
 const label = require("../reaks/label")
 const multilineText = require("../reaks/multilineText")
 const style = require("../reaks/style")
@@ -47,6 +46,7 @@ const bodyText = message =>
 
 const dialogPopupLayer = ({
   title,
+  customTitle = false,
   content,
   actions = [],
   maxWidth = 768,
@@ -70,17 +70,20 @@ const dialogPopupLayer = ({
     vPile(
       compact([
         hFlex({ align: "top" }, [
-          innerMargin({ t: 24 }, title && titleLabel(title)),
+          customTitle ? title : margin({ t: 24 }, title && titleLabel(title)),
           [
             "fixed",
             !modal &&
-              iconButton(
-                {
-                  icon: closeIcon,
-                  color: "#DDD",
-                  iconSize: { w: 30, h: 30 },
-                },
-                ctx => ctx.closePopup
+              margin(
+                4,
+                iconButton(
+                  {
+                    icon: closeIcon,
+                    color: "#DDD",
+                    iconSize: { w: 30, h: 30 },
+                  },
+                  ctx => ctx.closePopup
+                )
               ),
           ],
         ]),
