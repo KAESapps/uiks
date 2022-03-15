@@ -7,18 +7,18 @@
  * A la différence de remotePropEditor, cette implémentation n'embarque pas la logique d'entité et de propriété
  * seulement value/setValue
  */
-
+const debounce = require("lodash/debounce")
 const random = require("lodash/random")
 const create = require("lodash/create")
 const { observable, transaction } = require("kobs")
 const defaultValue = null // TODO: rendre paramétrable ?
 
-module.exports = view => ctx => {
+module.exports = (view, opts) => ctx => {
   let exitEditModeAfterSubmit
   const editMode = observable(false)
   const inputValue = observable(defaultValue)
 
-  const submit = () => {
+  const submitRaw = () => {
     const submitId = random(0, 1e6)
     const newValue = inputValue()
     exitEditModeAfterSubmit = submitId
@@ -29,6 +29,8 @@ module.exports = view => ctx => {
       }
     })
   }
+  const submit =
+    opts && opts.debounce ? debounce(submitRaw, opts.debounce) : submitRaw
 
   const value = observable(() => {
     if (editMode()) return inputValue()
