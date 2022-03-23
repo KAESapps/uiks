@@ -26,5 +26,4 @@ module.exports = actions => rootCtx =>
         }
       )
     ),
-    actions: [dialog.cancelButton()],
   })(rootCtx)
