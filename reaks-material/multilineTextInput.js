@@ -19,7 +19,7 @@ module.exports = ctxCmp(
           font: "inherit",
         }),
         innerMargin(8),
-        size({ w: "100%" }),
+        size({ w: "100%", h: 100 }),
         border({ radius: 2 }),
         attrs({
           placeholder,
@@ -40,7 +40,7 @@ module.exports = ctxCmp(
       () => document.createElement("textarea")
     ),
   // defaults args from context
-  function(arg) {
+  function (arg) {
     return [
       defaults({}, arg, {
         value: ctx => ctx.value,
