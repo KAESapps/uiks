@@ -4,7 +4,7 @@ const debounce = require("lodash/debounce")
 module.exports = onSizeChange => node => {
   let rectObserver = observeRect(
     node,
-    debounce(rect => onSizeChange(node, rect), 100)
+    debounce(rect => onSizeChange(node, rect), 100, { leading: true })
   )
 
   // start observing
