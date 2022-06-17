@@ -48,5 +48,5 @@ module.exports = ({ title, listValue, itemLabel, actions }) =>
         ])
       )
     ),
-    actions: concat(actions, dialog.cancelButton()),
+    actions,
   })

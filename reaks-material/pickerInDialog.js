@@ -13,7 +13,7 @@ const popup = require("uiks/reaks/popup")
 const getStaticValue = require("kobs/getStaticValue")
 
 module.exports = (picker, opts = {}) => {
-  const { title = "Saisir une nouvelle valeur", customActions } = opts
+  const { title = "Saisir une nouvelle valeur", customActions, noValidateButton } = opts
   return popup(
     assignObservable(
       {
@@ -47,12 +47,9 @@ module.exports = (picker, opts = {}) => {
               observableAsValue("internalValue", picker)
             ),
             actions: concat(
-              flatButton(
-                { label: "Annuler", primary: false },
-                ctx => ctx.closePopup
-              ),
+              [],
               customActions,
-              button("Valider", ctx => ctx.validate)
+              !noValidateButton && button("Valider", ctx => ctx.validate)
             ),
             minHeight: opts.minHeight,
           })
