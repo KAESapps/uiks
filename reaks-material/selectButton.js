@@ -9,9 +9,12 @@ const textInputLook = require("./textInputLook")
 const dropDownIcon = require("./icons/navigation/arrowDropDown")
 const hoverable = require("../reaks/hoverable")
 
-module.exports = function(opts, onAction) {
-  const { label: labelArg, valueDisplayer: valueDisplayerArg, iconColor } =
-    isString(opts) || isFunction(opts) ? { label: opts } : opts
+module.exports = function (opts, onAction) {
+  const {
+    label: labelArg,
+    valueDisplayer: valueDisplayerArg,
+    iconColor,
+  } = isString(opts) || isFunction(opts) ? { label: opts } : opts
 
   const valueDisplayer = valueDisplayerArg ? valueDisplayerArg : label(labelArg)
 
@@ -21,7 +24,7 @@ module.exports = function(opts, onAction) {
       { over: style.mixin({ backgroundColor: "rgba(0,0,0,0.1)" }) },
       textInputLook(
         opts,
-        hFlex([
+        hFlex({ gap: 6 }, [
           valueDisplayer,
           ["fixed", icon({ icon: dropDownIcon, color: iconColor })],
         ])
