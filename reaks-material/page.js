@@ -6,7 +6,7 @@ const moreActionsMenu = require("./moreActionsMenu")
 module.exports = function (args) {
   const actions = concat(
     args.action,
-    args.moreActions && args.moreActions.length
+    args.moreActions
       ? moreActionsMenu(args.moreActions)
       : []
   )

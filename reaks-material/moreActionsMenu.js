@@ -2,10 +2,21 @@ const assign = require("lodash/assign")
 const menuIcon = require("./icons/navigation/moreVertical")
 const iconButton = require("./iconButton")
 const actionsPopup = require("./actionsPopup")
+const { isPlainObject } = require("lodash")
 
-module.exports = function (opts, actions) {
-  if (arguments.length === 1) {
-    actions = opts
+module.exports = function (arg, arg2) {
+  let actions, opts
+  if (arguments.length === 2) {
+    actions = arg2
+    opts = arg
+  } else {
+    if (isPlainObject(arg)) {
+      actions = arg.actions
+      opts = arg
+    } else {
+      actions = arg
+      opts = {}
+    }
   }
   return iconButton(
     assign(
@@ -13,8 +24,8 @@ module.exports = function (opts, actions) {
         icon: menuIcon,
         color: ctx => ctx.fgColor || ctx.colors.textOnPrimary,
       },
-      opts
+      opts.iconButtonOpts
     ),
-    actionsPopup(actions)
+    actionsPopup({ actions, title: opts.title })
   )
 }
