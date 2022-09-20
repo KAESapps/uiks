@@ -35,6 +35,9 @@ module.exports = ctxCmp(
         onEvent("input", ev => {
           setValue(ev.target.value || null)
         }),
+        onEvent("click", ev => {
+          ev.stopPropagation() // prevent unwanted effects of propagation of the click event to container
+        }),
         autoFocus &&
           (domNode => {
             domNode.focus()
@@ -44,7 +47,7 @@ module.exports = ctxCmp(
       () => document.createElement("input")
     ),
   // defaults args from context
-  function(arg) {
+  function (arg) {
     return [
       defaults({}, arg, {
         value: ctx => ctx.value,
