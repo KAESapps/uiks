@@ -1,12 +1,21 @@
 const alphanumericPad = require("./alphanumericPad")
 const textInputLook = require("./textInputLook")
-const label = require("uiks/reaks/label")
+const label = require("../reaks/label")
+const switchBoolean = require("../reaks/switchBoolean")
 
 const textFieldDisplayer = textInputLook(label())
 
 const dialogEditor = require("./dialogEditor")
 
-module.exports = dialogEditor(
-  alphanumericPad({ decimal: false }),
-  textFieldDisplayer
+module.exports = switchBoolean(
+  ctx => {
+    return ctx.readOnly
+  },
+  {
+    truthy: textFieldDisplayer,
+    falsy: dialogEditor(
+      alphanumericPad({ decimal: false }),
+      textFieldDisplayer
+    ),
+  }
 )
