@@ -6,9 +6,7 @@ const moreActionsMenu = require("./moreActionsMenu")
 module.exports = function (args) {
   const actions = concat(
     args.action,
-    args.moreActions
-      ? moreActionsMenu(args.moreActions)
-      : []
+    args.moreActions ? moreActionsMenu(args.moreActions) : []
   )
 
   return ctx => {
@@ -21,6 +19,7 @@ module.exports = function (args) {
       },
       action: actions.length > 0 && actionLayout(actions)(ctx),
       canExit: args.canExit && args.canExit(ctx),
+      minWidth: args.minWidth,
     }
   }
 }

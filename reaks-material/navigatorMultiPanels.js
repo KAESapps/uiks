@@ -3,7 +3,7 @@ const isString = require("lodash/isString")
 const memoize = require("lodash/memoize")
 const range = require("lodash/range")
 const ctxAssign = require("../core/assign")
-const withResponsiveSize = require("../reaks/withResponsiveSize")
+const withSize = require("../reaks/withSize")
 const menuIcon = require("./icons/navigation/menu")
 const label = require("../reaks/label").reaks
 const border = require("../reaks-layout/border")
@@ -30,8 +30,7 @@ const closeIcon = require("./icons/content/clear")
 const margin = require("../reaks-layout/margin")
 const clickable = require("../reaks/clickable").reaksMixin
 
-const previousPanelWidth = 500
-const mainPanelMinWidth = 700
+const defaultPanelMinWidth = 700
 
 const create = require("lodash/create")
 const { observable } = require("kobs")
@@ -79,17 +78,19 @@ const navigatorCore = args => ctx => {
   }
   const back = () => closePage(lastPageIndex())
 
-  const next = fromIndex => (pageCreator, ctx, { replace = false } = {}) => {
-    let pageIndex = replace ? fromIndex : fromIndex + 1
-    if (pageCreator == null) {
-      return closePage(pageIndex)
-    }
+  const next =
+    fromIndex =>
+    (pageCreator, ctx, { replace = false } = {}) => {
+      let pageIndex = replace ? fromIndex : fromIndex + 1
+      if (pageCreator == null) {
+        return closePage(pageIndex)
+      }
 
-    const page = createPage(pageIndex, ctx, pageCreator)
-    // màj du cache
-    getPage.cache.set(pageIndex, page)
-    lastPageIndex(pageIndex)
-  }
+      const page = createPage(pageIndex, ctx, pageCreator)
+      // màj du cache
+      getPage.cache.set(pageIndex, page)
+      lastPageIndex(pageIndex)
+    }
 
   return seq([
     renderer(
@@ -106,6 +107,8 @@ const navigatorCore = args => ctx => {
     },
   ])
 }
+
+const getPanelWidth = page => page.minWidth || defaultPanelMinWidth
 
 const appBar = function ({
   page,
@@ -151,78 +154,92 @@ const renderer = ({
   topBarBackgroundColor,
   topBarTextColor,
 } = {}) =>
-  withResponsiveSize(
-    w =>
-      1 + Math.floor(Math.max(0, w - mainPanelMinWidth) / previousPanelWidth),
-    function (ctx) {
-      const { getPage, getPageIndex, back, responsiveSize, closePage } = ctx
+  withSize(function (ctx) {
+    const { getPage, getPageIndex, back, size: availableSize, closePage } = ctx
 
-      const getLeftPageIndex = observable(() => {
-        const nbMaxPanels = responsiveSize() || 1
-        const lastPageIndex = getPageIndex()
+    const getLeftPageIndex = observable(() => {
+      let availableWidth = availableSize().width
+      if (!availableWidth) return 0
 
-        const nbPanels = Math.min(lastPageIndex + 1, nbMaxPanels)
-        return lastPageIndex + 1 - nbPanels
-      })
+      const lastPageIndex = getPageIndex()
+      let i = lastPageIndex
+      let page
+      let stop = false
+      do {
+        page = getPage(i)
+        const panelWidth = getPanelWidth(page)
+        availableWidth -= panelWidth
+        if (availableWidth < 0) {
+          // if available width < 0, current panel should not be displayed
+          i = i + 1
+          stop = true
+        } else {
+          // continue loop
+          i--
+        }
+      } while (!stop && i >= 0)
+      return Math.max(0, Math.min(i, lastPageIndex))
+    })
 
-      const getRange = observable(() => {
-        const lastPageIndex = getPageIndex()
-        // on fait appel à getPage ici pour s'assurer qu'un changement de page sans changement d'index provoque bien un rafraîchissement de la page qui change
-        // (ex. pages affichées de 0 à 2, la page 2 change)
-        return range(0, lastPageIndex + 1).map(i => getPage(i))
-      })
+    const getRange = observable(() => {
+      const lastPageIndex = getPageIndex()
+      // on fait appel à getPage ici pour s'assurer qu'un changement de page sans changement d'index provoque bien un rafraîchissement de la page qui change
+      // (ex. pages affichées de 0 à 2, la page 2 change)
+      return range(0, lastPageIndex + 1).map(i => getPage(i))
+    })
 
-      return seq([
-        flexParentStyle({ orientation: "row" }),
-        repeat(getRange, page => {
-          const pageIndex = page.index
-          const rootAction = observable(() => {
-            const leftPageIndex = getLeftPageIndex()
-            if (pageIndex === 0 && firstPanelRootAction) {
-              // side menu toggle on first panel
+    return seq([
+      flexParentStyle({ orientation: "row" }),
+      repeat(getRange, page => {
+        const pageIndex = page.index
+        const panelWidth = getPanelWidth(page)
+        const rootAction = observable(() => {
+          const leftPageIndex = getLeftPageIndex()
+          if (pageIndex === 0 && firstPanelRootAction) {
+            // side menu toggle on first panel
+            return {
+              icon: firstPanelRootAction.icon,
+              action: firstPanelRootAction.action(ctx),
+            }
+          } else {
+            if (pageIndex === leftPageIndex && leftPageIndex > 0) {
               return {
-                icon: firstPanelRootAction.icon,
-                action: firstPanelRootAction.action(ctx),
+                icon: backIcon,
+                action: back,
               }
-            } else {
-              if (pageIndex === leftPageIndex && leftPageIndex > 0) {
-                return {
-                  icon: backIcon,
-                  action: back,
-                }
-              } else if (pageIndex > leftPageIndex) {
-                return {
-                  icon: closeIcon,
-                  action: () => closePage(pageIndex),
-                }
+            } else if (pageIndex > leftPageIndex) {
+              return {
+                icon: closeIcon,
+                action: () => closePage(pageIndex),
               }
             }
-          })
+          }
+        })
 
-          return seq([
-            flexChildStyle({
-              weight: () => (pageIndex === getPageIndex() ? 1 : null),
-            }),
-            size({ w: previousPanelWidth }),
-            border({ r: true }),
-            vFlex([
-              [
-                "fixed",
-                appBar({
-                  page,
-                  backgroundColor: topBarBackgroundColor(ctx),
-                  textColor: topBarTextColor(ctx),
-                  rootAction,
-                }),
-              ],
-              page.content,
-            ]),
-            style(() => pageIndex < getLeftPageIndex() && { display: "none" }),
-          ])
-        }),
-      ])
-    }
-  )
+        return seq([
+          flexChildStyle({
+            weight: 1,
+            shrinkable: true,
+          }),
+          size({ w: panelWidth }),
+          border({ r: true }),
+          vFlex([
+            [
+              "fixed",
+              appBar({
+                page,
+                backgroundColor: topBarBackgroundColor(ctx),
+                textColor: topBarTextColor(ctx),
+                rootAction,
+              }),
+            ],
+            page.content,
+          ]),
+          style(() => pageIndex < getLeftPageIndex() && { display: "none" }),
+        ])
+      }),
+    ])
+  })
 
 module.exports = function (opts, pages) {
   if (!pages) {
