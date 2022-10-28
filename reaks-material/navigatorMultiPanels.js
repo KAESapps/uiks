@@ -1,4 +1,5 @@
 const castArray = require("lodash/castArray")
+const get = require("lodash/get")
 const isString = require("lodash/isString")
 const memoize = require("lodash/memoize")
 const range = require("lodash/range")
@@ -30,7 +31,8 @@ const closeIcon = require("./icons/content/clear")
 const margin = require("../reaks-layout/margin")
 const clickable = require("../reaks/clickable").reaksMixin
 
-const defaultPanelMinWidth = 700
+const defaultParentPanelMinWidth = 500
+const defaultChildPanelMinWidth = 700
 
 const create = require("lodash/create")
 const { observable } = require("kobs")
@@ -108,7 +110,12 @@ const navigatorCore = args => ctx => {
   ])
 }
 
-const getPanelWidth = page => page.minWidth || defaultPanelMinWidth
+const getPanelWidth = (page, { last }) =>
+  get(
+    page,
+    last ? "minWidthAsChildPanel" : "minWidthAsParentPanel",
+    last ? defaultChildPanelMinWidth : defaultParentPanelMinWidth
+  )
 
 const appBar = function ({
   page,
@@ -167,7 +174,7 @@ const renderer = ({
       let stop = false
       do {
         page = getPage(i)
-        const panelWidth = getPanelWidth(page)
+        const panelWidth = getPanelWidth(page, { last: i === lastPageIndex })
         availableWidth -= panelWidth
         if (availableWidth < 0) {
           // if available width < 0, current panel should not be displayed
@@ -192,7 +199,7 @@ const renderer = ({
       flexParentStyle({ orientation: "row" }),
       repeat(getRange, page => {
         const pageIndex = page.index
-        const panelWidth = getPanelWidth(page)
+
         const rootAction = observable(() => {
           const leftPageIndex = getLeftPageIndex()
           if (pageIndex === 0 && firstPanelRootAction) {
@@ -217,11 +224,17 @@ const renderer = ({
         })
 
         return seq([
-          flexChildStyle({
-            weight: 1,
-            shrinkable: true,
+          style(),
+          style(() => {
+            const last = pageIndex === getPageIndex()
+            return {
+              width: getPanelWidth(page, { last }),
+              overflow: "hidden",
+              flexGrow: last ? "2" : "1",
+              flexShrink: "1",
+              flexBasis: "auto",
+            }
           }),
-          size({ w: panelWidth }),
           border({ r: true }),
           vFlex([
             [

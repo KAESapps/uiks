@@ -19,7 +19,9 @@ module.exports = function (args) {
       },
       action: actions.length > 0 && actionLayout(actions)(ctx),
       canExit: args.canExit && args.canExit(ctx),
-      minWidth: args.minWidth,
+
+      minWidthAsChildPanel: args.minWidthAsChildPanel,
+      minWidthAsParentPanel: args.minWidthAsParentPanel,
     }
   }
 }
