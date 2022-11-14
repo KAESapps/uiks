@@ -4,7 +4,7 @@ const swap = require("reaks/swap")
 const label = require("uiks/reaks/label").reaks
 const { observable } = require("kobs")
 
-module.exports = (pageGenerator, opts) => {
+module.exports = (pageGenerator, opts = {}) => {
   return ctx => {
     const getPage = observable(pageGenerator(ctx))
     return {
