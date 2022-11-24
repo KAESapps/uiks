@@ -16,7 +16,7 @@ const swap = require("reaks/swap")
 const svgIcon = require("reaks/svgIcon")
 const successIcon = require("./icons/action/done")
 const errorIcon = require("./icons/alert/error")
-const hFlex = require("../reaks-layout/hFlex")
+const hPile = require("../reaks-layout/hPile")
 const icon = require("./icon").reaks
 const hoverable = require("../reaks/hoverable").reaksMixin
 const color = require("color")
@@ -53,7 +53,10 @@ module.exports = ctxComponent(
     const textCmp = text && seq([style({ textAlign: "center" }), label(text)])
     const content =
       iconCmp && textCmp
-        ? hFlex({ gap: 6, align: "center" }, [["fixed", iconCmp], textCmp])
+        ? align(
+            { h: "center" },
+            hPile({ gap: 6, align: "center" }, [["fixed", iconCmp], textCmp])
+          )
         : iconCmp || textCmp
 
     return seq([
