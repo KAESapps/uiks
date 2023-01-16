@@ -82,13 +82,16 @@ const navigatorCore = args => ctx => {
 
   const next =
     fromIndex =>
-    (pageCreator, ctx, { replace = false } = {}) => {
+    (pageCreator, ctx, { replace = false, panelMinWidth } = {}) => {
       let pageIndex = replace ? fromIndex : fromIndex + 1
       if (pageCreator == null) {
         return closePage(pageIndex)
       }
 
       const page = createPage(pageIndex, ctx, pageCreator)
+      if (panelMinWidth) {
+        page.minWidthAsChildPanel = panelMinWidth
+      }
       // màj du cache
       getPage.cache.set(pageIndex, page)
       lastPageIndex(pageIndex)
@@ -230,7 +233,7 @@ const renderer = ({
             return {
               width: getPanelWidth(page, { last }),
               overflow: "hidden",
-              flexGrow: last ? "2" : "1",
+              flexGrow: getPanelWidth(page, { last }),
               flexShrink: "1",
               flexBasis: "auto",
             }
