@@ -1,8 +1,9 @@
-module.exports = ({ accept } = {}) => {
+module.exports = ({ accept, multi } = {}) => {
   const fileInput = document.createElement("input")
   fileInput.type = "file"
   fileInput.accept = accept
   fileInput.style.visibility = "hidden"
+  if (multi) fileInput.multiple = true
 
   document.body.appendChild(fileInput)
   fileInput.focus()
@@ -13,7 +14,7 @@ module.exports = ({ accept } = {}) => {
       document.body.removeChild(this)
 
       if (this.files.length) {
-        resolve(this.files[0])
+        resolve(multi ? Array.from(this.files) : this.files[0])
       } else {
         reject(this.files)
       }
