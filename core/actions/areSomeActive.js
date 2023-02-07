@@ -16,7 +16,7 @@ module.exports = actions => {
   else
     return ctx => {
       const ctxConditions = conditions.map(c => {
-        const cond = c(ctx)
+        const cond = isFunction(c) ? c(ctx) : c
         return isFunction(cond) ? cond : () => cond
       })
       return () => ctxConditions.some(c => c())
