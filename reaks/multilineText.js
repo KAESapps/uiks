@@ -6,6 +6,7 @@ const vPile = require("../reaks-layout/vPile")
 
 const staticMultilineText = multilineTextValue =>
   multilineTextValue &&
+  multilineTextValue.split &&
   vPile(multilineTextValue.split("\n").map(line => text(line)))
 
 module.exports = component(
@@ -15,7 +16,7 @@ module.exports = component(
       : staticMultilineText(value)
   },
   // map arguments
-  function() {
+  function () {
     if (arguments.length === 0) {
       return [ctx => ctx.value]
     }
