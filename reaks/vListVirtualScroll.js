@@ -183,7 +183,7 @@ const listWindow =
 const overscanPx = 500
 
 module.exports = ({
-  itemHeight,
+  itemHeight: itemHeightArg,
   item,
   getDefaultVisibleItem: getDefaultVisibleItemGetter,
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
@@ -197,7 +197,10 @@ module.exports = ({
     const getItemIds = observable(
       isFunction(ctx.value) ? () => ctx.value() || [] : ctx.value || []
     )
-    itemHeight = isFunction(itemHeight) ? itemHeight(ctx) : itemHeight
+    const itemHeight = isFunction(itemHeightArg)
+      ? itemHeightArg(ctx)
+      : itemHeightArg
+
     const getItemTop = isFunction(itemHeight)
       ? id => {
           const idx = getItemIds().indexOf(id)
