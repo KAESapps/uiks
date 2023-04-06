@@ -40,13 +40,14 @@ module.exports = arg => {
     items,
     itemLabel = valueLoadingAs("", propQuery("label")),
     itemEnabled,
+    itemHeight = 36,
     multiple = false,
     horizontal = false,
   } = isFunction(arg) ? { items: arg } : arg
 
   const padKey = mix(
     [
-      size.mixin({ h: 36 }),
+      size.mixin({ h: itemHeight }),
       innerMargin.mixin({ h: 8 }),
       style.mixin({
         fontWeight: 500,
