@@ -14,10 +14,13 @@ module.exports = args => {
     content,
     action,
     colors = ctx => ({
-      backgroundColor: ctx.colors.primary,
-      color: ctx.colors.textOnPrimary,
+      backgroundColor: ctx.colors.mediumPrimary || ctx.colors.primary,
+      color: ctx.colors.mediumPrimary
+        ? ctx.colors.darkText
+        : ctx.colors.textOnPrimary,
     }),
     noBorder,
+    innerMargin: innerMarginValue = { h: 12, v: 1 },
   } = args
   return style(
     noBorder
@@ -32,20 +35,20 @@ module.exports = args => {
         [
           "fixed",
           style(
-            {
-              fontWeight: 500,
-              height: 32,
-            },
+            { height: 32 },
             style(
               colors,
               border(
                 { b: { color: "#999" } },
                 innerMargin(
-                  { h: 12, v: 2 },
+                  innerMarginValue,
                   hFlex([
-                    isString(title)
-                      ? align({ v: "center" }, label(title))
-                      : title,
+                    style(
+                      { fontWeight: 500 },
+                      isString(title)
+                        ? align({ v: "center" }, label(title))
+                        : title
+                    ),
                     ["fixed", action && align({ h: "right" }, action)],
                   ])
                 )

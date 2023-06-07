@@ -24,6 +24,9 @@ const {
 } = require("../reaks-layout/flex/style")
 const vPileCfg = require("../reaks-layout/flex/configs/vPile")
 const hPileCfg = require("../reaks-layout/flex/configs/hPile")
+const hFlexCfg = require("../reaks-layout/flex/configs/hFlex")
+const vFlexCfg = require("../reaks-layout/flex/configs/vFlex")
+
 const vList = (arg1, arg2) =>
   mix(
     [() => asFlexParent(vPileCfg)],
@@ -34,6 +37,16 @@ const hList = (arg1, arg2) =>
     [() => asFlexParent(hPileCfg)],
     repeat(arg1, mix([() => flexChildStyle(hPileCfg)], arg2))
   )
+const vFlex = (arg1, arg2) =>
+  mix(
+    [() => asFlexParent(vFlexCfg)],
+    repeat(arg1, mix([() => flexChildStyle(vFlexCfg)], arg2))
+  )
+const hFlex = (arg1, arg2) =>
+  mix(
+    [() => asFlexParent(hFlexCfg)],
+    repeat(arg1, mix([() => flexChildStyle(hFlexCfg)], arg2))
+  )
 
 module.exports = arg => {
   const {
@@ -43,16 +56,13 @@ module.exports = arg => {
     itemHeight = 36,
     multiple = false,
     horizontal = false,
+    flex,
   } = isFunction(arg) ? { items: arg } : arg
 
   const padKey = mix(
     [
       size.mixin({ h: itemHeight }),
       innerMargin.mixin({ h: 8 }),
-      style.mixin({
-        fontWeight: 500,
-        fontSize: 16,
-      }),
       switchBoolean(itemEnabled || true, {
         truthy: group([
           ctx =>
@@ -115,6 +125,9 @@ module.exports = arg => {
 
   return assignCtx(
     { selectedValue: ctx => ctx.value, items },
-    (horizontal ? hList : vList)(ctx => ctx.items, padKey)
+    (horizontal ? (flex ? hFlex : hList) : flex ? vFlex : vList)(
+      ctx => ctx.items,
+      padKey
+    )
   )
 }
