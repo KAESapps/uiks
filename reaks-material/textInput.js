@@ -19,6 +19,7 @@ module.exports = ctxCmp(
     seq([
       style({
         display: "flex",
+        flexDirection: "column", // found this to be necessary for flex to work in all situations
       }),
       child(
         seq([
