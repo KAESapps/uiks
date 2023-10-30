@@ -14,6 +14,7 @@ const searchIcon = require("uiks/reaks-material/icons/action/search")
 module.exports = ({ title, listValue, itemLabel, actions }) =>
   dialog({
     title,
+    minHeight: 400,
     content: assignObservable(
       {
         search: null,
