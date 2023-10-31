@@ -7,14 +7,17 @@ const valueAttr = require("reaks/valueAttr")
 const attrs = require("reaks/attrs")
 const onEvent = require("reaks/onEvent")
 const defaults = require("lodash/defaults")
+const pickBy = require("lodash/pickBy")
 
 module.exports = ctxCmp(
   ({
-    placeholder = "",
+    id,
+    placeholder,
     value,
     setValue,
     password = false,
     autoFocus = false,
+    autocomplete,
   }) =>
     seq([
       style({
@@ -31,10 +34,14 @@ module.exports = ctxCmp(
             backgroundColor: "transparent",
           }),
           textInputLook.reaksMixin(),
-          attrs({
-            placeholder: placeholder,
-            type: password ? "password" : null,
-          }),
+          attrs(
+            pickBy({
+              id,
+              placeholder,
+              type: password ? "password" : null,
+              autocomplete,
+            })
+          ),
           valueAttr(value), // specialized attr handler that prevent cursor jumping
           onEvent("input", ev => {
             setValue(ev.target.value || null)

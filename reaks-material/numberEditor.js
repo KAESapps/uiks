@@ -12,4 +12,7 @@ const textFieldDisplayer = textInputLook(
 
 const dialogEditor = require("./dialogEditor")
 
-module.exports = opt => dialogEditor(numericPad(opt), textFieldDisplayer)
+module.exports = opt =>
+  opt && opt.readOnly
+    ? textFieldDisplayer
+    : dialogEditor(numericPad(opt), textFieldDisplayer)
