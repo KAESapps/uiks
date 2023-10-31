@@ -11,9 +11,10 @@ const textInput = require("uiks/reaks-material/textInput")
 const icon = require("uiks/reaks-material/icon")
 const searchIcon = require("uiks/reaks-material/icons/action/search")
 
-module.exports = ({ title, listValue, itemLabel, actions }) =>
+module.exports = ({ title, listValue, itemLabel, actions, fullscreen }) =>
   dialog({
     title,
+    minHeight: fullscreen ? "100%" : null,
     content: assignObservable(
       {
         search: null,
