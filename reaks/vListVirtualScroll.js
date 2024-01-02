@@ -124,8 +124,11 @@ const listWindow =
 
     let cancelRangeObservation
     const cancelValueObservation = autorun(() => {
-      const newFullIds = getItemIds() || []
-      const newIds = newFullIds.slice(currentRange[0], currentRange[1])
+      const newFullIds = getItemIds()
+      const newIds =
+        newFullIds && newFullIds.slice
+          ? newFullIds.slice(currentRange[0], currentRange[1])
+          : []
 
       // console.time("value change : diffArrays")
       const diff = diffArrays(currentIds, newIds)
