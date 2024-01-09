@@ -1,5 +1,7 @@
+const isFunction = require("lodash/isFunction")
 const isString = require("lodash/isString")
 const compact = require("lodash/compact")
+const ctxAssign = require("uiks/core/assign")
 const hFlex = require("uiks/reaks/hFlex")
 const vFlex = require("uiks/reaks/vFlex")
 const label = require("uiks/reaks/label")
@@ -16,7 +18,7 @@ module.exports = args => {
     colors = ctx => ({
       backgroundColor: ctx.colors.mediumPrimary || ctx.colors.primary,
       color: ctx.colors.mediumPrimary
-        ? ctx.colors.darkText
+        ? ctx.colors.textOnMediumPrimary || ctx.colors.darkText
         : ctx.colors.textOnPrimary,
     }),
     noBorder,
@@ -34,23 +36,28 @@ module.exports = args => {
       compact([
         [
           "fixed",
-          style(
-            { height: 32 },
+          ctxAssign(
+            isFunction(colors)
+              ? ctx => ({ fgColor: colors(ctx).color })
+              : { fgColor: colors.color },
             style(
-              colors,
-              border(
-                { b: { color: "#999" } },
-                innerMargin(
-                  innerMarginValue,
-                  hFlex([
-                    style(
-                      { fontWeight: 500 },
-                      isString(title)
-                        ? align({ v: "center" }, label(title))
-                        : title
-                    ),
-                    ["fixed", action && align({ h: "right" }, action)],
-                  ])
+              { height: 32 },
+              style(
+                colors,
+                border(
+                  { b: { color: "#999" } },
+                  innerMargin(
+                    innerMarginValue,
+                    hFlex([
+                      style(
+                        { fontWeight: 500 },
+                        isString(title)
+                          ? align({ v: "center" }, label(title))
+                          : title
+                      ),
+                      ["fixed", action && align({ h: "right" }, action)],
+                    ])
+                  )
                 )
               )
             )
