@@ -192,6 +192,8 @@ module.exports = ({
   disableEnsureItemVisible: getDisableEnsureItemVisibleFn,
   onScroll,
   listAvailWidthObs, // observable à fournir pour activer l'option
+  selfSizingHeight, // hauteur variable en fonction du contenu et d'un éventuel max,
+  selfSizingMaxItems, // si selfSizingHeight = true, hauteur maximale calculée selon la taille des selfSizingMaxItems premiers éléments
 }) => {
   return withSize(ctx => {
     const onScrollCb = onScroll && onScroll(ctx)
@@ -222,7 +224,7 @@ module.exports = ({
       disableEnsureItemVisible,
       scrollTop = 0,
       defaultScrollTop = () => 0
-    if (getDefaultVisibleItem) {
+    if (getDefaultVisibleItem && !selfSizingHeight) {
       disableEnsureItemVisible = getDisableEnsureItemVisibleFn(ctx)
 
       defaultScrollTop = () => {
@@ -305,12 +307,29 @@ module.exports = ({
         }
 
     return seq([
+      // définit le scroll initial (une seule fois)
       () => scrollTopObs(defaultScrollTop()),
       style({
         position: "relative",
         willChange: "transform",
         overflow: "auto",
       }),
+      // hauteur max si self-sizing
+      selfSizingHeight &&
+        selfSizingMaxItems &&
+        style(
+          isFunction(itemHeight)
+            ? () => ({
+                maxHeight: sum(
+                  getItemIds()
+                    .slice(0, selfSizingMaxItems)
+                    .map(itemHeight)
+                    .filter(v => v)
+                ),
+              })
+            : { maxHeight: selfSizingMaxItems * itemHeight }
+        ),
+
       onEvent("scroll", ev => {
         setScrollTop(ev.target.scrollTop)
         if (programmaticScroll) {

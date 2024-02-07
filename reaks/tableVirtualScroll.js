@@ -74,6 +74,8 @@ module.exports = function (arg1, arg2) {
         if (ctx.scrollLeft() !== scrollLeftValue)
           ctx.scrollLeft(scrollLeftValue)
       }),
+    selfSizingHeight: opts.selfSizingHeight,
+    selfSizingMaxItems: opts.selfSizingMaxItems,
   })
 
   let fullTable = assignObservable(
