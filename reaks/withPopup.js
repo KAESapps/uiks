@@ -9,25 +9,24 @@ const clickable = require("./clickable").reaksMixin
 
 const disableState = { enabled: false }
 
-const popupBuilder = (
-  content,
-  aligner = cmp => align({ v: "center", h: "center" }, cmp)
-) => ctx =>
-  seq([
-    style({
-      pointerEvents: "none",
-    }),
-    aligner(
-      seq([
-        style({
-          pointerEvents: "all",
-        }),
-        content(ctx),
-      ])
-    ),
-  ])
+const popupBuilder =
+  (content, aligner = cmp => align({ v: "center", h: "center" }, cmp)) =>
+  ctx =>
+    seq([
+      style({
+        pointerEvents: "none",
+      }),
+      aligner(
+        seq([
+          style({
+            pointerEvents: "all",
+          }),
+          content(ctx),
+        ])
+      ),
+    ])
 
-const withPopup = function(opts, view) {
+const withPopup = function (opts, view) {
   if (arguments.length === 1) {
     view = opts
     opts = {}
@@ -36,7 +35,11 @@ const withPopup = function(opts, view) {
   return ctx => {
     const popupParams = observable(disableState)
 
-    const closePopup = () => popupParams(disableState)
+    const closePopup = () => {
+      const onClose = popupParams().onClose
+      onClose && onClose(popupParams().ctx)()
+      popupParams(disableState)
+    }
 
     const popup = (popupLayer, ctx, opts = {}) => {
       if (popupLayer === false) {
@@ -48,7 +51,7 @@ const withPopup = function(opts, view) {
         throw new Error("popup(): ctx must be defined")
       }
 
-      const { modal = false, nested = true } = opts
+      const { modal = false, nested = true, onClose } = opts
 
       popupParams({
         popupLayer,
@@ -56,6 +59,7 @@ const withPopup = function(opts, view) {
         enabled: true,
         ctx,
         nested,
+        onClose,
       })
     }
 
