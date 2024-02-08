@@ -13,8 +13,13 @@ const popup = require("uiks/reaks/popup")
 const getStaticValue = require("kobs/getStaticValue")
 
 module.exports = (picker, opts = {}) => {
-  const { title = "Saisir une nouvelle valeur", customActions, noValidateButton } = opts
+  const {
+    title = "Saisir une nouvelle valeur",
+    customActions,
+    noValidateButton,
+  } = opts
   return popup(
+    { modal: true }, //évite de cliquer à côté de la popup et de fermer sans valider. Idélament il faudrait plutôt considérer que la popup est un cas d'affichage d'un éditeur inline et donc que les modif sur le picker sont enregistrées en permanence comme le reste. Il n'y aurait plus de bouton valider et annuler. Simplement, pour optimiser les cas un peu lourd, comme les richtext ou les multiline, on utiliserait un debounce et une validation auto sur onclose
     assignObservable(
       {
         internalValue: ctx => getStaticValue(ctx.value),
