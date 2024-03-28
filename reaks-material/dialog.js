@@ -52,6 +52,7 @@ const dialogPopupLayer = ({
   maxWidth = 768,
   minHeight,
   modal,
+  onClose: onCloseCtx,
 }) => {
   const mainPopup = mix(
     [
@@ -82,7 +83,13 @@ const dialogPopupLayer = ({
                     color: "#DDD",
                     iconSize: { w: 30, h: 30 },
                   },
-                  ctx => ctx.closePopup
+                  ctx => {
+                    const onClose = onCloseCtx && onCloseCtx(ctx)
+                    return () => {
+                      ctx.closePopup()
+                      onClose && onClose()
+                    }
+                  }
                 )
               ),
           ],

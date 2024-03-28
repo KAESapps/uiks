@@ -43,7 +43,8 @@ const normalizeInternalValue = val => {
   return val
 }
 
-const defaultFromExternalValue = val => toString(val).replace(".", ",")
+const defaultFromExternalValue = val =>
+  val == null ? "" : toString(val).replace(".", ",")
 
 const defaultToExternalValue = toNumber => stringVal => {
   stringVal = trim(stringVal, ",").replace(",", ".")
@@ -73,6 +74,13 @@ module.exports = (opts = {}) => {
       : defaultDisplay
     const { setValue, value, activeRow } = ctx
     const $stringValue = observable("")
+    //indique que le widget vient d'être initialisé :
+    // le premier charactère saisi remplace toute la valeur au lieu d'être ajouté (le appendChar fonctionne en mode replace)
+    // le back fonctionne normalement et désinitialise (le prochain appendChar fonctionnera en mode modif)
+    // le toogleSign fonctionne normalement et désinitialise (le prochain appendChar fonctionnera en mode modif)
+    // si on est abonné à un activeRow, on reinitialise à chaque changement de activeRow
+    // on reste en mode init tant qu'il n'y a pas d'action utilisateur (même si la valeur externe pulse) par contre dès que l'on est passé en mode "append" on y reste même si la valeur externe pulse
+    const isInitValue = observable(true)
 
     function onUserInput() {
       const stringVal = $stringValue()
@@ -83,7 +91,15 @@ module.exports = (opts = {}) => {
     }
 
     function appendChar(char) {
-      const currentValue = $stringValue()
+      let currentValue = $stringValue()
+      if (isInitValue()) {
+        //à l'init si le premier charactère saisi est un séparateur décimal et que la valeur en cours n'en contient pas, on reste en mode "append" sinon on passe ne mode "replace"
+        const appendMode = char === "," && currentValue.indexOf(",") === -1
+        if (!appendMode) {
+          currentValue = ""
+        }
+        isInitValue(false)
+      }
       if (char === "," && currentValue.indexOf(",") !== -1) {
         return
       }
@@ -101,6 +117,7 @@ module.exports = (opts = {}) => {
     }
     function eraseLastChar() {
       $stringValue($stringValue().slice(0, -1))
+      if (isInitValue()) isInitValue(false)
       onUserInput()
     }
     function toggleSign() {
@@ -112,6 +129,7 @@ module.exports = (opts = {}) => {
         nextValue = "-" + currentValue
       }
       $stringValue(nextValue)
+      if (isInitValue()) isInitValue(false)
       onUserInput()
     }
 
@@ -135,6 +153,7 @@ module.exports = (opts = {}) => {
       activeRow &&
       observe(activeRow, function () {
         updateFromExternalValue(value())
+        isInitValue(true)
       })
 
     const padKey = (content, action, { size: sizeArg = { h: 48 } } = {}) => {
