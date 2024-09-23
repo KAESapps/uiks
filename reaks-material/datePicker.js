@@ -124,12 +124,23 @@ module.exports = ({
     if (precisionAtLeast("minute")) {
       str += ":" + padStart(value.minute, 2, "0")
     }
-
-    return precisionAtLeast("hour") ? new Date(str).toISOString() : str
+    return str
   }
 
   const internalValuetoExternalValue = value => {
-    const isoStr = internalValuetoISOString(value)
+    if (!value) return null
+    let isoStr = internalValuetoISOString(value)
+    // si le picker permet de choisir l'heure, on doit la convertir en UTC
+    if (precisionAtLeast("hour")) {
+      // si les éléments de date ne permettent pas de créer une date valide, il ne faut pas que le toISOString plante
+      try {
+        isoStr = new Date(isoStr).toISOString()
+        return isoStr
+      } catch (err) {
+        return null
+      }
+    }
+
     if (!isValidISODate(isoStr)) return null
 
     if (precision === "week") {

@@ -1,4 +1,5 @@
 const isFunction = require("lodash/isFunction")
+const toString = require("lodash/toString")
 const includes = require("lodash/includes")
 const intersection = require("lodash/intersection")
 const without = require("lodash/without")
@@ -17,6 +18,14 @@ const size = require("uiks/reaks/size")
 const colors = require("material-colors")
 const propQuery = require("../reactivedb/propQuery")
 const valueLoadingAs = require("../reactivedb/valueLoadingAs")
+
+//recherche si l'item (cle de type texte du enum) est sélectionné, la sélection pouvant être un string, un number (cas d'une prop de type integer que l'on transfrome à la volée en type enum) ou un array de string ou de integer
+const isItemSelected = (item, selection) => {
+  if (Array.isArray(selection)) {
+    return includes(selection, item) || includes(selection.map(toString), item)
+  }
+  return item === selection || item === toString(selection)
+}
 
 const {
   parent: asFlexParent,
@@ -88,11 +97,7 @@ module.exports = arg => {
             ),
           style.mixin(
             ctx => () =>
-              (
-                multiple
-                  ? includes(ctx.selectedValue(), ctx.value)
-                  : ctx.selectedValue() === ctx.value
-              )
+              isItemSelected(ctx.value, ctx.selectedValue())
                 ? {
                     backgroundColor: ctx.colors.primary,
                     color: ctx.colors.textOnPrimary,
@@ -105,11 +110,7 @@ module.exports = arg => {
         ]),
         falsy: style.mixin(
           ctx => () =>
-            (
-              multiple
-                ? includes(ctx.selectedValue(), ctx.value)
-                : ctx.selectedValue() === ctx.value
-            )
+            isItemSelected(ctx.value, ctx.selectedValue())
               ? {
                   backgroundColor: ctx.colors.lightPrimary,
                   color: ctx.colors.textOnPrimary,
