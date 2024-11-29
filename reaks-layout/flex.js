@@ -62,7 +62,7 @@ const dynamicFlex = (config, getChildrenArg) => {
         ? () =>
             intersperse(getChildrenArg(), () => [
               { weight: null },
-              size({ w: config.gap }),
+              size({ [config.orientation === "row" ? "w" : "h"]: config.gap }),
             ])
         : getChildrenArg,
       childCreator(config)

@@ -14,7 +14,7 @@ const getValue = ctx => ctx.value
 const defaultValue = null // TODO: rendre paramétrable ?
 
 module.exports = (arg, view) => ctx => {
-  const { entity, prop, patchOperator } =
+  const { entity, prop, patchOperator, getOperator } =
     typeof arg === "string" ? { entity: getValue, prop: arg } : arg
   const getEntity = isFunction(entity) ? entity(ctx) : entity
   const getProp = isFunction(prop) ? prop(ctx) : prop
@@ -49,7 +49,7 @@ module.exports = (arg, view) => ctx => {
     if (!e) return defaultValue
     const remoteValue = ctx.query([
       { constant: e },
-      { valueOfProp: isFunction(getProp) ? getProp() : getProp },
+      getOperator || { valueOfProp: isFunction(getProp) ? getProp() : getProp },
     ])
     return remoteValue.loaded ? remoteValue.value : defaultValue
   })
