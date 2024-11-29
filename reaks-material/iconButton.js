@@ -20,7 +20,7 @@ module.exports = ctxCmp(
     btnSize = defaults({}, btnSize, { h: 40, w: 40 })
     return hoverable(
       {
-        out: style({ backgroundColor }),
+        out: backgroundColor && style({ backgroundColor }),
         over: style({ backgroundColor: backgroundColorHover }),
       },
       clickable(

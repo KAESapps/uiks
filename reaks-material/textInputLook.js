@@ -19,6 +19,6 @@ module.exports = wrapper(
       innerMargin({ h: 6 }),
       align({ v: "center", h: hAlign }),
       withBorder && border({ color: borderColor, radius: 3 }),
-      style({ backgroundColor }),
+      backgroundColor && style({ backgroundColor }),
     ])
 )
