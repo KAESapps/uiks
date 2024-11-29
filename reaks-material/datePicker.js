@@ -1,10 +1,17 @@
 const parseISO = require("date-fns/parseISO")
 const formatISO = require("date-fns/formatISO")
 const getISOWeek = require("date-fns/getISOWeek")
+const startOfMonth = require("date-fns/startOfMonth")
+const endOfMonth = require("date-fns/endOfMonth")
+const startOfISOWeek = require("date-fns/startOfISOWeek")
+const endOfISOWeek = require("date-fns/endOfISOWeek")
+const addDays = require("date-fns/addDays")
+const differenceInCalendarDays = require("date-fns/differenceInCalendarDays")
 const compact = require("lodash/compact")
-const round = require("lodash/round")
 const defaults = require("lodash/defaults")
+const pick = require("lodash/pick")
 const pickBy = require("lodash/pickBy")
+const isEqual = require("lodash/isEqual")
 const isFunction = require("lodash/isFunction")
 const toString = require("lodash/toString")
 const toInteger = require("lodash/toInteger")
@@ -14,6 +21,7 @@ const assign = require("lodash/assign")
 const range = require("lodash/range")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
+const swap = require("reaks/swap")
 const hFlex = require("../reaks-layout/hFlex")
 const hPile = require("../reaks-layout/hPile")
 const vPile = require("../reaks-layout/vPile")
@@ -23,14 +31,12 @@ const label = require("../reaks/label").reaks
 const displayIf = require("../reaks/displayIf").reaks
 const align = require("../reaks-layout/align")
 const size = require("../reaks/size")
-const empty = require("../reaks/empty")
 const colors = require("material-colors")
 const iconButton = require("./iconButton").reaks
 const icon = require("./icon").reaks
-const button = require("./button").reaks
 const textInput = require("./textInput").reaks
 const labelled = require("./labelled")
-const clearIconDef = require("./icons/content/clear")
+const todayIcon = require("./icons/today")
 const arrowBack = require("./icons/navigation/arrowBack")
 const arrowForward = require("./icons/navigation/arrowForward")
 const alertIcon = require("./icons/alert/error")
@@ -48,11 +54,11 @@ const isValidISODate = iso => {
 const padKeyStyle = (isActive, ctx) =>
   seq([
     align({ h: "center", v: "center" }),
-    size.reaksMixin({ h: 48 }),
-    innerMargin({ h: 16 }),
+    size.reaksMixin({ h: keyHeight }),
+    innerMargin({ h: 8 }),
     style({
       fontWeight: 500,
-      fontSize: 20,
+      fontSize: 18,
     }),
     style(() =>
       isActive()
@@ -67,18 +73,43 @@ const padKeyStyle = (isActive, ctx) =>
     ),
   ])
 
+const dayKeyStyle = ({ isActive, inCurrentMonth }, ctx) =>
+  seq([
+    align({ h: "center", v: "center" }),
+    size.reaksMixin({ h: keyHeight }),
+    innerMargin({ h: 8 }),
+    style({
+      fontWeight: 500,
+      fontSize: 18,
+    }),
+    style(() =>
+      isActive()
+        ? {
+            color: ctx.colors.textOnPrimary,
+            backgroundColor: ctx.colors.primary,
+          }
+        : {
+            color: inCurrentMonth ? colors.grey[800] : colors.grey[600],
+            backgroundColor: inCurrentMonth && colors.grey[100],
+          }
+    ),
+  ])
+
 const fragmentLabels = {
   year: "Année",
   month: "Mois",
   week: "Semaine",
   day: "Jour",
   hour: "Heure",
-  minute: "Minute",
+  minute: "Min",
 }
+
+const keyHeight = 40
+const dayHeaderHeight = 18
 
 const integerInput = opts =>
   size.reaksWrapper(
-    { w: (opts.fragmentId === "year" ? 4 : 2) * 20 },
+    { w: (opts.fragmentId === "year" ? 4 : 2) * 12 + 12 },
     labelled.reaks(fragmentLabels[opts.fragmentId], textInput(opts))
   )
 
@@ -149,19 +180,22 @@ module.exports = ({
     return isoStr
   }
 
-  const nowAsInternalValue = () =>
-    pickBy({
-      year: new Date().getFullYear(),
-      month: precisionAtLeast("month") && new Date().getMonth() + 1,
-      week: precisionAtLeast("week") && getISOWeek(new Date()),
-      day: precisionAtLeast("day") && new Date().getDate(),
-      hour: precisionAtLeast("hour") && new Date().getHours(),
-      minute: precisionAtLeast("minute") && new Date().getMinutes(),
+  const dateAsInternalValue = date => {
+    return pickBy({
+      year: date.getFullYear(),
+      month: precisionAtLeast("month") && date.getMonth() + 1,
+      week: precisionAtLeast("week") && getISOWeek(date),
+      day: precisionAtLeast("day") && date.getDate(),
+      hour: precisionAtLeast("hour") && date.getHours(),
+      minute: precisionAtLeast("minute") && date.getMinutes(),
     })
+  }
+
+  const nowAsInternalValue = () => dateAsInternalValue(new Date())
 
   return ctx => {
     const { setValue, value } = ctx
-    const internalValue = observable(nowAsInternalValue())
+    const internalValue = observable(null)
     const refYear = observable(new Date().getFullYear())
     const isInternalValueValid = () => {
       const val = internalValue()
@@ -174,19 +208,22 @@ module.exports = ({
           return toString(get(internalValue(), fragmentId))
         },
         setValue: val =>
-          setDateFragment(fragmentId, val !== "" ? toInteger(val) : null),
+          setDateFragment(fragmentId, val ? toInteger(val) : null),
         fragmentId,
-        autoFocus: precision === fragmentId,
+        autoFocus:
+          // pas d'autofocus sur mobile
+          process.env.PLATFORM !== "android" && precision === fragmentId,
       })
     }
     const display = seq([
       hPile(
-        { gap: 8 },
+        { gap: 4 },
         compact([
           precisionAtLeast("day") && displayFragment("day"),
           precisionAtLeast("month") && displayFragment("month"),
           precisionAtLeast("week") && displayFragment("week"),
           precisionAtLeast("year") && displayFragment("year"),
+          precisionAtLeast("hour") && size.reaksMixin({ w: 8 }),
           precisionAtLeast("hour") && displayFragment("hour"),
           precisionAtLeast("minute") && displayFragment("minute"),
         ])
@@ -240,65 +277,154 @@ module.exports = ({
       updateFromExternalValue(value())
     })
 
-    const key = (getValue, fragmentId) => {
+    const setDay = dayValue => {
+      const baseValue = internalValue()
+      const patch = dayValue
+      const now = nowAsInternalValue()
+
+      // fill-in other fragments from current date
+      defaults(
+        patch,
+        pickBy(now, (v, fragmentId) => get(baseValue, fragmentId) == null)
+      )
+
+      internalValue(assign(baseValue, patch))
+      onUserInput()
+    }
+
+    const dayKey = (date, { inCurrentMonth }) => {
+      const dayValue = pick(dateAsInternalValue(date), ["day", "month", "year"])
       return seq([
-        label(() => toString(getValue())),
+        label(toString(dayValue.day)),
+        clickable(() => setDay(dayValue)),
+        dayKeyStyle(
+          {
+            isActive: () =>
+              isEqual(
+                pick(internalValue(), ["day", "month", "year"]),
+                dayValue
+              ),
+            inCurrentMonth,
+          },
+          ctx
+        ),
+      ])
+    }
+
+    const key = ({ value: val, fragmentId, label: lbl }) => {
+      const getValue = isFunction(val) ? val : () => val
+      if (!lbl) lbl = () => toString(getValue())
+      return seq([
+        label(lbl),
         clickable(() => setDateFragment(fragmentId, getValue())),
         padKeyStyle(() => get(internalValue(), fragmentId) === getValue(), ctx),
       ])
     }
 
-    const keysRow = (fragmentId, keys) =>
-      hFlex(
-        keys.map(val => {
-          let getValue = val
-          if (!isFunction(val)) {
-            getValue = () => val
-          }
-          return key(getValue, fragmentId)
-        })
-      )
+    const dayKeysAsMonthCalendar = monthAsDate => {
+      if (!monthAsDate) monthAsDate = new Date()
+      const firstDayOfMonth = startOfMonth(monthAsDate)
+      const lastDayOfMonth = endOfMonth(monthAsDate)
 
-    return seq([
-      vPile({ gap: 12 }, [
-        seq([
-          size.reaksMixin({ h: 48 }),
-          hFlex({ align: "bottom" }, [
-            ["fixed", display],
-            [
-              "fixed",
-              displayIf(
-                () => !isInternalValueValid(),
-                size.reaksWrapper(
-                  { h: 32 },
-                  align(
-                    { v: "center" },
-                    icon({ icon: alertIcon, color: "red" })
+      const firstDayKeyAsDate = startOfISOWeek(firstDayOfMonth)
+      const lastDayKeyAsDate = endOfISOWeek(lastDayOfMonth)
+
+      const nbDays = differenceInCalendarDays(
+        lastDayKeyAsDate,
+        firstDayKeyAsDate
+      )
+      const nbWeeks = nbDays / 7
+      const currentMonthIndex = monthAsDate.getMonth()
+
+      return size.reaksWrapper(
+        { h: 6 * keyHeight + dayHeaderHeight },
+        vPile(
+          [
+            seq([
+              style({ color: colors.grey[800], fontSize: 12 }),
+              size.reaksWrapper(
+                { h: dayHeaderHeight },
+                hFlex(
+                  ["L", "M", "M", "J", "V", "S", "D"].map(d =>
+                    align({ h: "center" }, label(d))
                   )
                 )
               ),
-            ],
-            empty,
-            [
-              "fixed",
-              iconButton(
-                {
-                  icon: clearIconDef,
-                  color: colors.grey[600],
-                },
-                clearValue
-              ),
-            ],
-            ["fixed", button("Maintenant", setToNow)],
-          ]),
-        ]),
+            ]),
+          ].concat(
+            range(nbWeeks).map(w =>
+              hFlex(
+                range(7).map(d => {
+                  const dayAsDate = addDays(firstDayKeyAsDate, w * 7 + d)
+                  return dayKey(dayAsDate, {
+                    inCurrentMonth: dayAsDate.getMonth() === currentMonthIndex,
+                  })
+                })
+              )
+            )
+          )
+        )
+      )
+    }
+
+    const currentDayKeysCalendar = swap(() => {
+      const val = internalValue()
+      let internalValueAsDate = val
+        ? new Date(internalValuetoISOString(val))
+        : null
+      if (isNaN(internalValueAsDate)) internalValueAsDate = null
+      return dayKeysAsMonthCalendar(internalValueAsDate)
+    })
+
+    const monthLabels = [
+      "Jan",
+      "Fév",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juil",
+      "Août",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Déc",
+    ]
+    const monthPadRow = (start, end) =>
+      hFlex(
+        range(start, end).map(m =>
+          key({ label: monthLabels[m], value: m + 1, fragmentId: "month" })
+        )
+      )
+
+    const monthsPad = vPile([monthPadRow(0, 6), monthPadRow(6, 12)])
+
+    const keysRow = (fragmentId, keys) =>
+      hFlex(keys.map(value => key({ value, fragmentId })))
+
+    return seq([
+      vPile({ gap: 12 }, [
+        align(
+          { h: "center" },
+          hPile({ align: "bottom" }, [
+            display,
+            displayIf(
+              () => !isInternalValueValid(),
+              size.reaksWrapper(
+                { h: 32 },
+                align({ v: "center" }, icon({ icon: alertIcon, color: "red" }))
+              )
+            ),
+            iconButton({ icon: todayIcon, size: { w: 32, h: 32 } }, setToNow),
+          ])
+        ),
         vPile(
+          { gap: 8 },
           compact([
-            label("Année"),
             hFlex([
               [
                 "fixed",
-                iconButton({ icon: arrowBack, size: { h: 48 } }, () =>
+                iconButton({ icon: arrowBack, size: { h: keyHeight } }, () =>
                   refYear(refYear() - 1)
                 ),
               ],
@@ -310,43 +436,46 @@ module.exports = ({
               ]),
               [
                 "fixed",
-                iconButton({ icon: arrowForward, size: { h: 48 } }, () =>
+                iconButton({ icon: arrowForward, size: { h: keyHeight } }, () =>
                   refYear(refYear() + 1)
                 ),
               ],
             ]),
-            precisionAtLeast("month") && label("Mois"),
-            precisionAtLeast("month") && keysRow("month", range(1, 13)),
-            precisionAtLeast("week") && label("Semaine"),
-            precisionAtLeast("week") && keysRow("week", range(1, 11)),
-            precisionAtLeast("week") && keysRow("week", range(11, 21)),
-            precisionAtLeast("week") && keysRow("week", range(21, 32)),
-            precisionAtLeast("week") && keysRow("week", range(32, 43)),
-            precisionAtLeast("week") && keysRow("week", range(43, 54)),
-            precisionAtLeast("day") && label("Jour"),
-            precisionAtLeast("day") && keysRow("day", range(1, 11)),
-            precisionAtLeast("day") && keysRow("day", range(11, 21)),
-            precisionAtLeast("day") && keysRow("day", range(21, 32)),
-            precisionAtLeast("hour") && label("Heure"),
+            precisionAtLeast("month") && monthsPad,
+            precisionAtLeast("week") &&
+              vPile([
+                label("Semaine"),
+                keysRow("week", range(1, 11)),
+                keysRow("week", range(11, 21)),
+                keysRow("week", range(21, 32)),
+                keysRow("week", range(32, 43)),
+                keysRow("week", range(43, 54)),
+              ]),
+            precisionAtLeast("day") && currentDayKeysCalendar,
             precisionAtLeast("hour") &&
-              keysRow(
-                "hour",
-                range(
-                  hourMin,
-                  Math.floor(hourMin + (hourMax - hourMin) / 2) + 1
-                )
-              ),
-            precisionAtLeast("hour") &&
-              keysRow(
-                "hour",
-                range(
-                  Math.floor(hourMin + (hourMax - hourMin) / 2) + 1,
-                  hourMax + 1
-                )
-              ),
-            precisionAtLeast("minute") && label("Minute"),
+              vPile([
+                label("Heure"),
+                keysRow(
+                  "hour",
+                  range(
+                    hourMin,
+                    Math.floor(hourMin + (hourMax - hourMin) / 2) + 1
+                  )
+                ),
+
+                keysRow(
+                  "hour",
+                  range(
+                    Math.floor(hourMin + (hourMax - hourMin) / 2) + 1,
+                    hourMax + 1
+                  )
+                ),
+              ]),
             precisionAtLeast("minute") &&
-              keysRow("minute", range(0, 60, minuteInterval)),
+              vPile([
+                label("Minute"),
+                keysRow("minute", range(0, 60, minuteInterval)),
+              ]),
           ])
         ),
       ]),

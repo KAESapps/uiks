@@ -18,7 +18,7 @@ const size = require("reaks/size")
 const colors = require("material-colors")
 const icon = require("./icon").reaks
 const iconButton = require("uiks/reaks-material/iconButton").reaks
-const clearIconDef = require("uiks/reaks-material/icons/content/clear")
+const clearIconDef = require("uiks/reaks-material/icons/content/cancel")
 const backspaceIcon = require("./icons/content/backspace")
 const { observable } = require("kobs")
 const { observe } = require("kobs")
@@ -215,7 +215,7 @@ module.exports = (opts = {}) => {
               padKey(
                 icon({
                   icon: backspaceIcon,
-                  color: colors.grey[800],
+                  color: colors.grey[600],
                 }),
                 eraseLastChar
               ),
