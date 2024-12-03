@@ -34,7 +34,10 @@ module.exports = ({ title, listValue, itemLabel, actions, fullscreen }) =>
               ],
               observableAsValue(
                 "search",
-                textInput({ placeholder: "Recherche", autoFocus: true })
+                textInput({
+                  placeholder: "Recherche",
+                  autoFocus: process.env.PLATFORM !== "android",
+                })
               ),
             ]),
           ],

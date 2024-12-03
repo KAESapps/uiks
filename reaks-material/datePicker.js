@@ -29,6 +29,7 @@ const innerMargin = require("../reaks-layout/innerMargin")
 const clickable = require("../reaks/clickable").reaksMixin
 const label = require("../reaks/label").reaks
 const displayIf = require("../reaks/displayIf").reaks
+const switchBoolean = require("../reaks/switchBoolean").reaks
 const align = require("../reaks-layout/align")
 const size = require("../reaks/size")
 const colors = require("material-colors")
@@ -68,18 +69,17 @@ const padKeyStyle = (isActive, ctx) =>
           }
         : {
             color: colors.grey[800],
-            backgroundColor: colors.grey[100],
+            backgroundColor: colors.grey[200],
           }
     ),
   ])
 
-const dayKeyStyle = ({ isActive, inCurrentMonth }, ctx) =>
+const dayKeyStyle = ({ isActive, inCurrentMonth, isDisabled, nonOuvre }, ctx) =>
   seq([
     align({ h: "center", v: "center" }),
     size.reaksMixin({ h: keyHeight }),
     innerMargin({ h: 8 }),
     style({
-      fontWeight: 500,
       fontSize: 18,
     }),
     style(() =>
@@ -87,11 +87,23 @@ const dayKeyStyle = ({ isActive, inCurrentMonth }, ctx) =>
         ? {
             color: ctx.colors.textOnPrimary,
             backgroundColor: ctx.colors.primary,
+            fontWeight: 500,
           }
-        : {
-            color: inCurrentMonth ? colors.grey[800] : colors.grey[600],
-            backgroundColor: inCurrentMonth && colors.grey[100],
+        : inCurrentMonth && !nonOuvre
+        ? isDisabled && isDisabled()
+          ? {
+              color: colors.grey[400],
+            }
+          : {
+              color: colors.grey[800],
+              backgroundColor: colors.grey[200],
+              fontWeight: 500,
+            }
+        : isDisabled && isDisabled()
+        ? {
+            color: colors.grey[400],
           }
+        : { color: colors.grey[600], backgroundColor: colors.grey[100] }
     ),
   ])
 
@@ -118,6 +130,7 @@ module.exports = ({
   hourMin = 0,
   hourMax = 23,
   minuteInterval = 5,
+  isDayDisabled: isDayDisabledCtx,
 } = {}) => {
   const precisionAtLeast = datePrecisionAtLeast(precision)
 
@@ -201,6 +214,7 @@ module.exports = ({
       const val = internalValue()
       return val === null || isValidISODate(internalValuetoISOString(val))
     }
+    const isDayDisabled = isDayDisabledCtx && isDayDisabledCtx(ctx)
 
     const displayFragment = fragmentId => {
       return integerInput({
@@ -292,11 +306,13 @@ module.exports = ({
       onUserInput()
     }
 
-    const dayKey = (date, { inCurrentMonth }) => {
+    const dayKey = (date, { inCurrentMonth, nonOuvre }) => {
       const dayValue = pick(dateAsInternalValue(date), ["day", "month", "year"])
+      const dayIso = internalValuetoISOString(dayValue)
+      const isDisabled = isDayDisabled ? () => isDayDisabled(dayIso) : false
       return seq([
         label(toString(dayValue.day)),
-        clickable(() => setDay(dayValue)),
+        switchBoolean(isDisabled, { falsy: clickable(() => setDay(dayValue)) }),
         dayKeyStyle(
           {
             isActive: () =>
@@ -304,7 +320,9 @@ module.exports = ({
                 pick(internalValue(), ["day", "month", "year"]),
                 dayValue
               ),
+            isDisabled,
             inCurrentMonth,
+            nonOuvre,
           },
           ctx
         ),
@@ -358,6 +376,9 @@ module.exports = ({
                   const dayAsDate = addDays(firstDayKeyAsDate, w * 7 + d)
                   return dayKey(dayAsDate, {
                     inCurrentMonth: dayAsDate.getMonth() === currentMonthIndex,
+                    // NB: non ouvré, samedi/dimanche pour le moment,
+                    // mais pourrait être issu d'une liste dynamique
+                    nonOuvre: d > 4,
                   })
                 })
               )
