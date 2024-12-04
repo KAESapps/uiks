@@ -2,9 +2,9 @@ const wrapper = require("./ctx-level-helpers/wrapper")
 const style = require("reaks/style")
 
 module.exports = wrapper(style, {
-  mapArgs: (activeStyle) => {
+  mapArgs: activeStyle => {
     return [
-      (ctx) => {
+      ctx => {
         if (!activeStyle) {
           activeStyle = {
             backgroundColor: ctx.colors.highlight || ctx.colors.primary,

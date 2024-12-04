@@ -2,11 +2,13 @@ const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
 const style = require("reaks/style")
 const innerMargin = require("../reaks-layout/innerMargin")
+const border = require("../reaks-layout/border")
 const colors = require("material-colors")
 
 module.exports = ctxComponent(content => {
   return seq([
     innerMargin(10),
+    border({ color: "#DDD" }),
     style({
       backgroundColor: colors.white,
       borderRadius: 2,
