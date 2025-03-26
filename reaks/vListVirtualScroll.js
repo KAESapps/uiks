@@ -334,7 +334,7 @@ module.exports = ({
         setScrollTop(ev.target.scrollTop)
         if (programmaticScroll) {
           programmaticScroll = false
-        } else if (getDefaultVisibleItem) {
+        } else if (getDefaultVisibleItem && disableEnsureItemVisible) {
           getDefaultVisibleItem() != null && disableEnsureItemVisible()
         }
         onScrollCb && onScrollCb(ev)
