@@ -51,6 +51,7 @@ const dialogPopupLayer = ({
   actions = [],
   maxWidth = 768,
   minHeight,
+  height, // permet d'imposer la hauteur aux enfants, donc permet le mode flex
   modal,
   onClose: onCloseCtx,
 }) => {
@@ -59,7 +60,8 @@ const dialogPopupLayer = ({
       style.mixin({
         width: "100%",
         maxWidth,
-        maxHeight: "100%",
+        height,
+        maxHeight: height == null ? "100%" : null,
         minHeight,
         boxSizing: "border-box",
         backgroundColor: "white",
