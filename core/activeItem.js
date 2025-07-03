@@ -17,7 +17,7 @@ module.exports = (cbGenerator, nextPage) => ctx => {
   }
   const selfOpenItem = (arg, opts) => {
     const res = cb(arg)
-    if (res.then) {
+    if (res && res.then) {
       return res
         .then(ret => activeItem(ret, opts))
         .catch(err => {
