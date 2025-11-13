@@ -1,4 +1,6 @@
+const assign = require("lodash/assign")
 const defaults = require("lodash/defaults")
+const get = require("lodash/get")
 const isString = require("lodash/isString")
 const label = require("../reaks/label").reaks
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
@@ -22,21 +24,18 @@ const hoverable = require("../reaks/hoverable").reaksMixin
 const color = require("color")
 
 module.exports = ctxComponent(
-  (arg, action, opts) => {
-    const { text, icon: iconDef } = isString(arg) ? { text: arg } : arg
-    let { textColor, backgroundColor, height, flat, outline } = defaults(
-      {},
-      opts,
-      {
-        textColor: colors.black,
-        backgroundColor: colors.grey[300],
-        height: 40,
-        flat: false,
-        outline: false,
-      }
-    )
-
-    if (outline || flat) backgroundColor = null
+  (arg, action, legacyOpts) => {
+    // opts est déprécié, les options peuvent être passées dans arg
+    const {
+      text,
+      icon: iconDef,
+      textColor = colors.black,
+      backgroundColor = colors.grey[300],
+      height = 40,
+      flat = false,
+      outline = false,
+      iconPosition = "left",
+    } = assign({}, legacyOpts, isString(arg) ? { text: arg } : arg)
 
     const state = observable("idle")
     const visibleIf = (visibleState, cmp) =>
@@ -55,7 +54,12 @@ module.exports = ctxComponent(
       iconCmp && textCmp
         ? align(
             { h: "center" },
-            hPile({ gap: 6, align: "center" }, [["fixed", iconCmp], textCmp])
+            hPile(
+              { gap: 6, align: "center" },
+              iconPosition === "right"
+                ? [textCmp, ["fixed", iconCmp]]
+                : [["fixed", iconCmp], textCmp]
+            )
           )
         : iconCmp || textCmp
 
@@ -140,14 +144,20 @@ module.exports = ctxComponent(
       }),
     ])
   },
-  function (text, action, opts) {
+  function (arg, action, legacyOpts) {
+    const opts = assign({}, legacyOpts, isString(arg) ? { text: arg } : arg)
     return [
-      text,
-      action,
       defaults({}, opts, {
-        textColor: ctx => ctx.colors.textOnSecondary,
-        backgroundColor: ctx => ctx.colors.secondary,
+        textColor: ctx =>
+          get(opts, "flat") || get(opts, "outline")
+            ? ctx.colors.secondary
+            : ctx.colors.textOnSecondary,
+        backgroundColor:
+          get(opts, "flat") || get(opts, "outline")
+            ? "white"
+            : ctx => ctx.colors.secondary,
       }),
+      action,
     ]
   }
 )
