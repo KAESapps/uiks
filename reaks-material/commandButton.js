@@ -158,7 +158,7 @@ module.exports = ctxComponent(
             : ctx.colors.textOnSecondary,
         backgroundColor:
           get(opts, "flat") || get(opts, "outline")
-            ? "white"
+            ? null
             : ctx => ctx.colors.secondary,
       }),
       action,
