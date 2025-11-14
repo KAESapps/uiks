@@ -1,7 +1,7 @@
 const assign = require("lodash/assign")
 const defaults = require("lodash/defaults")
 const get = require("lodash/get")
-const isString = require("lodash/isString")
+const isPlainObject = require("lodash/isPlainObject")
 const label = require("../reaks/label").reaks
 const ctxComponent = require("../reaks/ctx-level-helpers/component")
 const seq = require("reaks/seq")
@@ -35,7 +35,7 @@ module.exports = ctxComponent(
       flat = false,
       outline = false,
       iconPosition = "left",
-    } = assign({}, legacyOpts, isString(arg) ? { text: arg } : arg)
+    } = assign({}, legacyOpts, isPlainObject(arg) ? arg : { text: arg })
 
     const state = observable("idle")
     const visibleIf = (visibleState, cmp) =>
@@ -145,7 +145,11 @@ module.exports = ctxComponent(
     ])
   },
   function (arg, action, legacyOpts) {
-    const opts = assign({}, legacyOpts, isString(arg) ? { text: arg } : arg)
+    const opts = assign(
+      {},
+      legacyOpts,
+      isPlainObject(arg) ? arg : { text: arg }
+    )
     return [
       defaults({}, opts, {
         textColor: ctx =>
