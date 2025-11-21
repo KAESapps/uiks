@@ -1,5 +1,6 @@
 const { observable } = require("kobs")
 const create = require("lodash/create")
+const isFunction = require("lodash/isFunction")
 const isString = require("lodash/isString")
 const upperFirst = require("lodash/upperFirst")
 
@@ -14,7 +15,10 @@ module.exports = (opts, view) => ctx => {
     }
   }
   const { prop = "activeItem", defaultValue = null } = opts
-  const activeItem = observable(defaultValue, prop)
+  const activeItem = observable(
+    isFunction(defaultValue) ? defaultValue(ctx) : defaultValue,
+    prop
+  )
   return view(
     create(ctx, { [prop]: activeItem, [`set${upperFirst(prop)}`]: activeItem })
   )
