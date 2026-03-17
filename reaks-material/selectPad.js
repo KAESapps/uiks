@@ -6,6 +6,7 @@ const without = require("lodash/without")
 const concat = require("lodash/concat")
 const assignCtx = require("uiks/core/assign")
 const group = require("uiks/reaks/group")
+const staticHFlex = require("uiks/reaks/hFlex")
 const mix = require("uiks/reaks/mix")
 const style = require("uiks/reaks/style")
 const repeat = require("uiks/reaks/repeat")
@@ -15,9 +16,12 @@ const onTouchStart = require("../reaks/onTouchStart")
 const label = require("../reaks/label")
 const align = require("../reaks/align")
 const size = require("uiks/reaks/size")
+const icon = require("uiks/reaks-material/icon")
 const colors = require("material-colors")
 const propQuery = require("../reactivedb/propQuery")
 const valueLoadingAs = require("../reactivedb/valueLoadingAs")
+const checkedIcon = require("./icons/toggle/checkbox")
+const uncheckedIcon = require("./icons/toggle/checkboxOutline")
 
 //recherche si l'item (cle de type texte du enum) est sélectionné, la sélection pouvant être un string, un number (cas d'une prop de type integer que l'on transfrome à la volée en type enum) ou un array de string ou de integer
 const isItemSelected = (item, selection) => {
@@ -64,9 +68,12 @@ module.exports = arg => {
     itemEnabled,
     itemHeight = 36,
     multiple = false,
+    withCheckbox = true, // seulement si multiple = true
     horizontal = false,
     flex,
   } = isFunction(arg) ? { items: arg } : arg
+
+  const padKeyText = label({ noEllipsis: true }, itemLabel)
 
   const padKey = mix(
     [
@@ -121,7 +128,24 @@ module.exports = arg => {
         ),
       }),
     ],
-    align({ h: "center", v: "center" }, label({ noEllipsis: true }, itemLabel))
+    withCheckbox && multiple
+      ? staticHFlex({ align: "center", gap: 8 }, [
+          [
+            "fixed",
+            switchBoolean(
+              ctx => () => isItemSelected(ctx.value, ctx.selectedValue()),
+              {
+                truthy: icon({
+                  icon: checkedIcon,
+                  color: ctx => ctx.colors.textOnPrimary,
+                }),
+                falsy: icon({ icon: uncheckedIcon }),
+              }
+            ),
+          ],
+          padKeyText,
+        ])
+      : align({ h: "center", v: "center" }, padKeyText)
   )
 
   return assignCtx(
