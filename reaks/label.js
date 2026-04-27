@@ -26,7 +26,7 @@ module.exports = component(
 
     const styleArg = {
       overflow: "hidden",
-      whiteSpace: opt.wrap ? null : "nowrap",
+      whiteSpace: opt.wrap ? "pre-wrap" : "nowrap",
       textOverflow: opt.noEllipsis ? null : "ellipsis",
     }
 
