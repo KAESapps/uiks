@@ -12,7 +12,9 @@ const border = require("uiks/reaks/border")
 
 module.exports = args => {
   const {
-    title,
+    // pour le titre, utiliser soit "title", soit "titleText"
+    title, // accepte titre en string ou composant
+    titleText, // accepte titre en string ou ctx-fonction
     content,
     action,
     colors = ctx => ({
@@ -43,7 +45,9 @@ module.exports = args => {
             style(
               { height: 32 },
               style(
-                colors,
+                isFunction(colors)
+                  ? ctx => ({ backgroundColor: colors(ctx).backgroundColor })
+                  : { backgroundColor: colors.backgroundColor },
                 border(
                   { b: { color: "#999" } },
                   innerMargin(
@@ -51,8 +55,14 @@ module.exports = args => {
                     hFlex([
                       style(
                         { fontWeight: 500 },
-                        isString(title)
-                          ? align({ v: "center" }, label(title))
+                        titleText || isString(title)
+                          ? align(
+                              { v: "center" },
+                              style(
+                                ctx => ({ color: ctx.fgColor }),
+                                label(titleText || title)
+                              )
+                            )
                           : title
                       ),
                       ["fixed", action && align({ h: "right" }, action)],

@@ -38,7 +38,7 @@ module.exports = ctxCmp(
   function (arg, action) {
     return [
       defaults({}, arg, {
-        color: ctx => ctx.colors.iconDefault,
+        color: ctx => ctx.fgColor || ctx.colors.iconDefault,
       }),
       action,
     ]

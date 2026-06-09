@@ -274,18 +274,13 @@ module.exports = function (opts, pages) {
 
   pages = castArray(pages)
 
-  return ctxAssign(
-    {
-      fgColor: topBarTextColor,
-    },
-    navigatorCore({
-      pages,
-      renderer: renderer({
-        firstPanelRootAction,
-        topBarBackgroundColor,
-        topBarTextColor,
-      }),
-      lastPageIndex: opts.lastPageIndex,
-    })
-  )
+  return navigatorCore({
+    pages,
+    renderer: renderer({
+      firstPanelRootAction,
+      topBarBackgroundColor,
+      topBarTextColor,
+    }),
+    lastPageIndex: opts.lastPageIndex,
+  })
 }
