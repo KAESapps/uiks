@@ -2,7 +2,7 @@ const isArray = require("lodash/isArray")
 const displayIf = require("../reaks/displayIf")
 const normalizeActionsArg = require("../core/actions/normalizeArg")
 const vPile = require("../reaks/vPile")
-const button = require("./button")
+const commandButton = require("./commandButton")
 const dialog = require("./dialog")
 const style = require("../reaks/style")
 const multilineText = require("../reaks/multilineText")
@@ -19,9 +19,9 @@ module.exports = arg => {
       content: vPile(
         { gap: 18 },
         normalizeActionsArg(actions).map(
-          ([{ label: labelArg, desc, displayIf: cond }, action]) => {
+          ([{ label: text, icon, desc, displayIf: cond }, action]) => {
             action = action && action(rootCtx)
-            const btn = button(labelArg, ctx => () => {
+            const btn = commandButton({ icon, text }, ctx => () => {
               // TODO: attendre le retour d'un promise pour fermer le menu ?
               ctx.closePopup()
               action()
