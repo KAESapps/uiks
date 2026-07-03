@@ -51,7 +51,7 @@ module.exports = ctxComponent(
       }),
     ])
   },
-  function(arg, action) {
+  function (arg, action) {
     if (!isPlainObject(arg)) {
       arg = { label: arg }
     }
@@ -59,7 +59,7 @@ module.exports = ctxComponent(
     return [
       defaults({}, arg, {
         color: ctx =>
-          primary ? ctx.colors.secondary : ctx.colors.fadedDarkText,
+          primary ? ctx.colors.darkText : ctx.colors.fadedDarkText,
       }),
       action,
     ]
