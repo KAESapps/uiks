@@ -65,6 +65,7 @@ module.exports = arg => {
   const {
     items,
     itemLabel = valueLoadingAs("", propQuery("label")),
+    itemContent, // pour un contenu de touche plus riche que du texte. Si défini, itemLabel sera ignoré
     itemEnabled,
     itemHeight = 36,
     multiple = false,
@@ -73,79 +74,85 @@ module.exports = arg => {
     flex,
   } = isFunction(arg) ? { items: arg } : arg
 
-  const padKeyText = label({ noEllipsis: true }, itemLabel)
+  const padKeyContent = itemContent
+    ? itemContent
+    : label({ noEllipsis: true }, itemLabel)
 
-  const padKey = mix(
-    [
-      size.mixin({ h: itemHeight }),
-      innerMargin.mixin({ h: 8 }),
-      switchBoolean(itemEnabled || true, {
-        truthy: group([
-          ctx =>
-            onTouchStart(
-              multiple
-                ? () => {
-                    let selectedValues = ctx.selectedValue() || []
-                    if (includes(selectedValues, ctx.value)) {
-                      selectedValues = without(selectedValues, ctx.value)
-                    } else {
-                      selectedValues = concat(selectedValues, [ctx.value])
+  const padKey = assignCtx(
+    {
+      isItemSelected: ctx => () =>
+        isItemSelected(ctx.value, ctx.selectedValue()),
+      isItemEnabled: itemEnabled || true,
+    },
+    mix(
+      [
+        size.mixin({ h: itemHeight }),
+        innerMargin.mixin({ h: 8 }),
+        switchBoolean(ctx => ctx.isItemEnabled, {
+          truthy: group([
+            ctx =>
+              onTouchStart(
+                multiple
+                  ? () => {
+                      let selectedValues = ctx.selectedValue() || []
+                      if (includes(selectedValues, ctx.value)) {
+                        selectedValues = without(selectedValues, ctx.value)
+                      } else {
+                        selectedValues = concat(selectedValues, [ctx.value])
+                      }
+                      // intersection with items so that no old items stays in selected array
+                      ctx.setValue(intersection(ctx.items(), selectedValues))
                     }
-                    // intersection with items so that no old items stays in selected array
-                    ctx.setValue(intersection(ctx.items(), selectedValues))
-                  }
-                : () => {
-                    if (ctx.selectedValue() !== ctx.value) {
-                      ctx.setValue(ctx.value)
-                    } else {
-                      ctx.setValue(null)
+                  : () => {
+                      if (ctx.selectedValue() !== ctx.value) {
+                        ctx.setValue(ctx.value)
+                      } else {
+                        ctx.setValue(null)
+                      }
                     }
-                  }
+              ),
+            style.mixin(
+              ctx => () =>
+                ctx.isItemSelected()
+                  ? {
+                      backgroundColor: ctx.colors.primary,
+                      color: ctx.colors.textOnPrimary,
+                    }
+                  : {
+                      backgroundColor: colors.grey[100],
+                      color: colors.grey[800],
+                    }
             ),
-          style.mixin(
+          ]),
+          falsy: style.mixin(
             ctx => () =>
-              isItemSelected(ctx.value, ctx.selectedValue())
+              ctx.isItemSelected()
                 ? {
-                    backgroundColor: ctx.colors.primary,
+                    backgroundColor: ctx.colors.lightPrimary,
                     color: ctx.colors.textOnPrimary,
                   }
                 : {
-                    backgroundColor: colors.grey[100],
-                    color: colors.grey[800],
+                    color: colors.grey[400],
                   }
           ),
-        ]),
-        falsy: style.mixin(
-          ctx => () =>
-            isItemSelected(ctx.value, ctx.selectedValue())
-              ? {
-                  backgroundColor: ctx.colors.lightPrimary,
-                  color: ctx.colors.textOnPrimary,
-                }
-              : {
-                  color: colors.grey[400],
-                }
-        ),
-      }),
-    ],
-    withCheckbox && multiple
-      ? staticHFlex({ align: "center", gap: 8 }, [
-          [
-            "fixed",
-            switchBoolean(
-              ctx => () => isItemSelected(ctx.value, ctx.selectedValue()),
-              {
+        }),
+      ],
+      withCheckbox && multiple
+        ? staticHFlex({ align: "center", gap: 8 }, [
+            [
+              "fixed",
+              switchBoolean(ctx => ctx.isItemSelected, {
                 truthy: icon({
                   icon: checkedIcon,
                   color: ctx => ctx.colors.textOnPrimary,
                 }),
                 falsy: icon({ icon: uncheckedIcon }),
-              }
-            ),
-          ],
-          padKeyText,
-        ])
-      : align({ h: "center", v: "center" }, padKeyText)
+              }),
+            ],
+            padKeyContent,
+          ])
+        : align({ h: "center", v: "center" }, padKeyContent)
+    )
   )
 
   return assignCtx(
