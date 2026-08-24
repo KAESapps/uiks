@@ -55,7 +55,10 @@ const createCell = itemArg => {
     cell = backgroundColor(opts.bgColor, cell)
   }
   cell = [
-    { weight: opts.growable ? 1 : null, shrinkable: false },
+    {
+      weight: opts.growable ? (opts.weight == null ? 1 : opts.weight) : null,
+      shrinkable: false,
+    },
     size({ w: opts.width || 0 }, cell),
   ]
 
