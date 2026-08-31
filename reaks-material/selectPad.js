@@ -4,19 +4,19 @@ const includes = require("lodash/includes")
 const intersection = require("lodash/intersection")
 const without = require("lodash/without")
 const concat = require("lodash/concat")
-const assignCtx = require("uiks/core/assign")
-const group = require("uiks/reaks/group")
-const staticHFlex = require("uiks/reaks/hFlex")
-const mix = require("uiks/reaks/mix")
-const style = require("uiks/reaks/style")
-const repeat = require("uiks/reaks/repeat")
-const switchBoolean = require("uiks/reaks/switchBoolean")
+const assignCtx = require("../core/assign")
+const group = require("../reaks/group")
+const staticHFlex = require("../reaks/hFlex")
+const mix = require("../reaks/mix")
+const style = require("../reaks/style")
+const repeat = require("../reaks/repeat")
+const switchBoolean = require("../reaks/switchBoolean")
+const clickable = require("../reaks/clickable")
 const innerMargin = require("../reaks/innerMargin")
-const onTouchStart = require("../reaks/onTouchStart")
 const label = require("../reaks/label")
 const align = require("../reaks/align")
-const size = require("uiks/reaks/size")
-const icon = require("uiks/reaks-material/icon")
+const size = require("../reaks/size")
+const icon = require("../reaks-material/icon")
 const colors = require("material-colors")
 const propQuery = require("../reactivedb/propQuery")
 const valueLoadingAs = require("../reactivedb/valueLoadingAs")
@@ -90,27 +90,26 @@ module.exports = arg => {
         innerMargin.mixin({ h: 8 }),
         switchBoolean(ctx => ctx.isItemEnabled, {
           truthy: group([
-            ctx =>
-              onTouchStart(
-                multiple
-                  ? () => {
-                      let selectedValues = ctx.selectedValue() || []
-                      if (includes(selectedValues, ctx.value)) {
-                        selectedValues = without(selectedValues, ctx.value)
-                      } else {
-                        selectedValues = concat(selectedValues, [ctx.value])
-                      }
-                      // intersection with items so that no old items stays in selected array
-                      ctx.setValue(intersection(ctx.items(), selectedValues))
+            clickable.mixin(
+              multiple
+                ? ctx => () => {
+                    let selectedValues = ctx.selectedValue() || []
+                    if (includes(selectedValues, ctx.value)) {
+                      selectedValues = without(selectedValues, ctx.value)
+                    } else {
+                      selectedValues = concat(selectedValues, [ctx.value])
                     }
-                  : () => {
-                      if (ctx.selectedValue() !== ctx.value) {
-                        ctx.setValue(ctx.value)
-                      } else {
-                        ctx.setValue(null)
-                      }
+                    // intersection with items so that no old items stays in selected array
+                    ctx.setValue(intersection(ctx.items(), selectedValues))
+                  }
+                : ctx => () => {
+                    if (ctx.selectedValue() !== ctx.value) {
+                      ctx.setValue(ctx.value)
+                    } else {
+                      ctx.setValue(null)
                     }
-              ),
+                  }
+            ),
             style.mixin(
               ctx => () =>
                 ctx.isItemSelected()
