@@ -68,21 +68,27 @@ const navigatorCore = args => ctx => {
     const page = getPage.cache.get(index)
     if (!page) return
 
+    // onClose (option de next) n'est appelé que si la page était affichée
+    const wasDisplayed = index <= lastPageIndex()
+    const afterClose = () => wasDisplayed && page.onClose && page.onClose()
+
     if (page.canExit) {
       return page.canExit().then(res => {
         if (res !== true) return
         pages.pop()
         lastPageIndex(index - 1)
+        afterClose()
       })
     }
     // pages.splice(index)
     lastPageIndex(index - 1)
+    afterClose()
   }
   const back = () => closePage(lastPageIndex())
 
   const next =
     fromIndex =>
-    (pageCreator, ctx, { replace = false, panelMinWidth } = {}) => {
+    (pageCreator, ctx, { replace = false, panelMinWidth, onClose } = {}) => {
       let pageIndex = replace ? fromIndex : fromIndex + 1
       if (pageCreator == null) {
         return closePage(pageIndex)
@@ -91,6 +97,9 @@ const navigatorCore = args => ctx => {
       const page = createPage(pageIndex, ctx, pageCreator)
       if (panelMinWidth) {
         page.minWidthAsChildPanel = panelMinWidth
+      }
+      if (onClose) {
+        page.onClose = onClose
       }
       // màj du cache
       getPage.cache.set(pageIndex, page)
