@@ -45,11 +45,11 @@ module.exports = ctxCmp(
         : align({ h: "center", v: "center" }, checkbox)
     )
   },
-  function(arg) {
+  function (arg) {
     return [
       defaults({}, arg, {
         uncheckedIconColor: ctx => ctx.colors.primary,
-        checkedIconColor: ctx => ctx.colors.secondary,
+        checkedIconColor: ctx => ctx.colors.primary,
         value: ctx => ctx.value,
         setValue: ctx => ctx.setValue,
       }),
