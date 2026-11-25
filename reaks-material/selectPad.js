@@ -72,6 +72,8 @@ module.exports = arg => {
     withCheckbox = true, // seulement si multiple = true
     horizontal = false,
     flex,
+    // largeur mini des touches : en horizontal avec flex, les touches se partagent la largeur sans descendre sous ce minimum, et la liste défile au-delà
+    itemMinWidth,
   } = isFunction(arg) ? { items: arg } : arg
 
   const padKeyContent = itemContent
@@ -87,6 +89,7 @@ module.exports = arg => {
     mix(
       [
         size.mixin({ h: itemHeight }),
+        itemMinWidth && style.mixin({ minWidth: itemMinWidth }),
         innerMargin.mixin({ h: 8 }),
         switchBoolean(ctx => ctx.isItemEnabled, {
           truthy: group([
@@ -154,11 +157,15 @@ module.exports = arg => {
     )
   )
 
+  const list = (horizontal ? (flex ? hFlex : hList) : flex ? vFlex : vList)(
+    ctx => ctx.items,
+    padKey
+  )
   return assignCtx(
     { selectedValue: ctx => ctx.value, items },
-    (horizontal ? (flex ? hFlex : hList) : flex ? vFlex : vList)(
-      ctx => ctx.items,
-      padKey
-    )
+    horizontal && itemMinWidth
+      ? // après la liste, pour surcharger le overflow: hidden posé par asFlexParent
+        group([list, style.mixin({ overflowX: "auto", overflowY: "hidden" })])
+      : list
   )
 }
