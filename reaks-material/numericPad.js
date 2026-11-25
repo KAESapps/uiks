@@ -60,6 +60,8 @@ module.exports = (opts = {}) => {
     validateValue,
     toExternalValue: toExternalValueArg,
     fromExternalValue: fromExternalValueArg,
+    // touches arrondies séparées par une marge, qui ne réagit pas au toucher (false : touches jointives, ancien affichage)
+    roundedKeys = true,
   } = opts
 
   const fromExternalValue = fromExternalValueArg || defaultFromExternalValue
@@ -73,6 +75,38 @@ module.exports = (opts = {}) => {
       ? val => customDisplay(val)(create(ctx, { defaultDisplay }))
       : defaultDisplay
     const { setValue, value, activeRow } = ctx
+    const feedbackColor = (ctx.colors && ctx.colors.primary) || colors.blue[500]
+    const keyBackgroundColor = roundedKeys ? colors.grey[200] : colors.grey[100]
+    // en mode arrondi, la marge est prise sur la taille de la touche : l'encombrement du pavé ne change pas
+    const KEY_GAP = 3
+    const keySize = (sizeArg) =>
+      roundedKeys
+        ? {
+            h: sizeArg.h != null ? sizeArg.h - 2 * KEY_GAP : sizeArg.h,
+            w: sizeArg.w != null ? sizeArg.w - 2 * KEY_GAP : sizeArg.w,
+          }
+        : sizeArg
+    const roundedKeyStyle = (sizeArg) =>
+      roundedKeys
+        ? style({
+            margin: KEY_GAP,
+            borderRadius: (sizeArg.h - 2 * KEY_GAP) / 2,
+          })
+        : null
+    // retour visuel à l'appui : la touche prend la couleur principale pendant 150 ms
+    const withFeedback = (action) => (ev) => {
+      const el = ev.currentTarget
+      if (el) {
+        el.style.backgroundColor = feedbackColor
+        el.style.color = "white"
+        clearTimeout(el.__feedbackTimeout)
+        el.__feedbackTimeout = setTimeout(() => {
+          el.style.backgroundColor = keyBackgroundColor
+          el.style.color = colors.grey[800]
+        }, 150)
+      }
+      action(ev)
+    }
     const $stringValue = observable("")
     //indique que le widget vient d'être initialisé :
     // le premier charactère saisi remplace toute la valeur au lieu d'être ajouté (le appendChar fonctionne en mode replace)
@@ -159,23 +193,26 @@ module.exports = (opts = {}) => {
     const padKey = (content, action, { size: sizeArg = { h: 48 } } = {}) => {
       return seq([
         content,
-        onTouchStart(action),
+        onTouchStart(withFeedback(action)),
         align({ h: "center", v: "center" }),
-        size(sizeArg),
+        size(keySize(sizeArg)),
         style({
           color: colors.grey[800],
-          backgroundColor: colors.grey[100],
+          backgroundColor: keyBackgroundColor,
           fontWeight: 500,
           fontSize: 24,
         }),
+        roundedKeyStyle(sizeArg),
       ])
     }
     const emptyKey = seq([
-      size({ h: 48 }),
+      size(keySize({ h: 48 })),
       style({
         color: colors.grey[800],
-        backgroundColor: colors.grey[100],
+        // en mode arrondi, emplacement vide sans fond
+        backgroundColor: roundedKeys ? "transparent" : colors.grey[100],
       }),
+      roundedKeyStyle({ h: 48 }),
     ])
 
     const charPadKey = n => padKey(label(toString(n)), () => appendChar(n))
